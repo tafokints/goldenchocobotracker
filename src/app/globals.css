@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Background texture from https://www.myfreetextures.com/background-texture-parchment-grungy-paper/ */
+body {
+  background-color: #201A15;
+  color: #FFF8F0;
+  background-image: url('/parchment-background.jpg');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+} 
