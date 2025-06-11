@@ -1,17 +1,13 @@
-'use client';
-
-import React, { useState } from "react";
-import chocoboCards from "../lib/chocobo-data.json";
+import { Redis } from '@upstash/redis';
 import { ChocoboCard } from "../lib/types";
 import Link from "next/link";
 import AffiliateLinks from "../components/AffiliateLinks";
-import { useKonamiCode } from "@/hooks/useKonamiCode";
+import ReportButton from '@/components/ReportButton';
 
-export default function Home() {
-  const cards: ChocoboCard[] = chocoboCards;
-  const [showSubmit, setShowSubmit] = useState(false);
+const redis = Redis.fromEnv();
 
-  useKonamiCode(() => setShowSubmit(true));
+export default async function Home() {
+  const cards: ChocoboCard[] = (await redis.get('chocobo-cards')) || [];
 
   const foundCards = cards.filter((card) => card.found);
   const foundCount = foundCards.length;
@@ -28,11 +24,7 @@ export default function Home() {
         <h1 className="text-2xl md:text-4xl font-bold text-chocobo-gold mb-4 lg:mb-0">
           Golden Chocobo Tracker
         </h1>
-        {showSubmit && (
-          <Link href="/submit" className="bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded">
-            Report a Find
-          </Link>
-        )}
+        <ReportButton />
       </div>
 
       <div className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark bg-opacity-75 p-4 rounded-lg">
