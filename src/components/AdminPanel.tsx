@@ -54,7 +54,7 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
       return;
     }
 
-    // Accept absolute URLs and relative URLs starting with '/'
+    // Accept absolute URLs and relative URLs starting with '/' (v2)
     const isValidUrl = (() => {
       if (imageUrl.startsWith('/')) return true;
       try {
