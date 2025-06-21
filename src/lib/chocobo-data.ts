@@ -12,6 +12,11 @@ export const initialChocoboCards: ChocoboCard[] = Array.from({ length: 77 }, (_,
   if (cardId === 1) {
     card.image = '/images/chocobo-01.jpg';
   }
+
+  // Add image for card #03
+  if (cardId === 3) {
+    card.image = '/images/chocobo-03.jpg';
+  }
   
   return card;
 });
