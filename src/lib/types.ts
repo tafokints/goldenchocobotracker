@@ -6,4 +6,6 @@ export interface ChocoboCard {
   dateFound?: string;
   link?: string;
   image?: string;
+  price?: number;
+  priceDate?: string;
 } 
