@@ -9,6 +9,10 @@ const affiliateLinks = [
     name: "MTG Booster Boxes",
     url: "https://amzn.to/4kAIv6n",
   },
+  {
+    name: "eBay MTG Final Fantasy Boxes",
+    url: "https://ebay.us/MZ8psC",
+  },
 ];
 
 export default function AffiliateLinks() {

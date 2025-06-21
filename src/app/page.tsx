@@ -2,7 +2,7 @@ import { Redis } from '@upstash/redis';
 import { ChocoboCard } from "../lib/types";
 import Link from "next/link";
 import AffiliateLinks from "../components/AffiliateLinks";
-import ReportButton from '@/components/ReportButton';
+import ReportButton from '../components/ReportButton';
 
 const redis = Redis.fromEnv();
 
