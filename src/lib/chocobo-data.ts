@@ -1,25 +1,10 @@
 import { ChocoboCard } from './types';
 
-export const initialChocoboCards: ChocoboCard[] = Array.from({ length: 77 }, (_, i) => {
-  const cardId = i + 1;
-  const card: ChocoboCard = {
-    id: cardId,
-    name: `Golden Chocobo #${cardId.toString().padStart(2, '0')}`,
-    found: false,
-  };
-  
-  // Add image for card #01
-  if (cardId === 1) {
-    card.image = '/images/chocobo-01.jpg';
-  }
-
-  // Add image for card #03
-  if (cardId === 3) {
-    card.image = '/images/chocobo-03.jpg';
-  }
-  
-  return card;
-});
+export const initialChocoboCards: ChocoboCard[] = Array.from({ length: 77 }, (_, i) => ({
+  id: i + 1,
+  name: `Golden Chocobo #${(i + 1).toString().padStart(2, '0')}`,
+  found: false,
+}));
 
 export const chocoboNames = [
   "Golden Chocobo #01", "Golden Chocobo #02", "Golden Chocobo #03", "Golden Chocobo #04", "Golden Chocobo #05",

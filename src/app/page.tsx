@@ -109,16 +109,19 @@ export default function Home() {
 
       <div className="w-full max-w-5xl mt-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {cards.map((card) => (
-            <div key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
-              {card.image && (
+          {cards.map((card) => {
+            // Default to the standard path, but allow overrides from the admin panel
+            const imageSrc = card.image || `/images/chocobo-${card.id.toString().padStart(2, '0')}.jpg`;
+            
+            return (
+              <div key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
                 <div className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden">
                   <img
-                    src={card.image}
+                    src={imageSrc}
                     alt={card.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      // Hide the image container if image fails to load
+                      // Hide the image container if the image fails to load
                       const target = e.target as HTMLImageElement;
                       const container = target.parentElement;
                       if (container) {
@@ -127,32 +130,32 @@ export default function Home() {
                     }}
                   />
                 </div>
-              )}
-              
-              <h2 className="text-lg font-bold text-chocobo-gold">#{card.id.toString().padStart(2, '0')}</h2>
-              
-              <div className="flex-grow">
-                <p className={`font-bold ${card.found ? "text-yellow-400" : "text-gray-400"}`}>
-                  {card.found ? "Found" : "Not Found"}
-                </p>
                 
-                {card.price && (
-                  <div className="text-sm mt-2 text-green-400">
-                    <p>Recent Sale: ${card.price.toLocaleString()}</p>
-                    {card.priceDate && <p className="text-xs text-chocobo-light">{card.priceDate}</p>}
-                  </div>
-                )}
+                <h2 className="text-lg font-bold text-chocobo-gold">#{card.id.toString().padStart(2, '0')}</h2>
                 
-                {card.found && (
-                  <div className="text-sm mt-2 text-chocobo-light">
-                    <p>Found by: {card.foundBy}</p>
-                    <p>Date: {card.dateFound}</p>
-                    {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">Source</a>}
-                  </div>
-                )}
+                <div className="flex-grow">
+                  <p className={`font-bold ${card.found ? "text-yellow-400" : "text-gray-400"}`}>
+                    {card.found ? "Found" : "Not Found"}
+                  </p>
+                  
+                  {card.price && (
+                    <div className="text-sm mt-2 text-green-400">
+                      <p>Recent Sale: ${card.price.toLocaleString()}</p>
+                      {card.priceDate && <p className="text-xs text-chocobo-light">{card.priceDate}</p>}
+                    </div>
+                  )}
+                  
+                  {card.found && (
+                    <div className="text-sm mt-2 text-chocobo-light">
+                      <p>Found by: {card.foundBy}</p>
+                      <p>Date: {card.dateFound}</p>
+                      {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">Source</a>}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
