@@ -51,6 +51,25 @@ export default function Home() {
     }
   };
 
+  const handleImageUpdate = async (cardId: number, imageUrl: string) => {
+    try {
+      const response = await fetch('/api/update-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cardId, imageUrl }),
+      });
+
+      if (response.ok) {
+        // Refresh the cards data
+        fetchCards();
+      }
+    } catch (error) {
+      console.error('Error updating image:', error);
+    }
+  };
+
   const foundCards = cards.filter((card) => card.found);
   const foundCount = foundCards.length;
   const totalCount = cards.length;
@@ -92,17 +111,23 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {cards.map((card) => (
             <div key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
-              <div className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden">
-                <img
-                  src={card.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzQzNDM0Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNENEE3M0QiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5DaG9jb2JvICM8L3RleHQ+Cjx0ZXh0IHg9IjEwMCIgeT0iMTIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2NzY3NjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD4KPC9zdmc+'}
-                  alt={card.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzQzNDM0Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNENEE3M0QiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5DaG9jb2JvICM8L3RleHQ+Cjx0ZXh0IHg9IjEwMCIgeT0iMTIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2NzY3NjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD4KPC9zdmc+';
-                  }}
-                />
-              </div>
+              {card.image && (
+                <div className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden">
+                  <img
+                    src={card.image}
+                    alt={card.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Hide the image container if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      const container = target.parentElement;
+                      if (container) {
+                        container.style.display = 'none';
+                      }
+                    }}
+                  />
+                </div>
+              )}
               
               <h2 className="text-lg font-bold text-chocobo-gold">#{card.id.toString().padStart(2, '0')}</h2>
               
@@ -132,7 +157,7 @@ export default function Home() {
       </div>
 
       <AffiliateLinks />
-      <AdminPanel cards={cards} onPriceUpdate={handlePriceUpdate} />
+      <AdminPanel cards={cards} onPriceUpdate={handlePriceUpdate} onImageUpdate={handleImageUpdate} />
     </main>
   );
 }

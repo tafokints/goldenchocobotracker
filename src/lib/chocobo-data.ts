@@ -4,7 +4,7 @@ export const initialChocoboCards: ChocoboCard[] = Array.from({ length: 77 }, (_,
   id: i + 1,
   name: `Golden Chocobo #${(i + 1).toString().padStart(2, '0')}`,
   found: false,
-  image: `/images/chocobo-${(i + 1).toString().padStart(2, '0')}.jpg`, // Placeholder image paths
+  // No default image - images will only show when explicitly added
 }));
 
 export const chocoboNames = [
