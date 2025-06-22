@@ -1,18 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Redis } from '@upstash/redis';
 import { ChocoboCard } from "../lib/types";
 import Link from "next/link";
 import AffiliateLinks from "../components/AffiliateLinks";
 import ReportButton from '../components/ReportButton';
 import AdminPanel from '../components/AdminPanel';
+import ProgressBar from '../components/ProgressBar';
+import FilterControls from '../components/FilterControls';
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 const redis = Redis.fromEnv();
 
 export default function Home() {
   const [cards, setCards] = useState<ChocoboCard[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // State for filtering and sorting
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('id-asc');
+  
+  // State for lightbox
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     fetchCards();
@@ -70,6 +83,45 @@ export default function Home() {
     }
   };
 
+  const filteredAndSortedCards = useMemo(() => {
+    return cards
+      .filter(card => {
+        // Search query filter
+        const matchesSearch = card.id.toString().padStart(2, '0').includes(searchQuery);
+
+        // Status filter
+        const matchesStatus =
+          statusFilter === 'all' ||
+          (statusFilter === 'found' && card.found) ||
+          (statusFilter === 'not-found' && !card.found);
+
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        switch (sortOrder) {
+          case 'id-desc':
+            return b.id - a.id;
+          case 'price-asc':
+            return (a.price ?? Infinity) - (b.price ?? Infinity);
+          case 'price-desc':
+            return (b.price ?? -1) - (a.price ?? -1);
+          case 'date-asc':
+            return new Date(a.dateFound ?? 0).getTime() - new Date(b.dateFound ?? 0).getTime();
+          case 'date-desc':
+            return new Date(b.dateFound ?? 0).getTime() - new Date(a.dateFound ?? 0).getTime();
+          case 'id-asc':
+          default:
+            return a.id - b.id;
+        }
+      });
+  }, [cards, searchQuery, statusFilter, sortOrder]);
+
+  const lightboxSlides = useMemo(() => {
+    return filteredAndSortedCards
+      .map(card => card.image || `/images/chocobo-${card.id.toString().padStart(2, '0')}.jpg`)
+      .map(src => ({ src }));
+  }, [filteredAndSortedCards]);
+
   const foundCards = cards.filter((card) => card.found);
   const foundCount = foundCards.length;
   const totalCount = cards.length;
@@ -93,39 +145,55 @@ export default function Home() {
         <h1 className="text-2xl md:text-4xl font-bold text-chocobo-gold mb-4 lg:mb-0">
           Golden Chocobo Tracker
         </h1>
-        <ReportButton />
+        <div className="flex items-center space-x-4">
+          <Link href="/stats" className="text-chocobo-gold hover:text-yellow-400 transition-colors">
+            Stats
+          </Link>
+          <ReportButton />
+        </div>
       </div>
 
-      <div className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark bg-opacity-75 p-4 rounded-lg">
-        <h2 className="text-2xl font-bold text-chocobo-gold">
-          {foundCount} / {totalCount} Found
-        </h2>
+      <div className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark bg-opacity-75 p-6 rounded-lg">
+        <ProgressBar current={foundCount} total={totalCount} />
         {lastFoundCard && (
-          <p className="text-chocobo-light mt-2">
+          <p className="text-chocobo-light mt-4 text-sm">
             Last find: #{lastFoundCard.id.toString().padStart(2, '0')} by {lastFoundCard.foundBy} on {lastFoundCard.dateFound}
           </p>
         )}
       </div>
 
+      <FilterControls
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+      />
+
       <div className="w-full max-w-5xl mt-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {cards.map((card) => {
-            // Default to the standard path, but allow overrides from the admin panel
+          {filteredAndSortedCards.map((card, index) => {
             const imageSrc = card.image || `/images/chocobo-${card.id.toString().padStart(2, '0')}.jpg`;
             
             return (
               <div key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
-                <div className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden">
+                <div 
+                  className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden cursor-pointer"
+                  onClick={() => {
+                    setLightboxIndex(index);
+                    setLightboxOpen(true);
+                  }}
+                >
                   <img
                     src={imageSrc}
                     alt={card.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      // Hide the image container if the image fails to load
                       const target = e.target as HTMLImageElement;
                       const container = target.parentElement;
                       if (container) {
-                        container.style.display = 'none';
+                        (container as HTMLElement).style.display = 'none';
                       }
                     }}
                   />
@@ -158,6 +226,13 @@ export default function Home() {
           })}
         </div>
       </div>
+
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        slides={lightboxSlides}
+        index={lightboxIndex}
+      />
 
       <AffiliateLinks />
       <AdminPanel cards={cards} onPriceUpdate={handlePriceUpdate} onImageUpdate={handleImageUpdate} />
