@@ -145,7 +145,12 @@ export default function Home() {
         <h1 className="text-2xl md:text-4xl font-bold text-chocobo-gold mb-4 lg:mb-0">
           Golden Chocobo Tracker
         </h1>
-        <ReportButton />
+        <div className="flex items-center space-x-4">
+          <Link href="/stats" className="text-chocobo-gold hover:text-yellow-400 transition-colors">
+            Stats
+          </Link>
+          <ReportButton />
+        </div>
       </div>
 
       <div className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark bg-opacity-75 p-6 rounded-lg">
