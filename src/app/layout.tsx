@@ -3,6 +3,7 @@ import { Cinzel } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const cinzel = Cinzel({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={cinzel.className}>
         {children}
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
