@@ -6,8 +6,8 @@ const affiliateLinks = [
     url: "https://amzn.to/4kAIv6n",
   },
   {
-    name: "MTG Booster Boxes",
-    url: "https://amzn.to/4kAIv6n",
+    name: "TCGPlayer Final Fantasy Boxes",
+    url: "https://partner.tcgplayer.com/raB7Vd",
   },
   {
     name: "eBay MTG Final Fantasy Boxes",
