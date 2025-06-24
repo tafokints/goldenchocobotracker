@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cinzel } from "next/font/google";
 import "./globals.css";
 import React from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const cinzel = Cinzel({ subsets: ["latin"] });
 
@@ -17,7 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cinzel.className}>{children}</body>
+      <body className={cinzel.className}>
+        {children}
+        <SpeedInsights />
+      </body>
     </html>
   );
 } 
