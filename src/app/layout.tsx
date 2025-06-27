@@ -92,6 +92,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/images/chocobo-01.jpg" />
         <meta name="msapplication-TileColor" content="#D6A73D" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="google-site-verification" content="I5HrRwj7iq4_ogZzP1MRAAdXIgWtKHu4mzRNCB-wQJQ" />
       </head>
       <body className={cinzel.className}>
         {children}
