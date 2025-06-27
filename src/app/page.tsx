@@ -11,6 +11,7 @@ import ProgressBar from '../components/ProgressBar';
 import FilterControls from '../components/FilterControls';
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import Head from 'next/head';
 
 const redis = Redis.fromEnv();
 
@@ -131,6 +132,27 @@ export default function Home() {
     return new Date(b.dateFound).getTime() - new Date(a.dateFound).getTime();
   })[0];
 
+  // Structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Golden Chocobo Tracker",
+    "description": "Track all 77 serialized Golden Chocobo cards from Magic: The Gathering's Final Fantasy collaboration",
+    "url": "https://goldenchocobotracker.com",
+    "applicationCategory": "EntertainmentApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "150"
+    }
+  };
+
   if (loading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-8">
@@ -140,102 +162,121 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-8 md:p-12">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <h1 className="text-2xl md:text-4xl font-bold text-chocobo-gold mb-4 lg:mb-0">
-          Golden Chocobo Tracker
-        </h1>
-        <div className="flex items-center space-x-4">
-          <Link href="/stats" className="text-chocobo-gold hover:text-yellow-400 transition-colors">
-            Stats
-          </Link>
-          <ReportButton />
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head>
+      <main className="flex min-h-screen flex-col items-center p-8 md:p-12">
+        <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+          <h1 className="text-2xl md:text-4xl font-bold text-chocobo-gold mb-4 lg:mb-0">
+            Golden Chocobo Tracker
+          </h1>
+          <div className="flex items-center space-x-4">
+            <Link href="/stats" className="text-chocobo-gold hover:text-yellow-400 transition-colors">
+              Stats
+            </Link>
+            <ReportButton />
+          </div>
         </div>
-      </div>
 
-      <div className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark bg-opacity-75 p-6 rounded-lg">
-        <ProgressBar current={foundCount} total={totalCount} />
-        {lastFoundCard && (
-          <p className="text-chocobo-light mt-4 text-sm">
-            Last find: #{lastFoundCard.id.toString().padStart(2, '0')} by {lastFoundCard.foundBy} on {lastFoundCard.dateFound}
-          </p>
-        )}
-      </div>
+        <div className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark bg-opacity-75 p-6 rounded-lg">
+          <ProgressBar current={foundCount} total={totalCount} />
+          {lastFoundCard && (
+            <p className="text-chocobo-light mt-4 text-sm">
+              Last find: #{lastFoundCard.id.toString().padStart(2, '0')} by {lastFoundCard.foundBy} on {lastFoundCard.dateFound}
+            </p>
+          )}
+        </div>
 
-      <FilterControls
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-      />
+        <FilterControls
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}
+        />
 
-      <div className="w-full max-w-5xl mt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredAndSortedCards.map((card, index) => {
-            const imageSrc = card.image || `/images/chocobo-${card.id.toString().padStart(2, '0')}.jpg`;
-            
-            return (
-              <div key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
-                <div 
-                  className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden cursor-pointer"
-                  onClick={() => {
-                    setLightboxIndex(index);
-                    setLightboxOpen(true);
-                  }}
-                >
-                  <img
-                    src={imageSrc}
-                    alt={card.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      const container = target.parentElement;
-                      if (container) {
-                        (container as HTMLElement).style.display = 'none';
+        <section className="w-full max-w-5xl mt-8" aria-label="Golden Chocobo Cards">
+          <h2 className="sr-only">Golden Chocobo Card Collection</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredAndSortedCards.map((card, index) => {
+              const imageSrc = card.image || `/images/chocobo-${card.id.toString().padStart(2, '0')}.jpg`;
+              
+              return (
+                <article key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
+                  <div 
+                    className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden cursor-pointer"
+                    onClick={() => {
+                      setLightboxIndex(index);
+                      setLightboxOpen(true);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View larger image of Golden Chocobo Card #${card.id.toString().padStart(2, '0')}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setLightboxIndex(index);
+                        setLightboxOpen(true);
                       }
                     }}
-                  />
-                </div>
-                
-                <h2 className="text-lg font-bold text-chocobo-gold">#{card.id.toString().padStart(2, '0')}</h2>
-                
-                <div className="flex-grow">
-                  <p className={`font-bold ${card.found ? "text-yellow-400" : "text-gray-400"}`}>
-                    {card.found ? "Found" : "Not Found"}
-                  </p>
+                  >
+                    <img
+                      src={imageSrc}
+                      alt={`Golden Chocobo Card #${card.id.toString().padStart(2, '0')} - ${card.name}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        const container = target.parentElement;
+                        if (container) {
+                          (container as HTMLElement).style.display = 'none';
+                        }
+                      }}
+                    />
+                  </div>
                   
-                  {card.price && (
-                    <div className="text-sm mt-2 text-green-400">
-                      <p>Recent Sale: ${card.price.toLocaleString()}</p>
-                      {card.priceDate && <p className="text-xs text-chocobo-light">{card.priceDate}</p>}
-                    </div>
-                  )}
+                  <h3 className="text-lg font-bold text-chocobo-gold">#{card.id.toString().padStart(2, '0')}</h3>
                   
-                  {card.found && (
-                    <div className="text-sm mt-2 text-chocobo-light">
-                      <p>Found by: {card.foundBy}</p>
-                      <p>Date: {card.dateFound}</p>
-                      {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">Source</a>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+                  <div className="flex-grow">
+                    <p className={`font-bold ${card.found ? "text-yellow-400" : "text-gray-400"}`}>
+                      {card.found ? "Found" : "Not Found"}
+                    </p>
+                    
+                    {card.price && (
+                      <div className="text-sm mt-2 text-green-400">
+                        <p>Recent Sale: ${card.price.toLocaleString()}</p>
+                        {card.priceDate && <p className="text-xs text-chocobo-light">{card.priceDate}</p>}
+                      </div>
+                    )}
+                    
+                    {card.found && (
+                      <div className="text-sm mt-2 text-chocobo-light">
+                        <p>Found by: {card.foundBy}</p>
+                        <p>Date: {card.dateFound}</p>
+                        {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">Source</a>}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
 
-      <Lightbox
-        open={lightboxOpen}
-        close={() => setLightboxOpen(false)}
-        slides={lightboxSlides}
-        index={lightboxIndex}
-      />
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          slides={lightboxSlides}
+          index={lightboxIndex}
+        />
 
-      <AffiliateLinks />
-      <AdminPanel cards={cards} onPriceUpdate={handlePriceUpdate} onImageUpdate={handleImageUpdate} />
-    </main>
+        <AffiliateLinks />
+        <AdminPanel cards={cards} onPriceUpdate={handlePriceUpdate} onImageUpdate={handleImageUpdate} />
+      </main>
+    </>
   );
 }

@@ -13,6 +13,10 @@ const affiliateLinks = [
     name: "eBay MTG Final Fantasy Boxes",
     url: "https://ebay.us/MZ8psC",
   },
+  {
+    name: "Magic: The Gathering Deck Builder",
+    url: "https://bit.ly/4kqjKd6",
+  },
 ];
 
 export default function AffiliateLinks() {
