@@ -257,7 +257,7 @@ export default function Home() {
                       <div className="text-sm mt-2 text-chocobo-light">
                         <p>Found by: {card.foundBy}</p>
                         <p>Date: {card.dateFound}</p>
-                        {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">Source</a>}
+                        {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">{card.link.toLowerCase().includes('ebay') ? 'Buy on eBay' : 'Source'}</a>}
                       </div>
                     )}
                   </div>
