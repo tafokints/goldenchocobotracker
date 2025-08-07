@@ -18,11 +18,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Validate grading data
-    if (typeof grading.grade !== 'number' || grading.grade < 0) {
+    // Convert grade to number and validate
+    const gradeValue = typeof grading.grade === 'string' ? parseFloat(grading.grade) : grading.grade;
+    if (isNaN(gradeValue) || gradeValue < 0) {
       console.log('Invalid grade value:', grading.grade);
       return NextResponse.json({ error: 'Invalid grade value' }, { status: 400 });
     }
+
+    // Update the grading object with the numeric grade
+    const validatedGrading = {
+      ...grading,
+      grade: gradeValue
+    };
 
     // Get current cards data
     const cardsData = await redis.get('chocobo_cards');
@@ -39,8 +46,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the card's grading information
-    console.log('Updating card grading from:', cards[cardIndex].grading, 'to:', grading);
-    cards[cardIndex].grading = grading;
+    console.log('Updating card grading from:', cards[cardIndex].grading, 'to:', validatedGrading);
+    cards[cardIndex].grading = validatedGrading;
 
     // Save back to Redis
     const saveResult = await redis.set('chocobo_cards', JSON.stringify(cards));
