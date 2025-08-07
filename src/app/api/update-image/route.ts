@@ -4,6 +4,10 @@ import { ChocoboCard } from '@/lib/types';
 
 const redis = Redis.fromEnv();
 
+// Force dynamic rendering to prevent caching issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(request: Request) {
   try {
     const { cardId, imageUrl } = await request.json();

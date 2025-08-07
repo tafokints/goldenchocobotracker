@@ -4,6 +4,10 @@ import { PriceHistoryEntry } from '../../../lib/types';
 
 const redis = Redis.fromEnv();
 
+// Force dynamic rendering to prevent caching issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(request: NextRequest) {
   try {
     const { cardId, entry } = await request.json();

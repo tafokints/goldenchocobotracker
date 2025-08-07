@@ -5,6 +5,10 @@ import { initialChocoboCards } from '@/lib/chocobo-data';
 
 const redis = Redis.fromEnv();
 
+// Force dynamic rendering to prevent caching issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     // Try the new key first
