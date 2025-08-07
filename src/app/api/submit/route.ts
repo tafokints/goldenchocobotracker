@@ -7,7 +7,7 @@ const redis = Redis.fromEnv();
 export async function POST(request: Request) {
   try {
     const submission = await request.json();
-    const cards: ChocoboCard[] = (await redis.get('chocobo-cards')) || [];
+    const cards: ChocoboCard[] = (await redis.get('chocobo_cards')) || [];
 
     const cardIndex = cards.findIndex(c => c.id === parseInt(submission.cardId));
 
@@ -21,9 +21,12 @@ export async function POST(request: Request) {
       foundBy: submission.foundBy,
       dateFound: submission.dateFound,
       link: submission.link,
+      // Preserve existing fields
+      priceHistory: cards[cardIndex].priceHistory || [],
+      grading: cards[cardIndex].grading || undefined
     };
 
-    await redis.set('chocobo-cards', cards);
+    await redis.set('chocobo_cards', cards);
 
     return NextResponse.json({ message: 'Submission successful' }, { status: 200 });
   } catch (error) {

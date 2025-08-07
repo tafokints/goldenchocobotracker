@@ -4,6 +4,7 @@ export const initialChocoboCards: ChocoboCard[] = Array.from({ length: 77 }, (_,
   id: i + 1,
   name: `Golden Chocobo #${(i + 1).toString().padStart(2, '0')}`,
   found: false,
+  priceHistory: [],
 }));
 
 export const chocoboNames = [

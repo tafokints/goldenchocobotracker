@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Redis } from '@upstash/redis';
-import { ChocoboCard } from "../lib/types";
+import { ChocoboCard, GradingInfo, PriceHistoryEntry } from "../lib/types";
 import Link from "next/link";
 import AffiliateLinks from "../components/AffiliateLinks";
 import ReportButton from '../components/ReportButton';
 import AdminPanel from '../components/AdminPanel';
 import ProgressBar from '../components/ProgressBar';
 import FilterControls from '../components/FilterControls';
+import CardDetails from '../components/CardDetails';
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import Head from 'next/head';
@@ -27,6 +28,9 @@ export default function Home() {
   // State for lightbox
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // State for card details
+  const [selectedCardForDetails, setSelectedCardForDetails] = useState<ChocoboCard | null>(null);
 
   useEffect(() => {
     fetchCards();
@@ -81,6 +85,44 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error updating image:', error);
+    }
+  };
+
+  const handleGradingUpdate = async (cardId: number, grading: GradingInfo) => {
+    try {
+      const response = await fetch('/api/update-grading', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cardId, grading }),
+      });
+
+      if (response.ok) {
+        // Refresh the cards data
+        fetchCards();
+      }
+    } catch (error) {
+      console.error('Error updating grading:', error);
+    }
+  };
+
+  const handlePriceHistoryAdd = async (cardId: number, entry: PriceHistoryEntry) => {
+    try {
+      const response = await fetch('/api/add-price-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cardId, entry }),
+      });
+
+      if (response.ok) {
+        // Refresh the cards data
+        fetchCards();
+      }
+    } catch (error) {
+      console.error('Error adding price history:', error);
     }
   };
 
@@ -252,6 +294,13 @@ export default function Home() {
                         {card.priceDate && <p className="text-xs text-chocobo-light">{card.priceDate}</p>}
                       </div>
                     )}
+
+                    {card.grading && (
+                      <div className="text-sm mt-2 text-blue-400">
+                        <p>{card.grading.service} {card.grading.grade}</p>
+                        {card.grading.dateGraded && <p className="text-xs text-chocobo-light">{card.grading.dateGraded}</p>}
+                      </div>
+                    )}
                     
                     {card.found && (
                       <div className="text-sm mt-2 text-chocobo-light">
@@ -260,6 +309,14 @@ export default function Home() {
                         {card.link && <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline">{card.link.toLowerCase().includes('ebay') ? 'Buy on eBay' : 'Source'}</a>}
                       </div>
                     )}
+
+                    {/* Details button */}
+                    <button
+                      onClick={() => setSelectedCardForDetails(card)}
+                      className="w-full mt-3 bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded text-sm"
+                    >
+                      View Details
+                    </button>
                   </div>
                 </article>
               );
@@ -275,7 +332,20 @@ export default function Home() {
         />
 
         <AffiliateLinks />
-        <AdminPanel cards={cards} onPriceUpdate={handlePriceUpdate} onImageUpdate={handleImageUpdate} />
+        <AdminPanel 
+          cards={cards} 
+          onPriceUpdate={handlePriceUpdate} 
+          onImageUpdate={handleImageUpdate}
+          onGradingUpdate={handleGradingUpdate}
+          onPriceHistoryAdd={handlePriceHistoryAdd}
+        />
+        {selectedCardForDetails && (
+          <CardDetails
+            card={selectedCardForDetails}
+            isOpen={!!selectedCardForDetails}
+            onClose={() => setSelectedCardForDetails(null)}
+          />
+        )}
       </main>
     </>
   );

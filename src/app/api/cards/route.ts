@@ -7,12 +7,19 @@ const redis = Redis.fromEnv();
 
 export async function GET() {
   try {
-    let cards: ChocoboCard[] = (await redis.get('chocobo-cards')) || [];
+    let cards: ChocoboCard[] = (await redis.get('chocobo_cards')) || [];
     
     // If no cards exist in Redis, initialize with default data
     if (cards.length === 0) {
       cards = initialChocoboCards;
-      await redis.set('chocobo-cards', cards);
+      await redis.set('chocobo_cards', cards);
+    } else {
+      // Ensure all existing cards have the new fields
+      cards = cards.map(card => ({
+        ...card,
+        priceHistory: card.priceHistory || [],
+        grading: card.grading || undefined
+      }));
     }
 
     return NextResponse.json(cards);

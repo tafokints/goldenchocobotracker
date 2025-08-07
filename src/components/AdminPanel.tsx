@@ -1,21 +1,40 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChocoboCard } from '../lib/types';
+import { ChocoboCard, GradingInfo, PriceHistoryEntry } from '../lib/types';
 
 interface AdminPanelProps {
   cards: ChocoboCard[];
   onPriceUpdate: (cardId: number, price: number) => void;
   onImageUpdate: (cardId: number, imageUrl: string) => void;
+  onGradingUpdate: (cardId: number, grading: GradingInfo) => void;
+  onPriceHistoryAdd: (cardId: number, entry: PriceHistoryEntry) => void;
 }
 
-export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: AdminPanelProps) {
+export default function AdminPanel({ 
+  cards, 
+  onPriceUpdate, 
+  onImageUpdate, 
+  onGradingUpdate, 
+  onPriceHistoryAdd 
+}: AdminPanelProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'price' | 'image'>('price');
+  const [activeTab, setActiveTab] = useState<'price' | 'image' | 'grading' | 'history'>('price');
+  
+  // Grading fields
+  const [gradingService, setGradingService] = useState('');
+  const [grade, setGrade] = useState('');
+  const [dateGraded, setDateGraded] = useState('');
+  
+  // Price history fields
+  const [historyPrice, setHistoryPrice] = useState('');
+  const [soldBy, setSoldBy] = useState('');
+  const [soldTo, setSoldTo] = useState('');
+  const [saleDate, setSaleDate] = useState('');
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -75,6 +94,60 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
     setSelectedCard(null);
   };
 
+  const handleGradingUpdate = () => {
+    if (!selectedCard || !gradingService || !grade) {
+      setMessage('Please select a card and enter grading service and grade');
+      return;
+    }
+
+    const gradeValue = parseFloat(grade);
+    if (isNaN(gradeValue) || gradeValue < 0) {
+      setMessage('Please enter a valid grade');
+      return;
+    }
+
+    const gradingInfo: GradingInfo = {
+      service: gradingService,
+      grade: gradeValue,
+      dateGraded: dateGraded || new Date().toISOString().split('T')[0]
+    };
+
+    onGradingUpdate(selectedCard, gradingInfo);
+    setMessage(`Grading updated for card #${selectedCard.toString().padStart(2, '0')}`);
+    setGradingService('');
+    setGrade('');
+    setDateGraded('');
+    setSelectedCard(null);
+  };
+
+  const handlePriceHistoryAdd = () => {
+    if (!selectedCard || !historyPrice || !saleDate) {
+      setMessage('Please select a card and enter price and sale date');
+      return;
+    }
+
+    const priceValue = parseFloat(historyPrice);
+    if (isNaN(priceValue) || priceValue < 0) {
+      setMessage('Please enter a valid price');
+      return;
+    }
+
+    const historyEntry: PriceHistoryEntry = {
+      price: priceValue,
+      date: saleDate,
+      soldBy: soldBy || undefined,
+      soldTo: soldTo || undefined
+    };
+
+    onPriceHistoryAdd(selectedCard, historyEntry);
+    setMessage(`Price history added for card #${selectedCard.toString().padStart(2, '0')}`);
+    setHistoryPrice('');
+    setSoldBy('');
+    setSoldTo('');
+    setSaleDate('');
+    setSelectedCard(null);
+  };
+
   const handleCardSelect = (cardId: number | null) => {
     setSelectedCard(cardId);
     setMessage('');
@@ -88,6 +161,11 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
         if (activeTab === 'image' && card.image) {
           setImageUrl(card.image);
         }
+        if (activeTab === 'grading' && card.grading) {
+          setGradingService(card.grading.service);
+          setGrade(card.grading.grade.toString());
+          setDateGraded(card.grading.dateGraded || '');
+        }
       }
     }
   };
@@ -96,7 +174,7 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-full max-w-md">
+      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-chocobo-gold">Admin Panel</h2>
           <button
@@ -127,10 +205,10 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex border-b border-chocobo-gold">
+          <div className="flex border-b border-chocobo-gold flex-wrap">
             <button
               onClick={() => setActiveTab('price')}
-              className={`px-4 py-2 text-sm font-bold ${
+              className={`px-2 py-2 text-xs font-bold ${
                 activeTab === 'price' 
                   ? 'text-chocobo-gold border-b-2 border-chocobo-gold' 
                   : 'text-chocobo-light hover:text-chocobo-gold'
@@ -140,13 +218,33 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
             </button>
             <button
               onClick={() => setActiveTab('image')}
-              className={`px-4 py-2 text-sm font-bold ${
+              className={`px-2 py-2 text-xs font-bold ${
                 activeTab === 'image' 
                   ? 'text-chocobo-gold border-b-2 border-chocobo-gold' 
                   : 'text-chocobo-light hover:text-chocobo-gold'
               }`}
             >
               Image
+            </button>
+            <button
+              onClick={() => setActiveTab('grading')}
+              className={`px-2 py-2 text-xs font-bold ${
+                activeTab === 'grading' 
+                  ? 'text-chocobo-gold border-b-2 border-chocobo-gold' 
+                  : 'text-chocobo-light hover:text-chocobo-gold'
+              }`}
+            >
+              Grading
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`px-2 py-2 text-xs font-bold ${
+                activeTab === 'history' 
+                  ? 'text-chocobo-gold border-b-2 border-chocobo-gold' 
+                  : 'text-chocobo-light hover:text-chocobo-gold'
+              }`}
+            >
+              History
             </button>
           </div>
 
@@ -190,6 +288,113 @@ export default function AdminPanel({ cards, onPriceUpdate, onImageUpdate }: Admi
                 className="w-full bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded mt-2"
               >
                 Update Image
+              </button>
+            </div>
+          )}
+
+          {/* Grading Tab */}
+          {activeTab === 'grading' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Grading Service
+                </label>
+                <input
+                  type="text"
+                  value={gradingService}
+                  onChange={(e) => setGradingService(e.target.value)}
+                  placeholder="e.g., PSA, BGS, CGC"
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Grade
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                  placeholder="e.g., 9.5"
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Date Graded (optional)
+                </label>
+                <input
+                  type="date"
+                  value={dateGraded}
+                  onChange={(e) => setDateGraded(e.target.value)}
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <button
+                onClick={handleGradingUpdate}
+                className="w-full bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded"
+              >
+                Update Grading
+              </button>
+            </div>
+          )}
+
+          {/* Price History Tab */}
+          {activeTab === 'history' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Sale Price ($)
+                </label>
+                <input
+                  type="number"
+                  value={historyPrice}
+                  onChange={(e) => setHistoryPrice(e.target.value)}
+                  placeholder="Enter sale price..."
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Sale Date
+                </label>
+                <input
+                  type="date"
+                  value={saleDate}
+                  onChange={(e) => setSaleDate(e.target.value)}
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Sold By (optional)
+                </label>
+                <input
+                  type="text"
+                  value={soldBy}
+                  onChange={(e) => setSoldBy(e.target.value)}
+                  placeholder="Previous owner"
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <div>
+                <label className="block text-chocobo-gold text-sm font-bold mb-2">
+                  Sold To (optional)
+                </label>
+                <input
+                  type="text"
+                  value={soldTo}
+                  onChange={(e) => setSoldTo(e.target.value)}
+                  placeholder="New owner"
+                  className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                />
+              </div>
+              <button
+                onClick={handlePriceHistoryAdd}
+                className="w-full bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded"
+              >
+                Add to Price History
               </button>
             </div>
           )}

@@ -7,7 +7,7 @@ const redis = Redis.fromEnv();
 export async function POST(request: Request) {
   try {
     const { cardId, imageUrl } = await request.json();
-    const cards: ChocoboCard[] = (await redis.get('chocobo-cards')) || [];
+    const cards: ChocoboCard[] = (await redis.get('chocobo_cards')) || [];
 
     const cardIndex = cards.findIndex(c => c.id === parseInt(cardId));
 
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       image: imageUrl,
     };
 
-    await redis.set('chocobo-cards', cards);
+    await redis.set('chocobo_cards', cards);
 
     return NextResponse.json({ message: 'Image updated successfully' }, { status: 200 });
   } catch (error) {
