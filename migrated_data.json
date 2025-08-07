@@ -238,7 +238,11 @@
         "date": "2025-07-21"
       }
     ],
-    "grading": null
+    "grading": {
+      "service": "PSA",
+      "grade": 10,
+      "dateGraded": null
+    }
   },
   {
     "id": 25,
