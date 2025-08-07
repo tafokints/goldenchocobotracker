@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Get current cards data
     const cardsData = await redis.get('chocobo_cards');
     console.log('Retrieved cards data from Redis:', cardsData ? 'exists' : 'null');
-    let cards = cardsData ? JSON.parse(cardsData as string) : [];
+    let cards = Array.isArray(cardsData) ? cardsData : (cardsData ? JSON.parse(cardsData as string) : []);
     console.log('Parsed cards array length:', cards.length);
 
     // Find and update the specific card
