@@ -1,0 +1,523 @@
+[
+    {
+      "id": 1,
+      "name": "Golden Chocobo #1",
+      "found": true,
+      "foundBy": "Ancestralmtg",
+      "dateFound": "2025-06-20",
+      "link": "https://www.instagram.com/p/DLJPL2WviUe/",
+      "image": "/images/chocobo-01.jpg",
+      "price": 50000,
+      "priceDate": "2025-07-25"
+    },
+    {
+      "id": 2,
+      "name": "Golden Chocobo #2",
+      "found": false
+    },
+    {
+      "id": 3,
+      "name": "Golden Chocobo #3",
+      "found": true,
+      "foundBy": "jlacomics",
+      "dateFound": "2025-06-11",
+      "link": "https://www.instagram.com/p/DKvoFlZxZh_/?img_index=1&igsh=N3U1ajlmaGE0MmVu",
+      "image": "/images/chocobo-03.jpg"
+    },
+    {
+      "id": 4,
+      "name": "Golden Chocobo #4",
+      "found": true,
+      "foundBy": "hin3033",
+      "dateFound": "2025-06-15",
+      "link": "https://www.ebay.com/itm/406051967653?_skw=traveling+chocobo&epid=7080246137&itmmeta=01K0B9AN7J4KTEM8DFASWWDK1W&hash=item5e8a9552a5:g:61kAAeSwZExod~Wb&itmprp=enc%3AAQAKAAAA8FkggFvd1GGDu0w3yXCmi1fh3tp7Bdq47hOy0Mnrbxk9c8mzvws1cvyAJPt98tfV%2BE7yy03qm5e3tEBsLELqXkbezEkGPwJCW3FqRywvoGXs6vY%2BZUz7x1cxu9x1n%2FBjnKRSeu6F3PSJPxS19yrx7EFdlHJi0Coy70pFQI3H3Mwk5Wv8wp%2B8HfVXam5adAK0xq6FNmTi%2Bzguj7ZCeKZXvq%2F4J62anVl1qg07WSVgQjrqwvgxahifg1Lr87gMcnkOrq4jQhnivyyOF96Ba20GnaWtOllZVPteCjbLSjFH%2FOvIKd9Fvtv%2FySyJAN%2BtONg6lQ%3D%3D%7Ctkp%3ABk9SR_7TqumCZg&mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339113954&customid=&toolid=10001&mkevt=1"
+    },
+    {
+      "id": 5,
+      "name": "Golden Chocobo #5",
+      "found": false
+    },
+    {
+      "id": 6,
+      "name": "Golden Chocobo #6",
+      "found": true,
+      "foundBy": "KennyKickzz",
+      "dateFound": "2025-07-18",
+      "link": "https://www.ebay.com/itm/365736417270",
+      "price": 79000,
+      "priceDate": "2025-07-21"
+    },
+    {
+      "id": 7,
+      "name": "Golden Chocobo #7",
+      "found": false
+    },
+    {
+      "id": 8,
+      "name": "Golden Chocobo #8",
+      "found": false
+    },
+    {
+      "id": 9,
+      "name": "Golden Chocobo #9",
+      "found": false
+    },
+    {
+      "id": 10,
+      "name": "Golden Chocobo #10",
+      "found": true,
+      "foundBy": "hawkzii",
+      "dateFound": "2025-06-07",
+      "link": "https://x.com/hawkzii/status/1931418856926392670",
+      "image": "/images/chocobo-10.jpg"
+    },
+    {
+      "id": 11,
+      "name": "Golden Chocobo #11",
+      "found": true,
+      "foundBy": "Xopher314",
+      "dateFound": "2025-06-06",
+      "link": "https://x.com/xopher314/status/1930984515138113547"
+    },
+    {
+      "id": 12,
+      "name": "Golden Chocobo #12",
+      "found": true,
+      "foundBy": "Grey Guardian Games",
+      "dateFound": "2025-06-13",
+      "link": "https://www.instagram.com/p/DK1_MnaPPTx/"
+    },
+    {
+      "id": 13,
+      "name": "Golden Chocobo #13",
+      "found": false
+    },
+    {
+      "id": 14,
+      "name": "Golden Chocobo #14",
+      "found": true,
+      "foundBy": "Gamers Guild",
+      "dateFound": "2025-06-07",
+      "link": "https://www.facebook.com/photo?fbid=1254032296726540"
+    },
+    {
+      "id": 15,
+      "name": "Golden Chocobo #15",
+      "found": true,
+      "foundBy": "Brendan Khuri",
+      "dateFound": "2025-07-16",
+      "link": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fff-mtg-golden-chocobo-tracker-v0-z7iwenu2fvcf1.jpeg%3Fwidth%3D1170%26format%3Dpjpg%26auto%3Dwebp%26s%3Dbbf81d2b66798a76a5a8c96ee4578955cdd7c5fa"
+    },
+    {
+      "id": 16,
+      "name": "Golden Chocobo #16",
+      "found": false
+    },
+    {
+      "id": 17,
+      "name": "Golden Chocobo #17",
+      "found": true,
+      "foundBy": "toamagic",
+      "dateFound": "2025-06-20",
+      "link": "https://www.reddit.com/r/mtg/comments/1lgjzti/golden_chocobo_17_sold_in_vegas_to_toamagic_not/",
+      "price": 55000,
+      "priceDate": "2025-07-24"
+    },
+    {
+      "id": 18,
+      "name": "Golden Chocobo #18",
+      "found": true,
+      "foundBy": "benjamin.be.13",
+      "dateFound": "2025-07-04",
+      "link": "https://www.instagram.com/p/DLtFMJFS7N-/"
+    },
+    {
+      "id": 19,
+      "name": "Golden Chocobo #19",
+      "found": true,
+      "foundBy": "Josh Snider",
+      "dateFound": "2025-07-12",
+      "link": "https://www.facebook.com/groups/buyandsellmtg/permalink/3647680548872549/"
+    },
+    {
+      "id": 20,
+      "name": "Golden Chocobo #20",
+      "found": false
+    },
+    {
+      "id": 21,
+      "name": "Golden Chocobo #21",
+      "found": false
+    },
+    {
+      "id": 22,
+      "name": "Golden Chocobo #22",
+      "found": false
+    },
+    {
+      "id": 23,
+      "name": "Golden Chocobo #23",
+      "found": true,
+      "foundBy": "Tyler Henry",
+      "dateFound": "2025-06-15",
+      "link": "https://x.com/tylernhenry/status/1934618485335744735"
+    },
+    {
+      "id": 24,
+      "name": "Golden Chocobo #24",
+      "found": true,
+      "foundBy": "jtb3582",
+      "dateFound": "2025-07-19",
+      "link": "https://www.ebay.com/itm/146718814470",
+      "price": 75000,
+      "priceDate": "2025-07-21"
+    },
+    {
+      "id": 25,
+      "name": "Golden Chocobo #25",
+      "found": true,
+      "foundBy": "EducationFoot7084",
+      "dateFound": "2025-06-16",
+      "link": "https://www.reddit.com/r/MagicCardPulls/comments/1lbk17k/ff_mtg_golden_chocobo_tracker_77/"
+    },
+    {
+      "id": 26,
+      "name": "Golden Chocobo #26",
+      "found": false
+    },
+    {
+      "id": 27,
+      "name": "Golden Chocobo #27",
+      "found": true,
+      "foundBy": "tonytorrez",
+      "dateFound": "2025-06-27",
+      "link": "https://ebay.us/qef4HY",
+      "price": 56999,
+      "priceDate": "2025-07-17"
+    },
+    {
+      "id": 28,
+      "name": "Golden Chocobo #28",
+      "found": false
+    },
+    {
+      "id": 29,
+      "name": "Golden Chocobo #29",
+      "found": true,
+      "foundBy": "Vladmir_labe_factum",
+      "dateFound": "2025-08-04",
+      "link": "https://www.reddit.com/r/MagicCardPulls/comments/1mhch63/i_pulled_this_from_a_collector_bundle_booster/"
+    },
+    {
+      "id": 30,
+      "name": "Golden Chocobo #30",
+      "found": false
+    },
+    {
+      "id": 31,
+      "name": "Golden Chocobo #31",
+      "found": false
+    },
+    {
+      "id": 32,
+      "name": "Golden Chocobo #32",
+      "found": false
+    },
+    {
+      "id": 33,
+      "name": "Golden Chocobo #33",
+      "found": true,
+      "foundBy": "TwinBlasters",
+      "dateFound": "2025-06-09",
+      "link": "https://www.youtube.com/watch?v=_DyLpTJMLIc"
+    },
+    {
+      "id": 34,
+      "name": "Golden Chocobo #34",
+      "found": true,
+      "foundBy": "Andrew Murphy",
+      "dateFound": "2025-08-02",
+      "link": "https://www.facebook.com/groups/657646125885289/posts/1278567040459858/"
+    },
+    {
+      "id": 35,
+      "name": "Golden Chocobo #35",
+      "found": false
+    },
+    {
+      "id": 36,
+      "name": "Golden Chocobo #36",
+      "found": true,
+      "foundBy": "collectionary",
+      "dateFound": "2025-06-10",
+      "link": "https://ebay.us/q1jmQF",
+      "price": 75000,
+      "priceDate": "2025-07-17"
+    },
+    {
+      "id": 37,
+      "name": "Golden Chocobo #37",
+      "found": false
+    },
+    {
+      "id": 38,
+      "name": "Golden Chocobo #38",
+      "found": true,
+      "foundBy": "Jason Tompkins",
+      "dateFound": "2025-07-10",
+      "link": "https://www.facebook.com/groups/magicarenamtg/permalink/1762120754430585/"
+    },
+    {
+      "id": 39,
+      "name": "Golden Chocobo #39",
+      "found": true,
+      "foundBy": "Thejewell25",
+      "dateFound": "2025-07-15",
+      "link": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fff-mtg-golden-chocobo-tracker-v0-cbctph8hmkcf1.jpeg%3Fwidth%3D3000%26format%3Dpjpg%26auto%3Dwebp%26s%3Dbfa874c8cf7af4f74c27aa2ba3c10498eb803ce2"
+    },
+    {
+      "id": 40,
+      "name": "Golden Chocobo #40",
+      "found": true,
+      "foundBy": "gapman (whatnot)",
+      "dateFound": "2025-06-06",
+      "link": "https://imgur.com/a/ONYlafS"
+    },
+    {
+      "id": 41,
+      "name": "Golden Chocobo #41",
+      "found": true,
+      "foundBy": "Collector's Lounge",
+      "dateFound": "2025-06-05",
+      "link": "https://i.ebayimg.com/images/g/SMMAAeSw8cpoQmOA/s-l500.jpg",
+      "price": 40000,
+      "priceDate": "2025-06-21",
+      "image": "/images/chocobo-41.jpg"
+    },
+    {
+      "id": 42,
+      "name": "Golden Chocobo #42",
+      "found": true,
+      "foundBy": "Vorthos",
+      "dateFound": "2025-07-04",
+      "link": "https://www.facebook.com/groups/657646125885289/permalink/1256041522712410"
+    },
+    {
+      "id": 43,
+      "name": "Golden Chocobo #43",
+      "found": true,
+      "foundBy": "areiaitch",
+      "dateFound": "2025-06-17",
+      "link": "https://www.ebay.com/itm/267324858338?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339113954&customid=&toolid=10001&mkevt=1"
+    },
+    {
+      "id": 44,
+      "name": "Golden Chocobo #44",
+      "found": false
+    },
+    {
+      "id": 45,
+      "name": "Golden Chocobo #45",
+      "found": true,
+      "foundBy": "tpezair",
+      "dateFound": "2025-06-16",
+      "link": "https://www.reddit.com/r/MagicCardPulls/comments/1ld7bie/4577_golden_chocobo/"
+    },
+    {
+      "id": 46,
+      "name": "Golden Chocobo #46",
+      "found": false
+    },
+    {
+      "id": 47,
+      "name": "Golden Chocobo #47",
+      "found": false
+    },
+    {
+      "id": 48,
+      "name": "Golden Chocobo #48",
+      "found": true,
+      "foundBy": "uno_mtg",
+      "dateFound": "2025-07-07",
+      "link": "https://www.instagram.com/reel/DL0sJOdIWzE/?igsh=bXpycnJ1cHgxYW13"
+    },
+    {
+      "id": 49,
+      "name": "Golden Chocobo #49",
+      "found": false
+    },
+    {
+      "id": 50,
+      "name": "Golden Chocobo #50",
+      "found": true,
+      "foundBy": "cardsnhobbywa",
+      "dateFound": "2025-07-21",
+      "link": "https://www.instagram.com/p/DMYLFBFJikw/"
+    },
+    {
+      "id": 51,
+      "name": "Golden Chocobo #51",
+      "found": false
+    },
+    {
+      "id": 52,
+      "name": "Golden Chocobo #52",
+      "found": true,
+      "foundBy": "Anlishuo",
+      "dateFound": "2025-06-22",
+      "link": "https://www.reddit.com/r/mtgfinance/comments/1lifhfc/5277_golden_chocobo_pulled_in_china/"
+    },
+    {
+      "id": 53,
+      "name": "Golden Chocobo #53",
+      "found": true,
+      "foundBy": "Nathan Lucas",
+      "dateFound": "2025-06-20",
+      "link": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fff-mtg-golden-chocobo-tracker-v0-er8nz9gc558f1.jpeg%3Fwidth%3D1170%26format%3Dpjpg%26auto%3Dwebp%26s%3Dda9a2671bedf8e02989b876b47bd5fa41f9504d4"
+    },
+    {
+      "id": 54,
+      "name": "Golden Chocobo #54",
+      "found": false
+    },
+    {
+      "id": 55,
+      "name": "Golden Chocobo #55",
+      "found": true,
+      "foundBy": "bacaihau",
+      "dateFound": "2025-06-06",
+      "link": "https://x.com/SadPoor/status/1931688237547888643"
+    },
+    {
+      "id": 56,
+      "name": "Golden Chocobo #56",
+      "found": true,
+      "foundBy": "XCapnCanadaX",
+      "dateFound": "2025-06-13",
+      "link": "https://www.instagram.com/p/DK3U-poS0lC/?igsh=MWt3bXYzbTBzajU1Mw=="
+    },
+    {
+      "id": 57,
+      "name": "Golden Chocobo #57",
+      "found": false
+    },
+    {
+      "id": 58,
+      "name": "Golden Chocobo #58",
+      "found": false
+    },
+    {
+      "id": 59,
+      "name": "Golden Chocobo #59",
+      "found": false
+    },
+    {
+      "id": 60,
+      "name": "Golden Chocobo #60",
+      "found": false
+    },
+    {
+      "id": 61,
+      "name": "Golden Chocobo #61",
+      "found": true,
+      "foundBy": "Layton Gaming",
+      "dateFound": "2025-06-06",
+      "link": "https://www.instagram.com/p/DKlEguds490/?igsh=OGs2bjk5M3FibWd0"
+    },
+    {
+      "id": 62,
+      "name": "Golden Chocobo #62",
+      "found": true,
+      "foundBy": "fish_post (need more proof)",
+      "dateFound": "2025-06-17",
+      "link": "https://www.reddit.com/r/mtgfinance/comments/1le1hz9/comment/mydaqtf/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"
+    },
+    {
+      "id": 63,
+      "name": "Golden Chocobo #63",
+      "found": true,
+      "foundBy": "Orb Sports Cards & Collectibles",
+      "dateFound": "2025-07-21",
+      "link": "https://www.facebook.com/reel/1139328838029565",
+      "price": 50000,
+      "priceDate": "2025-07-24"
+    },
+    {
+      "id": 64,
+      "name": "Golden Chocobo #64",
+      "found": false
+    },
+    {
+      "id": 65,
+      "name": "Golden Chocobo #65",
+      "found": false
+    },
+    {
+      "id": 66,
+      "name": "Golden Chocobo #66",
+      "found": false
+    },
+    {
+      "id": 67,
+      "name": "Golden Chocobo #67",
+      "found": true,
+      "foundBy": "Dick and Janes",
+      "dateFound": "2025-06-13",
+      "link": "https://www.ebay.com/itm/277204582097"
+    },
+    {
+      "id": 68,
+      "name": "Golden Chocobo #68",
+      "found": false
+    },
+    {
+      "id": 69,
+      "name": "Golden Chocobo #69",
+      "found": true,
+      "foundBy": "Joe Lowdon",
+      "dateFound": "2025-06-19",
+      "link": "https://www.facebook.com/groups/657646125885289/permalink/1244798303836732/?mibextid=wwXIfr&rdid=TKFdhrDF6T0SMEFa&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fp%2F15gsr2G2m3%2F%3Fmibextid%3DwwXIfr#",
+      "price": 46844,
+      "priceDate": "2025-07-17"
+    },
+    {
+      "id": 70,
+      "name": "Golden Chocobo #70",
+      "found": false
+    },
+    {
+      "id": 71,
+      "name": "Golden Chocobo #71",
+      "found": false
+    },
+    {
+      "id": 72,
+      "name": "Golden Chocobo #72",
+      "found": false
+    },
+    {
+      "id": 73,
+      "name": "Golden Chocobo #73",
+      "found": false
+    },
+    {
+      "id": 74,
+      "name": "Golden Chocobo #74",
+      "found": false
+    },
+    {
+      "id": 75,
+      "name": "Golden Chocobo #75",
+      "found": false
+    },
+    {
+      "id": 76,
+      "name": "Golden Chocobo #76",
+      "found": false
+    },
+    {
+      "id": 77,
+      "name": "Golden Chocobo #77",
+      "found": false
+    }
+  ]
