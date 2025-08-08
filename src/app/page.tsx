@@ -249,9 +249,9 @@ export default function Home() {
               const imageSrc = card.image || `/images/chocobo-${card.id.toString().padStart(2, '0')}.jpg`;
               
               return (
-                <article key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col">
+                <article key={card.id} className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.5)] flex flex-col h-full">
                   <div 
-                    className="aspect-square mb-3 bg-chocobo-light rounded overflow-hidden cursor-pointer"
+                    className="aspect-[3/4] mb-3 bg-chocobo-light rounded overflow-hidden cursor-pointer"
                     onClick={() => {
                       setLightboxIndex(index);
                       setLightboxOpen(true);
@@ -269,7 +269,7 @@ export default function Home() {
                     <img
                       src={imageSrc}
                       alt={`Golden Chocobo Card #${card.id.toString().padStart(2, '0')} - ${card.name}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-black/20"
                       loading="lazy"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -281,12 +281,14 @@ export default function Home() {
                     />
                   </div>
                   
-                  <h3 className="text-lg font-bold text-chocobo-gold">#{card.id.toString().padStart(2, '0')}</h3>
+                  <h3 className="text-lg font-bold text-chocobo-gold tabular-nums">#{card.id.toString().padStart(2, '0')}</h3>
                   
-                  <div className="flex-grow">
-                    <p className={`font-bold ${card.found ? "text-yellow-400" : "text-gray-400"}`}>
-                      {card.found ? "Found" : "Not Found"}
-                    </p>
+                  <div className="flex-grow flex flex-col">
+                    <span
+                      className={`inline-block rounded px-2 py-0.5 text-xs font-bold ${card.found ? 'bg-green-800/50 text-green-300' : 'bg-gray-700/50 text-gray-300'}`}
+                    >
+                      {card.found ? 'Found' : 'Not Found'}
+                    </span>
                     
                     {card.price && (
                       <div className="text-sm mt-2 text-green-400">
@@ -313,7 +315,7 @@ export default function Home() {
                     {/* Details button */}
                     <button
                       onClick={() => setSelectedCardForDetails(card)}
-                      className="w-full mt-3 bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded text-sm"
+                      className="w-full mt-auto bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded text-sm"
                     >
                       View Details
                     </button>

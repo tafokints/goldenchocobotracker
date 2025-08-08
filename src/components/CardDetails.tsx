@@ -13,21 +13,21 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true">
+      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-[min(90vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/20">
+        <div className="flex justify-between items-center pb-4">
           <h2 className="text-xl font-bold text-chocobo-gold">
             Golden Chocobo #{card.id.toString().padStart(2, '0')} Details
           </h2>
           <button
             onClick={onClose}
-            className="text-chocobo-gold hover:text-yellow-400"
+            className="text-chocobo-gold hover:text-yellow-400 rounded px-2 py-1"
           >
             ✕
           </button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 pt-4">
           {/* Basic Info */}
           <div>
             <h3 className="text-lg font-bold text-chocobo-gold mb-2">Basic Information</h3>
