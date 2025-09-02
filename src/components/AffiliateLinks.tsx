@@ -7,7 +7,7 @@ const affiliateLinks = [
   },
   {
     name: "TCGPlayer Final Fantasy Boxes",
-    url: "https://partner.tcgplayer.com/raB7Vd",
+    url: "https://partner.tcgplayer.com/WyLbG3",
   },
   {
     name: "eBay MTG Final Fantasy Boxes",
