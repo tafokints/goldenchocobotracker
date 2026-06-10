@@ -4,6 +4,7 @@ import "./globals.css";
 import React from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import AffiliateDisclosure from "../components/AffiliateDisclosure";
 
 const cinzel = Cinzel({ subsets: ["latin"] });
 
@@ -95,6 +96,7 @@ export default function RootLayout({
         <meta name="google-site-verification" content="Wk33xovnISzNrBj7DbC1fT1OIzs53G7IZHXtI85KDdw" />
       </head>
       <body className={cinzel.className}>
+        <AffiliateDisclosure />
         {children}
         <SpeedInsights />
         <Analytics />
