@@ -9,6 +9,7 @@ interface FilterControlsProps {
   setStatusFilter: (status: string) => void;
   sortOrder: string;
   setSortOrder: (order: string) => void;
+  embedded?: boolean;
 }
 
 export default function FilterControls({
@@ -18,50 +19,59 @@ export default function FilterControls({
   setStatusFilter,
   sortOrder,
   setSortOrder,
+  embedded = false,
 }: FilterControlsProps) {
   return (
-    <div className="w-full max-w-5xl mt-8 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-4 bg-chocobo-dark bg-opacity-75 rounded-lg">
+    <div
+      className={
+        embedded
+          ? 'grid grid-cols-1 md:grid-cols-12 gap-2.5'
+          : 'w-full mt-5 grid grid-cols-1 md:grid-cols-12 gap-2.5 p-3 bg-chocobo-surface border border-chocobo-gold/25 rounded-lg'
+      }
+    >
       {/* Search Input */}
-      <div className="relative col-span-1 md:col-span-1">
+      <div className="relative md:col-span-6">
         <input
           type="text"
-          placeholder="Search by card # or finder"
-          aria-label="Search by card number or finder"
+          placeholder="Search card #, finder, region, or grail..."
+          aria-label="Search by card number, finder, region, or grail"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-10 bg-chocobo-light border border-chocobo-gold text-chocobo-dark rounded-lg py-2 pl-10 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+          className="w-full h-9 bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-light placeholder:text-chocobo-muted/70 text-sm rounded-md py-1.5 pl-9 pr-3 focus-visible:outline-none focus-visible:border-chocobo-gold focus-visible:ring-1 focus-visible:ring-chocobo-gold"
         />
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-chocobo-dark" />
+        <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-chocobo-muted pointer-events-none" />
       </div>
 
-      {/* Filter and Sort Dropdowns */}
-      <div className="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full h-10 bg-chocobo-light border border-chocobo-gold text-chocobo-dark rounded-lg py-2 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
-          >
-            <option value="all">Show All</option>
-            <option value="found">Show Found</option>
-            <option value="not-found">Show Not Found</option>
-          </select>
-        </div>
-        <div>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="w-full h-10 bg-chocobo-light border border-chocobo-gold text-chocobo-dark rounded-lg py-2 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
-          >
-            <option value="id-asc">Sort by ID (Asc)</option>
-            <option value="id-desc">Sort by ID (Desc)</option>
-            <option value="price-desc">Sort by Price (High-Low)</option>
-            <option value="price-asc">Sort by Price (Low-High)</option>
-            <option value="date-desc">Sort by Date (Newest)</option>
-            <option value="date-asc">Sort by Date (Oldest)</option>
-          </select>
-        </div>
+      {/* Status Filter */}
+      <div className="md:col-span-3">
+        <select
+          aria-label="Filter by discovery status"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="w-full h-9 bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-light text-sm rounded-md py-1.5 px-3 focus-visible:outline-none focus-visible:border-chocobo-gold focus-visible:ring-1 focus-visible:ring-chocobo-gold"
+        >
+          <option value="all">All Statuses</option>
+          <option value="found">Found Only</option>
+          <option value="not-found">Unpulled Only</option>
+        </select>
+      </div>
+
+      {/* Sort Order */}
+      <div className="md:col-span-3">
+        <select
+          aria-label="Sort cards"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="w-full h-9 bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-light text-sm rounded-md py-1.5 px-3 focus-visible:outline-none focus-visible:border-chocobo-gold focus-visible:ring-1 focus-visible:ring-chocobo-gold"
+        >
+          <option value="id-asc">Serial # (01 → 77)</option>
+          <option value="id-desc">Serial # (77 → 01)</option>
+          <option value="price-desc">Price (High → Low)</option>
+          <option value="price-asc">Price (Low → High)</option>
+          <option value="date-desc">Date Found (Newest)</option>
+          <option value="date-asc">Date Found (Oldest)</option>
+        </select>
       </div>
     </div>
   );
-} 
+}

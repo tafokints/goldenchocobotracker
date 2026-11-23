@@ -196,7 +196,7 @@ export default function SubmissionForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 md:p-8 space-y-5"
+      className="w-full max-w-xl bg-chocobo-surface border border-chocobo-gold/30 rounded-lg p-6 md:p-7 space-y-5"
     >
       {!submissionsReady && (
         <div
@@ -218,7 +218,7 @@ export default function SubmissionForm({
           id="submission-type"
           value={submissionType}
           onChange={(e) => setSubmissionType(e.target.value as SubmissionType)}
-          className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+          className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
         >
           {SUBMISSION_TYPES.map((t) => (
             <option key={t.value} value={t.value}>
@@ -239,7 +239,7 @@ export default function SubmissionForm({
             required
             value={serialNumber}
             onChange={(e) => setSerialNumber(e.target.value)}
-            className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+            className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
           >
             <option value="">Select card #{serialMin.toString().padStart(padWidth, '0')}–#{serialMax}...</option>
             {Array.from({ length: serialCount }, (_, i) => serialMin + i).map((num) => (
@@ -258,7 +258,7 @@ export default function SubmissionForm({
             value={serialNumber}
             onChange={(e) => setSerialNumber(e.target.value)}
             placeholder={`Enter serial number (${serialMin}–${serialMax})`}
-            className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+            className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
           />
         )}
       </div>
@@ -277,7 +277,7 @@ export default function SubmissionForm({
               value={foundBy}
               onChange={(e) => setFoundBy(e.target.value)}
               placeholder="Collector, LGS, or handle"
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>
           <div>
@@ -290,7 +290,7 @@ export default function SubmissionForm({
               required
               value={dateFound}
               onChange={(e) => setDateFound(e.target.value)}
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>
           <div>
@@ -301,7 +301,7 @@ export default function SubmissionForm({
               id="pull-channel"
               value={pullChannel}
               onChange={(e) => setPullChannel(e.target.value)}
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             >
               <option value="">Unspecified</option>
               <option value="lgs">Local Game Store (LGS)</option>
@@ -321,7 +321,7 @@ export default function SubmissionForm({
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               placeholder="e.g., US, Japan, Canada, UK"
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>
         </div>
@@ -343,7 +343,7 @@ export default function SubmissionForm({
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="e.g., 65000"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+                className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
               />
             </div>
             <div>
@@ -356,7 +356,7 @@ export default function SubmissionForm({
                 required
                 value={saleDate}
                 onChange={(e) => setSaleDate(e.target.value)}
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+                className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
               />
             </div>
           </div>
@@ -371,7 +371,7 @@ export default function SubmissionForm({
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value)}
                 placeholder="eBay, Goldin, Private"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3 text-sm"
+                className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3 text-sm"
               />
             </div>
             <div>
@@ -384,7 +384,7 @@ export default function SubmissionForm({
                 value={soldBy}
                 onChange={(e) => setSoldBy(e.target.value)}
                 placeholder="Handle"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3 text-sm"
+                className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3 text-sm"
               />
             </div>
             <div>
@@ -397,7 +397,7 @@ export default function SubmissionForm({
                 value={soldTo}
                 onChange={(e) => setSoldTo(e.target.value)}
                 placeholder="Handle"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3 text-sm"
+                className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3 text-sm"
               />
             </div>
           </div>
@@ -414,7 +414,7 @@ export default function SubmissionForm({
               id="grading-service"
               value={gradingService}
               onChange={(e) => setGradingService(e.target.value)}
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             >
               <option value="PSA">PSA</option>
               <option value="BGS">BGS (Beckett)</option>
@@ -437,7 +437,7 @@ export default function SubmissionForm({
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
               placeholder="e.g., 10 or 9.5"
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>
           <div>
@@ -450,7 +450,7 @@ export default function SubmissionForm({
               value={certNumber}
               onChange={(e) => setCertNumber(e.target.value)}
               placeholder="e.g., 104829104"
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>
           <div>
@@ -462,7 +462,7 @@ export default function SubmissionForm({
               type="date"
               value={dateGraded}
               onChange={(e) => setDateGraded(e.target.value)}
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>
         </div>
@@ -480,7 +480,7 @@ export default function SubmissionForm({
           value={proofUrl}
           onChange={(e) => setProofUrl(e.target.value)}
           placeholder="https://..."
-          className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+          className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
         />
       </div>
 
@@ -517,7 +517,7 @@ export default function SubmissionForm({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Any helpful context for reviewers..."
-          className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3 text-sm"
+          className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3 text-sm"
         />
       </div>
 
@@ -532,7 +532,7 @@ export default function SubmissionForm({
           value={submitterHandle}
           onChange={(e) => setSubmitterHandle(e.target.value)}
           placeholder="Reddit, Discord, or X handle"
-          className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3 text-sm"
+          className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3 text-sm"
         />
       </div>
 

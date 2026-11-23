@@ -2,13 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #201A15;
-  color: #FFF8F0;
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #1B1612;
+    color: #F6EFE4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display), Georgia, serif;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-} 
+}

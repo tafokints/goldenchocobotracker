@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import SubmissionForm from '@/components/SubmissionForm';
 import { hasDatabaseEnv, type SubmissionType } from '@/db';
 import { hasR2Env } from '@/lib/r2';
@@ -43,19 +42,12 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || undefined;
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-6 md:p-12">
-      <header className="w-full max-w-xl flex items-center justify-between mb-6 gap-4 text-sm font-mono">
-        <Link href="/" className="text-chocobo-gold hover:text-yellow-400 transition-colors">
-          &larr; Back to Tracker
-        </Link>
-        <Link href="/admin" className="text-chocobo-light/70 hover:text-chocobo-gold text-xs">
-          Admin
-        </Link>
-      </header>
-
-      <div className="w-full max-w-xl text-center mb-6 space-y-2">
-        <h1 className="text-3xl font-bold text-chocobo-gold">Submit a Find or Update</h1>
-        <p className="text-sm text-chocobo-light/85">
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 flex flex-col items-center">
+      <div className="w-full max-w-xl text-center mb-6 space-y-1.5">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold">
+          Submit a Find or Update
+        </h1>
+        <p className="text-sm text-chocobo-muted">
           No account needed. Every submission is reviewed by a maintainer before going live to keep
           tracker data accurate and spam-free.
         </p>

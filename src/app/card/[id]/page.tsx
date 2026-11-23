@@ -122,32 +122,32 @@ export default async function CardPage({ params }: CardPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <main className="flex min-h-screen flex-col items-center p-6 md:p-12">
-        <div className="w-full max-w-4xl space-y-8">
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-6">
+        <div className="max-w-4xl mx-auto space-y-5">
           <nav
             aria-label="Breadcrumb and card navigation"
-            className="flex flex-wrap items-center justify-between gap-4 text-sm font-mono"
+            className="flex flex-wrap items-center justify-between gap-4 text-sm"
           >
-            <Link href="/" className="text-chocobo-gold hover:text-yellow-400 transition-colors">
+            <Link href="/" className="text-chocobo-muted hover:text-chocobo-gold transition-colors">
               &larr; All 77 Cards
             </Link>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 tabular-nums">
               <Link
                 href={`/card/${prevId}`}
-                className="text-chocobo-gold hover:text-yellow-400 transition-colors"
+                className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
               >
                 &larr; #{prevId}
               </Link>
               <Link
                 href={`/card/${nextId}`}
-                className="text-chocobo-gold hover:text-yellow-400 transition-colors"
+                className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
               >
                 #{nextId} &rarr;
               </Link>
             </div>
           </nav>
 
-          <article className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <article className="bg-chocobo-surface border border-chocobo-gold/40 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <div className="w-full">
               {card.resolvedImage ? (
                 <div className="relative aspect-[3/4] w-full bg-black/30 rounded-lg overflow-hidden border border-chocobo-gold/40">

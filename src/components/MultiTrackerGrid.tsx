@@ -210,7 +210,11 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
               return (
                 <article
                   key={`${activeSeries.slug}-${card.id}`}
-                  className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.3)] flex flex-col h-full"
+                  className={`rounded-lg p-3.5 flex flex-col h-full transition-all ${
+                    card.found
+                      ? 'bg-chocobo-surface border border-chocobo-gold/45 hover:border-chocobo-gold hover:-translate-y-0.5'
+                      : 'bg-chocobo-recessed/75 border border-chocobo-light/10 hover:border-chocobo-gold/30'
+                  }`}
                 >
                   {card.resolvedImage && slideIndex !== undefined ? (
                     <button

@@ -1,13 +1,27 @@
 import type { Metadata, Viewport } from 'next';
-import { Cinzel } from 'next/font/google';
+import { Cinzel, Inter } from 'next/font/google';
 import './globals.css';
 import React from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import AffiliateDisclosure from '../components/AffiliateDisclosure';
+import SiteFooter from '../components/SiteFooter';
+import SiteHeader from '../components/SiteHeader';
 import { getSiteUrl } from '@/lib/site-config';
 
-const cinzel = Cinzel({ subsets: ['latin'], display: 'swap' });
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  display: 'swap',
+  variable: '--font-display',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+});
+
 const siteUrl = getSiteUrl();
 
 export const viewport: Viewport = {
@@ -112,10 +126,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={cinzel.className}>
+    <html lang="en" className={`${inter.variable} ${cinzel.variable}`}>
+      <body className="font-sans bg-chocobo-dark text-chocobo-light min-h-screen flex flex-col">
         <AffiliateDisclosure />
-        {children}
+        <SiteHeader />
+        <div className="flex-1 flex flex-col">{children}</div>
+        <SiteFooter />
         <SpeedInsights />
         <Analytics />
       </body>

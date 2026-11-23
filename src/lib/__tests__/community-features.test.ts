@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { buildRecentActivity } from '@/lib/activity';
 import { cardsToCsv, escapeCsvCell } from '@/lib/csv';
+import { formatCompactUsd } from '@/lib/format';
 import { getGradingCertUrl } from '@/lib/grading-certs';
 import { getIconicLabel, isIconicNumber, normalizeIconicMap } from '@/lib/iconic-numbers';
 import { buildRssXml, escapeXml } from '@/lib/rss';
 import type { ResolvedCard } from '@/lib/types';
+
+describe('formatCompactUsd', () => {
+  it('formats million, thousand, and sub-thousand USD values cleanly', () => {
+    expect(formatCompactUsd(1_400_000)).toBe('$1.4M');
+    expect(formatCompactUsd(1_000_000)).toBe('$1M');
+    expect(formatCompactUsd(75_000)).toBe('$75k');
+    expect(formatCompactUsd(8_500)).toBe('$8.5k');
+    expect(formatCompactUsd(950)).toBe('$950');
+  });
+});
 
 describe('grading cert verification URLs', () => {
   it('builds verified lookup URLs for PSA, CGC, BGS, and TAG', () => {

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
+import { formatCompactUsd } from '@/lib/format';
 import {
   GOLDEN_CHOCOBO_ICONIC_NUMBERS,
   getIconicLabel,
@@ -100,8 +101,6 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
     return { lightboxSlides: slides, cardIdToSlideIndex: indexMap };
   }, [filteredAndSortedCards]);
 
-  // Track rendered image rank so only the first 2 actual visible images get high-priority preload
-  // (avoids competing parallel LCP downloads over the initial TCP congestion window)
   const imagePriorityRank = useMemo(() => {
     const rankMap = new Map<number, number>();
     let rank = 0;
@@ -115,78 +114,86 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
 
   return (
     <>
-      <FilterControls
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-      />
+      {/* Unified Dark Toolbar */}
+      <div className="w-full bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-3 space-y-3">
+        <FilterControls
+          embedded
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}
+        />
 
-      {/* Quick Filter Chips & Grid / Compact 1-77 Matrix View Toggle */}
-      <div className="w-full max-w-5xl mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Quick filters">
-          {(
-            [
-              ['all', 'All'],
-              ['graded', 'Graded'],
-              ['priced', 'Has Sale'],
-              ['iconic', '★ Iconic / Grails'],
-              ['unpulled-iconic', '★ Unpulled Grails'],
-            ] as Array<[QuickFilter, string]>
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setQuickFilter(key)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
-                quickFilter === key
-                  ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold'
-                  : 'bg-chocobo-dark/75 text-chocobo-light border-chocobo-gold/40 hover:border-chocobo-gold'
-              }`}
+        <div className="pt-2.5 border-t border-chocobo-gold/15 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+            {(
+              [
+                ['all', 'All'],
+                ['graded', 'Graded'],
+                ['priced', 'Has Sale'],
+                ['iconic', '★ Grails'],
+                ['unpulled-iconic', '★ Unpulled Grails'],
+              ] as Array<[QuickFilter, string]>
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setQuickFilter(key)}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                  quickFilter === key
+                    ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold font-semibold'
+                    : 'bg-chocobo-recessed/70 text-chocobo-muted border-chocobo-gold/20 hover:border-chocobo-gold/50 hover:text-chocobo-light'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 ml-auto">
+            <span className="text-xs text-chocobo-muted tabular-nums hidden sm:inline">
+              {filteredAndSortedCards.length} of {initialCards.length}
+            </span>
+            <div
+              className="inline-flex rounded-md border border-chocobo-gold/35 overflow-hidden text-xs font-medium bg-chocobo-recessed"
+              role="group"
+              aria-label="Layout view"
             >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div
-          className="inline-flex rounded-lg border border-chocobo-gold/60 overflow-hidden text-xs font-bold"
-          role="group"
-          aria-label="Layout view"
-        >
-          <button
-            type="button"
-            onClick={() => setViewMode('grid')}
-            aria-pressed={viewMode === 'grid'}
-            className={`px-3 py-1.5 transition-colors ${
-              viewMode === 'grid'
-                ? 'bg-chocobo-gold text-chocobo-dark'
-                : 'bg-chocobo-dark text-chocobo-light hover:text-chocobo-gold'
-            }`}
-          >
-            Card Grid
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('matrix')}
-            aria-pressed={viewMode === 'matrix'}
-            className={`px-3 py-1.5 transition-colors ${
-              viewMode === 'matrix'
-                ? 'bg-chocobo-gold text-chocobo-dark'
-                : 'bg-chocobo-dark text-chocobo-light hover:text-chocobo-gold'
-            }`}
-          >
-            1–77 Wall
-          </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                aria-pressed={viewMode === 'grid'}
+                className={`px-3 py-1 transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-chocobo-gold text-chocobo-dark font-semibold'
+                    : 'text-chocobo-muted hover:text-chocobo-light'
+                }`}
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('matrix')}
+                aria-pressed={viewMode === 'matrix'}
+                className={`px-3 py-1 transition-colors ${
+                  viewMode === 'matrix'
+                    ? 'bg-chocobo-gold text-chocobo-dark font-semibold'
+                    : 'text-chocobo-muted hover:text-chocobo-light'
+                }`}
+              >
+                1–77 Wall
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <section className="w-full max-w-5xl mt-6" aria-label="Golden Chocobo Cards">
+      <section className="w-full" aria-label="Golden Chocobo Cards">
         <h2 className="sr-only">Golden Chocobo Card Collection</h2>
         {filteredAndSortedCards.length === 0 ? (
-          <div className="text-center py-12 bg-chocobo-dark/75 border border-chocobo-gold/40 rounded-lg text-chocobo-light">
+          <div className="text-center py-12 bg-chocobo-surface border border-chocobo-gold/20 rounded-lg text-chocobo-muted text-sm">
             No cards match your current filters.
           </div>
         ) : viewMode === 'matrix' ? (
@@ -207,12 +214,16 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
               return (
                 <article
                   key={card.id}
-                  className="border border-chocobo-gold rounded-lg p-4 bg-chocobo-dark shadow-[0_0_15px_rgba(214,167,61,0.35)] flex flex-col h-full"
+                  className={`rounded-lg p-3.5 flex flex-col h-full transition-all ${
+                    card.found
+                      ? 'bg-chocobo-surface border border-chocobo-gold/45 hover:border-chocobo-gold hover:-translate-y-0.5'
+                      : 'bg-chocobo-recessed/75 border border-chocobo-light/10 hover:border-chocobo-gold/30'
+                  }`}
                 >
                   {card.resolvedImage && slideIndex !== undefined ? (
                     <button
                       type="button"
-                      className="relative aspect-[3/4] w-full mb-3 bg-black/30 rounded overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+                      className="relative aspect-[3/4] w-full mb-3 bg-black/35 rounded-md overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
                       onClick={() => {
                         setLightboxIndex(slideIndex);
                         setLightboxOpen(true);
@@ -232,120 +243,137 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
                     </button>
                   ) : (
                     <div
-                      className="aspect-[3/4] w-full mb-3 rounded border border-chocobo-gold/30 bg-gradient-to-b from-chocobo-gold/15 via-black/40 to-black/60 flex flex-col items-center justify-center p-4 text-center select-none"
+                      className={`aspect-[3/4] w-full mb-3 rounded-md border flex flex-col items-center justify-center p-4 text-center select-none ${
+                        card.found
+                          ? 'border-chocobo-gold/25 bg-chocobo-recessed/80'
+                          : 'border-chocobo-light/10 bg-chocobo-dark/80'
+                      }`}
                       aria-hidden="true"
                     >
-                      <span className="text-3xl font-bold text-chocobo-gold/80 tabular-nums">
+                      <span
+                        className={`font-display text-3xl font-bold tabular-nums ${
+                          card.found ? 'text-chocobo-gold/80' : 'text-chocobo-muted/45'
+                        }`}
+                      >
                         #{paddedId}
                       </span>
-                      <span className="text-xs uppercase tracking-widest text-chocobo-light/60 mt-2">
-                        {card.found ? 'Photo Pending' : 'Undiscovered'}
+                      <span className="text-[11px] uppercase tracking-widest text-chocobo-muted/60 mt-1.5">
+                        {card.found ? 'Photo Pending' : 'Unpulled'}
                       </span>
-                      <span className="text-[11px] text-chocobo-gold/60 mt-1">of 77</span>
+                      <span className="text-[11px] text-chocobo-muted/40 mt-0.5">of 77</span>
                     </div>
                   )}
 
+                  {/* Card Header Row */}
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-lg font-bold text-chocobo-gold tabular-nums">
-                      <Link href={`/card/${paddedId}`} className="hover:underline">
+                    <h3 className="font-display text-lg font-bold text-chocobo-gold tabular-nums">
+                      <Link href={`/card/${paddedId}`} className="hover:text-chocobo-gold-bright transition-colors">
                         #{paddedId}
                       </Link>
                     </h3>
                     <span
-                      className={`inline-block rounded px-2 py-0.5 text-xs font-bold ${
+                      className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${
                         card.found
-                          ? 'bg-green-800/50 text-green-300'
-                          : 'bg-gray-700/50 text-gray-300'
+                          ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-white/5 text-chocobo-muted border border-white/10'
                       }`}
                     >
-                      {card.found ? 'Found' : 'Not Found'}
+                      {card.found ? 'Found' : 'Unpulled'}
                     </span>
                   </div>
 
                   {iconicLabel && (
-                    <span className="inline-block self-start mt-1.5 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-yellow-500/20 border border-yellow-400/50 text-yellow-200">
+                    <span className="inline-block self-start mt-1.5 rounded px-2 py-0.5 text-[11px] font-medium bg-amber-950/70 border border-chocobo-gold/40 text-amber-200">
                       ★ {iconicLabel}
                     </span>
                   )}
 
-                  <div className="flex-grow flex flex-col mt-2 space-y-2">
-                    {typeof card.price === 'number' && (
-                      <div className="text-sm text-green-400">
-                        <p className="font-semibold tabular-nums">
-                          Recent Sale: ${card.price.toLocaleString()}
-                        </p>
-                        {card.priceDate && (
-                          <p className="text-xs text-chocobo-light/80">{card.priceDate}</p>
-                        )}
-                      </div>
-                    )}
+                  {/* Card Metadata */}
+                  <div className="flex-1 flex flex-col mt-2.5 text-xs">
+                    <div className="space-y-1.5 pb-3">
+                      {typeof card.price === 'number' && (
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-sm font-semibold text-emerald-400 tabular-nums">
+                            {formatCompactUsd(card.price)}
+                            <span className="text-xs font-normal text-chocobo-muted ml-1">
+                              (${card.price.toLocaleString()})
+                            </span>
+                          </span>
+                        </div>
+                      )}
 
-                    {card.grading && (
-                      <div className="text-sm text-blue-400">
-                        <p className="font-semibold">
+                      {card.grading && (
+                        <p className="text-sky-300 font-medium">
                           {card.grading.service} {card.grading.grade}
-                        </p>
-                        {card.grading.dateGraded && (
-                          <p className="text-xs text-chocobo-light/80">
-                            {card.grading.dateGraded}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {card.found && (
-                      <div className="text-sm text-chocobo-light space-y-0.5">
-                        {card.foundBy && <p className="truncate">Found by: {card.foundBy}</p>}
-                        {card.dateFound && (
-                          <p className="text-xs text-chocobo-light/80">
-                            Date: {card.dateFound}
-                            {card.region ? ` · ${card.region}` : ''}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-xs">
-                          {pullSourceUrl && (
-                            <a
-                              href={pullSourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-chocobo-gold hover:underline"
-                            >
-                              Pull Source
-                            </a>
+                          {card.grading.dateGraded && (
+                            <span className="text-chocobo-muted font-normal ml-1.5 tabular-nums">
+                              &middot; {card.grading.dateGraded}
+                            </span>
                           )}
-                          {marketplaceUrl && (
-                            <a
-                              href={marketplaceUrl}
-                              target="_blank"
-                              rel={
-                                isMarketplaceAffiliate
-                                  ? 'sponsored noopener noreferrer'
-                                  : 'noopener noreferrer'
-                              }
-                              className="text-chocobo-gold hover:underline"
-                            >
-                              View on {marketplaceLabel}
-                              {isMarketplaceAffiliate ? ' (Paid Link)' : ''}
-                            </a>
+                        </p>
+                      )}
+
+                      {card.found && (
+                        <div className="text-chocobo-light/90 space-y-0.5 pt-0.5">
+                          {card.foundBy && (
+                            <p className="truncate">
+                              <span className="text-chocobo-muted">By:</span> {card.foundBy}
+                            </p>
+                          )}
+                          {card.dateFound && (
+                            <p className="text-chocobo-muted tabular-nums">
+                              {card.dateFound}
+                              {card.region ? ` · ${card.region}` : ''}
+                            </p>
+                          )}
+                          {(pullSourceUrl || marketplaceUrl) && (
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
+                              {pullSourceUrl && (
+                                <a
+                                  href={pullSourceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-chocobo-gold hover:underline"
+                                >
+                                  Source
+                                </a>
+                              )}
+                              {marketplaceUrl && (
+                                <a
+                                  href={marketplaceUrl}
+                                  target="_blank"
+                                  rel={
+                                    isMarketplaceAffiliate
+                                      ? 'sponsored noopener noreferrer'
+                                      : 'noopener noreferrer'
+                                  }
+                                  className="text-chocobo-gold hover:underline"
+                                >
+                                  {marketplaceLabel}
+                                  {isMarketplaceAffiliate ? ' (Paid Link)' : ''}
+                                </a>
+                              )}
+                            </div>
                           )}
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
-                    <div className="pt-3 mt-auto flex gap-2">
+                    {/* Pinned Card Footer — Always Aligned on Baseline */}
+                    <div className="mt-auto pt-2.5 border-t border-chocobo-gold/15 flex items-center justify-between gap-2">
                       <button
                         type="button"
                         onClick={() => setSelectedCardForDetails(card)}
-                        className="flex-1 bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-3 rounded text-xs sm:text-sm transition-colors"
+                        className="text-xs font-semibold text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
                       >
                         Quick View
                       </button>
                       <Link
                         href={`/card/${paddedId}`}
-                        className="border border-chocobo-gold/70 hover:bg-chocobo-gold/15 text-chocobo-gold font-semibold py-2 px-3 rounded text-xs sm:text-sm transition-colors text-center"
+                        className="text-xs text-chocobo-muted hover:text-chocobo-light transition-colors"
                         aria-label={`Open full page for Golden Chocobo #${paddedId}`}
                       >
-                        Page
+                        Details &rarr;
                       </Link>
                     </div>
                   </div>

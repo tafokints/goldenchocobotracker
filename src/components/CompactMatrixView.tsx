@@ -1,5 +1,6 @@
 'use client';
 
+import { formatCompactUsd } from '@/lib/format';
 import { GOLDEN_CHOCOBO_ICONIC_NUMBERS, getIconicLabel } from '@/lib/iconic-numbers';
 import type { ResolvedCard } from '@/lib/types';
 
@@ -17,21 +18,21 @@ export default function CompactMatrixView({
   onSelectCard,
 }: CompactMatrixViewProps) {
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-chocobo-light/80 bg-chocobo-dark/75 border border-chocobo-gold/30 rounded-lg px-4 py-2.5">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-chocobo-muted bg-chocobo-surface border border-chocobo-gold/20 rounded-lg px-4 py-2">
         <div className="flex flex-wrap items-center gap-4">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-chocobo-gold inline-block" /> Found
+          <span className="inline-flex items-center gap-1.5 text-chocobo-light">
+            <span className="w-2.5 h-2.5 rounded-sm bg-chocobo-gold inline-block" /> Found
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-chocobo-dark border border-chocobo-gold/35 inline-block" />{' '}
+            <span className="w-2.5 h-2.5 rounded-sm bg-chocobo-recessed border border-chocobo-light/20 inline-block" />{' '}
             Unpulled
           </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="text-yellow-300 font-bold">★</span> Iconic / Grail Number
+          <span className="inline-flex items-center gap-1.5 text-amber-200">
+            <span className="text-amber-300">★</span> Iconic / Grail
           </span>
         </div>
-        <span className="text-chocobo-light/65">Click any tile for full details</span>
+        <span>Click any tile for full details</span>
       </div>
 
       <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-11 gap-2">
@@ -45,36 +46,38 @@ export default function CompactMatrixView({
               key={card.id}
               type="button"
               onClick={() => onSelectCard(card)}
-              title={`${card.name} — ${card.found ? `Found${card.foundBy ? ` by ${card.foundBy}` : ''}` : 'Not Found'}${
+              title={`${card.name} — ${card.found ? `Found${card.foundBy ? ` by ${card.foundBy}` : ''}` : 'Unpulled'}${
                 iconic ? ` · ${iconic}` : ''
               }${hasPrice ? ` · $${card.price!.toLocaleString()}` : ''}`}
-              className={`relative aspect-square rounded-md border p-1.5 flex flex-col items-center justify-center transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold ${
+              className={`relative aspect-square rounded-md border p-1.5 flex flex-col items-center justify-center transition-all hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold ${
                 card.found
-                  ? 'bg-chocobo-gold/25 border-chocobo-gold text-chocobo-gold shadow-[0_0_8px_rgba(214,167,61,0.3)]'
+                  ? 'bg-chocobo-gold/20 border-chocobo-gold/75 text-chocobo-gold hover:bg-chocobo-gold/30'
                   : iconic
-                    ? 'bg-chocobo-dark/90 border-yellow-400/60 text-chocobo-light/75'
-                    : 'bg-chocobo-dark/70 border-chocobo-gold/20 text-chocobo-light/45'
+                    ? 'bg-chocobo-surface/80 border-chocobo-gold/45 text-chocobo-light/70 hover:border-chocobo-gold'
+                    : 'bg-chocobo-recessed/80 border-chocobo-light/10 text-chocobo-muted/55 hover:border-chocobo-gold/35'
               }`}
             >
               {iconic && (
                 <span
                   aria-label={iconic}
-                  className="absolute top-0.5 right-1 text-[10px] leading-none text-yellow-300"
+                  className="absolute top-0.5 right-1 text-[10px] leading-none text-amber-300"
                 >
                   ★
                 </span>
               )}
-              <span className="text-sm sm:text-base font-bold tabular-nums">#{padded}</span>
+              <span className="font-display text-sm sm:text-base font-bold tabular-nums leading-none">
+                #{padded}
+              </span>
               {hasPrice ? (
-                <span className="text-[9px] text-green-300 font-semibold tabular-nums leading-tight mt-0.5">
-                  ${Math.round(card.price! / 1000)}k
+                <span className="text-[10px] text-emerald-300 font-semibold tabular-nums leading-tight mt-1">
+                  {formatCompactUsd(card.price!)}
                 </span>
               ) : card.grading ? (
-                <span className="text-[9px] text-blue-300 font-semibold leading-tight mt-0.5">
+                <span className="text-[10px] text-sky-300 font-medium leading-tight mt-1">
                   {card.grading.service} {card.grading.grade}
                 </span>
               ) : (
-                <span className="text-[9px] opacity-70 leading-tight mt-0.5">
+                <span className="text-[10px] opacity-75 leading-tight mt-1">
                   {card.found ? 'Found' : '—'}
                 </span>
               )}

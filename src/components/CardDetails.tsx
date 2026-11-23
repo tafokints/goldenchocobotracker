@@ -47,15 +47,15 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
         }
       }}
     >
-      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/20">
+      <div className="bg-chocobo-surface border border-chocobo-gold/55 rounded-lg p-6 w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/15 shadow-2xl">
         <div className="flex justify-between items-start pb-4 gap-4">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 id="card-details-title" className="text-xl font-bold text-chocobo-gold">
-                Golden Chocobo #{paddedId} Details
+              <h2 id="card-details-title" className="font-display text-xl font-bold text-chocobo-gold">
+                Golden Chocobo #{paddedId}
               </h2>
               {iconicLabel && (
-                <span className="rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-yellow-500/20 border border-yellow-400/50 text-yellow-200">
+                <span className="rounded px-2 py-0.5 text-[11px] font-medium bg-amber-950/80 border border-chocobo-gold/45 text-amber-200">
                   ★ {iconicLabel}
                 </span>
               )}

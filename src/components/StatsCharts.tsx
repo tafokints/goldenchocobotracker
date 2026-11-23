@@ -41,7 +41,7 @@ export default function StatsCharts({
     <div className="space-y-8">
       {/* Cumulative Discovery Curve + Monthly Pulls */}
       {findsByMonth.length > 0 && (
-        <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+        <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
           <div className="flex flex-wrap justify-between items-baseline gap-2 mb-4">
             <h2 className="text-xl font-bold text-chocobo-gold">
               Cumulative Discovery Curve &amp; Monthly Pulls
@@ -73,7 +73,7 @@ export default function StatsCharts({
       )}
 
       {/* Price Range Distribution */}
-      <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+      <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
         <h2 className="text-xl font-bold text-chocobo-gold mb-4">Sale Price Distribution</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={priceRanges}>
@@ -88,7 +88,7 @@ export default function StatsCharts({
 
       {/* Reported Sale Price History */}
       {priceHistory.length > 1 && (
-        <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+        <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
           <h2 className="text-xl font-bold text-chocobo-gold mb-4">Reported Sale Price Trend</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={priceHistory}>
@@ -118,7 +118,7 @@ export default function StatsCharts({
       {/* Grading Statistics */}
       {gradingStats.totalGraded > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+          <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
             <h2 className="text-xl font-bold text-chocobo-gold mb-4">Grade Distribution</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -144,7 +144,7 @@ export default function StatsCharts({
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+          <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
             <h2 className="text-xl font-bold text-chocobo-gold mb-4">Grading Services</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={gradingStats.serviceDistribution}>
@@ -163,7 +163,7 @@ export default function StatsCharts({
       {(pullChannelDistribution.length > 0 || regionDistribution.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {pullChannelDistribution.length > 0 && (
-            <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+            <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
               <h2 className="text-xl font-bold text-chocobo-gold mb-4">Pull Origin Breakdown</h2>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={pullChannelDistribution} layout="vertical">
@@ -178,7 +178,7 @@ export default function StatsCharts({
           )}
 
           {regionDistribution.length > 0 && (
-            <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+            <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
               <h2 className="text-xl font-bold text-chocobo-gold mb-4">Pulls by Region</h2>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={regionDistribution}>

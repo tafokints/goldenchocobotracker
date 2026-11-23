@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import AffiliateLinks from '@/components/AffiliateLinks';
 import LatestActivityStrip from '@/components/LatestActivityStrip';
 import ProgressBar from '@/components/ProgressBar';
@@ -13,13 +12,8 @@ export default async function HomePage() {
   const cards = await getCards();
   const recentActivity = buildRecentActivity(cards, { limit: 6 });
 
-  const foundCards = cards.filter((card) => card.found);
-  const foundCount = foundCards.length;
+  const foundCount = cards.filter((card) => card.found).length;
   const totalCount = cards.length;
-
-  const lastFoundCard = [...foundCards]
-    .filter((card) => Boolean(card.dateFound))
-    .sort((a, b) => new Date(b.dateFound!).getTime() - new Date(a.dateFound!).getTime())[0];
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -43,54 +37,29 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <main className="flex min-h-screen flex-col items-center p-6 md:p-12">
-        <header className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-wrap gap-4">
-          <h1 className="text-2xl md:text-4xl font-bold text-chocobo-gold">
-            Golden Chocobo Tracker
-          </h1>
-          <nav className="flex items-center space-x-5" aria-label="Main navigation">
-            <Link
-              href="/hub"
-              className="text-chocobo-light/85 hover:text-chocobo-gold transition-colors font-semibold"
-            >
-              All Trackers
-            </Link>
-            <Link
-              href="/stats"
-              className="text-chocobo-gold hover:text-yellow-400 transition-colors font-semibold"
-            >
-              Stats
-            </Link>
-            <Link
-              href="/submit"
-              className="text-chocobo-gold hover:text-yellow-400 transition-colors font-semibold"
-            >
-              Submit Update
-            </Link>
-          </nav>
-        </header>
-
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-4">
+        {/* Compact Hero + Progress Band */}
         <section
-          aria-label="Discovery progress"
-          className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold/30"
+          aria-label="Golden Chocobo discovery progress"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-chocobo-surface border border-chocobo-gold/25 rounded-lg px-5 py-4"
         >
-          <ProgressBar current={foundCount} total={totalCount} />
-          {lastFoundCard && (
-            <p className="text-chocobo-light mt-4 text-sm">
-              Last find:{' '}
-              <Link
-                href={`/card/${lastFoundCard.id.toString().padStart(2, '0')}`}
-                className="text-chocobo-gold hover:underline font-semibold"
-              >
-                #{lastFoundCard.id.toString().padStart(2, '0')}
-              </Link>{' '}
-              by {lastFoundCard.foundBy} on {lastFoundCard.dateFound}
+          <div className="lg:col-span-6 space-y-0.5">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-wide text-chocobo-gold">
+              Golden Chocobo Tracker
+            </h1>
+            <p className="text-xs sm:text-sm text-chocobo-muted">
+              Serialized /77 Traveling Chocobo &middot; Magic: The Gathering &times; Final Fantasy
             </p>
-          )}
+          </div>
+          <div className="lg:col-span-6">
+            <ProgressBar current={foundCount} total={totalCount} />
+          </div>
         </section>
 
+        {/* Collapsible Single-Row Latest Activity Ticker */}
         <LatestActivityStrip events={recentActivity} />
 
+        {/* Unified Dark Toolbar + Grid / 1-77 Wall */}
         <TrackerGrid initialCards={cards} />
 
         <AffiliateLinks />
