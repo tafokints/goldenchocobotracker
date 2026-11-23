@@ -1,5 +1,8 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
 import fs from 'node:fs';
+
+config({ path: '.env.local' });
+config();
 import path from 'node:path';
 import { and, eq } from 'drizzle-orm';
 import { getDb, hasDatabaseEnv, priceEvents, serialItems, series, trackers } from '../src/db';

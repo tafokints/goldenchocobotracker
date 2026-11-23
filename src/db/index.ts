@@ -6,16 +6,21 @@ export type AppDb = NeonHttpDatabase<typeof schema>;
 
 let cachedDb: AppDb | null = null;
 
+function resolveDatabaseUrl(): string | undefined {
+  return (process.env.DATABASE_URL || process.env.POSTGRES_URL)?.trim() || undefined;
+}
+
 export function hasDatabaseEnv(): boolean {
-  return Boolean(process.env.DATABASE_URL?.trim());
+  return Boolean(resolveDatabaseUrl());
 }
 
 export function getDb(): AppDb {
-  if (!hasDatabaseEnv()) {
+  const url = resolveDatabaseUrl();
+  if (!url) {
     throw new Error('DATABASE_URL environment variable is not configured');
   }
   if (!cachedDb) {
-    const sql = neon(process.env.DATABASE_URL!);
+    const sql = neon(url);
     cachedDb = drizzle(sql, { schema });
   }
   return cachedDb;
