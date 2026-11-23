@@ -48,16 +48,16 @@ export default async function DynamicTrackerStatsPage({ params }: TrackerStatsPa
             {tracker.setName} &middot; Live pull velocity, reported sale medians, and grading breakdown.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 text-xs w-full sm:w-auto">
           <Link
             href={`/t/${tracker.slug}`}
-            className="border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-1.5 px-3 rounded transition-colors"
+            className="inline-flex items-center justify-center min-h-[38px] sm:min-h-0 border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-2 sm:py-1.5 px-3 rounded transition-colors truncate"
           >
-            &larr; Back to {tracker.name}
+            &larr; {tracker.name}
           </Link>
           <Link
             href={`/t/${tracker.slug}/submit`}
-            className="border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-1.5 px-3 rounded transition-colors"
+            className="inline-flex items-center justify-center min-h-[38px] sm:min-h-0 border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-2 sm:py-1.5 px-3 rounded transition-colors"
           >
             Submit Update
           </Link>
@@ -65,57 +65,57 @@ export default async function DynamicTrackerStatsPage({ params }: TrackerStatsPa
       </div>
 
       {/* Primary Overview KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-          <p className="text-xs font-medium text-chocobo-muted">Cards Found</p>
-          <p className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold mt-1.5 tabular-nums">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+        <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+          <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Cards Found</p>
+          <p className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold mt-1 sm:mt-1.5 tabular-nums">
             {stats.foundCount}/{stats.totalCards}
           </p>
-          <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+          <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
             {stats.foundPercentage.toFixed(1)}% &middot; {stats.remainingCount} unpulled
           </p>
         </div>
 
-        <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-          <p className="text-xs font-medium text-chocobo-muted">Median Sale</p>
-          <p className="font-display text-2xl sm:text-3xl font-bold text-emerald-400 mt-1.5 tabular-nums">
+        <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+          <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Median Sale</p>
+          <p className="font-display text-xl sm:text-3xl font-bold text-emerald-400 mt-1 sm:mt-1.5 tabular-nums">
             ${Math.round(stats.medianPrice).toLocaleString()}
           </p>
-          <p className="text-xs text-chocobo-muted mt-1">
+          <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1">
             Across {stats.pricedCount} priced {stats.pricedCount === 1 ? 'card' : 'cards'}
           </p>
         </div>
 
-        <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-          <p className="text-xs font-medium text-chocobo-muted">Average Sale</p>
-          <p className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold mt-1.5 tabular-nums">
+        <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+          <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Average Sale</p>
+          <p className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold mt-1 sm:mt-1.5 tabular-nums">
             ${Math.round(stats.averagePrice).toLocaleString()}
           </p>
-          <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+          <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
             {stats.pricedCount > 0
               ? `${formatCompactUsd(stats.lowestPrice)} – ${formatCompactUsd(stats.highestPrice)}`
               : 'No sales logged'}
           </p>
         </div>
 
-        <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-          <p className="text-xs font-medium text-chocobo-muted">Graded Pop</p>
-          <p className="font-display text-2xl sm:text-3xl font-bold text-sky-400 mt-1.5 tabular-nums">
+        <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+          <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Graded Pop</p>
+          <p className="font-display text-xl sm:text-3xl font-bold text-sky-400 mt-1 sm:mt-1.5 tabular-nums">
             {stats.gradingStats.totalGraded}
           </p>
-          <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+          <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
             Avg Grade: {stats.gradingStats.averageGrade.toFixed(1)}
           </p>
         </div>
 
-        <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-          <p className="text-xs font-medium text-chocobo-muted">Pull Pace</p>
-          <p className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold mt-1.5 tabular-nums">
+        <div className="col-span-2 sm:col-span-1 bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+          <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Pull Pace</p>
+          <p className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold mt-1 sm:mt-1.5 tabular-nums">
             {stats.discoveryVelocity.avgDaysBetweenPulls !== null
               ? `${stats.discoveryVelocity.avgDaysBetweenPulls.toFixed(1)}d`
               : '—'}
           </p>
-          <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+          <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
             {stats.discoveryVelocity.daysSinceLastPull !== null
               ? `${stats.discoveryVelocity.daysSinceLastPull}d since last pull`
               : 'Avg days between pulls'}

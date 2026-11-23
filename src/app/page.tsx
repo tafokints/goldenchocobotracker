@@ -37,14 +37,14 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-4">
+      <main className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-3 sm:space-y-4">
         {/* Compact Hero + Progress Band */}
         <section
           aria-label="Golden Chocobo discovery progress"
-          className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-chocobo-surface border border-chocobo-gold/25 rounded-lg px-5 py-4"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-4 items-center bg-chocobo-surface border border-chocobo-gold/25 rounded-lg px-3.5 py-3 sm:px-5 sm:py-4"
         >
           <div className="lg:col-span-6 space-y-0.5">
-            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-wide text-chocobo-gold">
+            <h1 className="font-display text-xl sm:text-3xl font-bold tracking-wide text-chocobo-gold leading-tight">
               Golden Chocobo Tracker
             </h1>
             <p className="text-xs sm:text-sm text-chocobo-muted">

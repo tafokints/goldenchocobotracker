@@ -226,20 +226,20 @@ export default function StatsCharts({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Cumulative Discovery Curve + Monthly Pulls */}
       {findsByMonth.length > 0 && (
-        <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-          <div className="flex flex-wrap justify-between items-baseline gap-2 mb-4">
-            <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold">
+        <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25">
+          <div className="flex flex-wrap justify-between items-baseline gap-2 mb-3 sm:mb-4">
+            <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold">
               Cumulative Discovery Curve &amp; Monthly Pulls
             </h2>
-            <span className="text-xs text-chocobo-muted">
+            <span className="text-[11px] sm:text-xs text-chocobo-muted">
               Bars = monthly finds &middot; Line = cumulative total found
             </span>
           </div>
-          <ResponsiveContainer width="100%" height={320}>
-            <ComposedChart data={findsByMonth}>
+          <ResponsiveContainer width="100%" height={280}>
+            <ComposedChart data={findsByMonth} margin={{ top: 6, right: 4, left: -12, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
               <XAxis dataKey="month" stroke={AXIS_STROKE} tick={AXIS_TICK} />
               <YAxis
@@ -247,6 +247,7 @@ export default function StatsCharts({
                 allowDecimals={false}
                 stroke={AXIS_STROKE}
                 tick={AXIS_TICK}
+                width={38}
               />
               <YAxis
                 yAxisId="right"
@@ -254,6 +255,7 @@ export default function StatsCharts({
                 allowDecimals={false}
                 stroke="rgba(74, 222, 128, 0.35)"
                 tick={{ fill: '#86EFAC', fontSize: 11 }}
+                width={34}
               />
               <Tooltip
                 cursor={{ fill: 'rgba(214, 167, 61, 0.08)' }}
@@ -281,15 +283,15 @@ export default function StatsCharts({
       )}
 
       {/* Price Range Distribution */}
-      <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-        <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold mb-4">
+      <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25">
+        <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
           Sale Price Distribution
         </h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={priceRanges}>
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={priceRanges} margin={{ top: 6, right: 8, left: -14, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
-            <XAxis dataKey="range" stroke={AXIS_STROKE} tick={AXIS_TICK} />
-            <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} />
+            <XAxis dataKey="range" stroke={AXIS_STROKE} tick={AXIS_TICK} interval="preserveStartEnd" />
+            <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} width={38} />
             <Tooltip
               cursor={{ fill: 'rgba(214, 167, 61, 0.08)' }}
               content={(props) => <LedgerTooltip {...props} />}
@@ -301,13 +303,13 @@ export default function StatsCharts({
 
       {/* Reported Sale Price History */}
       {priceHistory.length > 1 && (
-        <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <div>
-              <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold">
+        <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+            <div className="min-w-0">
+              <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold">
                 Reported Sale Price Trend
               </h2>
-              <p className="text-xs text-chocobo-muted mt-0.5">
+              <p className="text-[11px] sm:text-xs text-chocobo-muted mt-0.5">
                 {effectiveScale === 'log'
                   ? 'Logarithmic scale highlights $40k–$150k market movement alongside seven-figure outliers.'
                   : 'Switch to Log scale to inspect mid-range trends alongside high-value outliers.'}
@@ -323,7 +325,7 @@ export default function StatsCharts({
                   type="button"
                   onClick={() => setPriceScale('linear')}
                   aria-pressed={effectiveScale === 'linear'}
-                  className={`px-3 py-1 transition-colors ${
+                  className={`min-h-[36px] sm:min-h-0 px-3.5 sm:px-3 py-1.5 sm:py-1 transition-colors ${
                     effectiveScale === 'linear'
                       ? 'bg-chocobo-gold text-chocobo-dark font-semibold'
                       : 'text-chocobo-muted hover:text-chocobo-light'
@@ -335,7 +337,7 @@ export default function StatsCharts({
                   type="button"
                   onClick={() => setPriceScale('log')}
                   aria-pressed={effectiveScale === 'log'}
-                  className={`px-3 py-1 transition-colors ${
+                  className={`min-h-[36px] sm:min-h-0 px-3.5 sm:px-3 py-1.5 sm:py-1 transition-colors ${
                     effectiveScale === 'log'
                       ? 'bg-chocobo-gold text-chocobo-dark font-semibold'
                       : 'text-chocobo-muted hover:text-chocobo-light'
@@ -346,10 +348,14 @@ export default function StatsCharts({
               </div>
             )}
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart key={effectiveScale} data={trendData}>
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart
+              key={effectiveScale}
+              data={trendData}
+              margin={{ top: 8, right: 18, left: 0, bottom: 4 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
-              <XAxis dataKey="date" stroke={AXIS_STROKE} tick={AXIS_TICK} />
+              <XAxis dataKey="date" stroke={AXIS_STROKE} tick={AXIS_TICK} minTickGap={24} />
               <YAxis
                 stroke={AXIS_STROKE}
                 tick={AXIS_TICK}
@@ -361,7 +367,7 @@ export default function StatsCharts({
                 }
                 ticks={effectiveScale === 'log' && logScaleConfig ? logScaleConfig.ticks : undefined}
                 tickFormatter={(value: number) => formatCompactUsd(value)}
-                width={58}
+                width={52}
               />
               <Tooltip
                 cursor={{ stroke: 'rgba(214, 167, 61, 0.45)', strokeDasharray: '3 3' }}
@@ -383,22 +389,20 @@ export default function StatsCharts({
 
       {/* Grading Statistics */}
       {gradingStats.totalGraded > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-            <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+          <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25 flex flex-col">
+            <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
               Grade Distribution
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={210}>
               <PieChart>
                 <Pie
                   data={gradingStats.gradeDistribution}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  label={({ payload, percent }) =>
-                    `${payload?.grade ?? ''} (${((percent ?? 0) * 100).toFixed(0)}%)`
-                  }
-                  outerRadius={88}
+                  innerRadius={44}
+                  outerRadius={80}
+                  paddingAngle={2}
                   stroke="#1B1612"
                   strokeWidth={2}
                   fill="#D6A73D"
@@ -416,17 +420,49 @@ export default function StatsCharts({
                 />
               </PieChart>
             </ResponsiveContainer>
+            {/* Zero-clipping color-swatched ledger legend */}
+            <div className="mt-3 pt-3 border-t border-chocobo-gold/15 grid grid-cols-2 gap-2 text-xs">
+              {gradingStats.gradeDistribution.map((entry, index) => {
+                const pct =
+                  gradingStats.totalGraded > 0
+                    ? Math.round((entry.count / gradingStats.totalGraded) * 100)
+                    : 0;
+                return (
+                  <div
+                    key={entry.grade}
+                    className="flex items-center justify-between gap-2 bg-chocobo-recessed/70 border border-chocobo-gold/15 rounded px-2.5 py-1.5 tabular-nums"
+                  >
+                    <span className="flex items-center gap-2 min-w-0">
+                      <span
+                        className="inline-block w-2.5 h-2.5 rounded-sm shrink-0"
+                        style={{ backgroundColor: GRADE_COLORS[index % GRADE_COLORS.length] }}
+                        aria-hidden="true"
+                      />
+                      <span className="font-semibold text-chocobo-light truncate">
+                        Grade {entry.grade}
+                      </span>
+                    </span>
+                    <span className="text-chocobo-muted shrink-0">
+                      <strong className="text-chocobo-gold">{entry.count}</strong> ({pct}%)
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-            <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold mb-4">
+          <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25">
+            <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
               Grading Services
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={gradingStats.serviceDistribution}>
+            <ResponsiveContainer width="100%" height={270}>
+              <BarChart
+                data={gradingStats.serviceDistribution}
+                margin={{ top: 6, right: 8, left: -14, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
                 <XAxis dataKey="service" stroke={AXIS_STROKE} tick={AXIS_TICK} />
-                <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} />
+                <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} width={38} />
                 <Tooltip
                   cursor={{ fill: 'rgba(214, 167, 61, 0.08)' }}
                   content={(props) => <LedgerTooltip {...props} />}
@@ -440,20 +476,20 @@ export default function StatsCharts({
 
       {/* Optional Provenance Charts (shown automatically once Pull Channel / Region data is populated) */}
       {(pullChannelDistribution.length > 0 || regionDistribution.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
           {pullChannelDistribution.length > 0 && (
-            <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-              <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold mb-4">
+            <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25">
+              <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
                 Pull Origin Breakdown
               </h2>
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={pullChannelDistribution} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
                   <XAxis type="number" allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} />
                   <YAxis
                     type="category"
                     dataKey="channel"
-                    width={140}
+                    width={120}
                     stroke={AXIS_STROKE}
                     tick={AXIS_TICK}
                   />
@@ -468,15 +504,18 @@ export default function StatsCharts({
           )}
 
           {regionDistribution.length > 0 && (
-            <div className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25">
-              <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold mb-4">
+            <div className="bg-chocobo-surface p-3.5 sm:p-6 rounded-lg border border-chocobo-gold/25">
+              <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
                 Pulls by Region
               </h2>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={regionDistribution}>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart
+                  data={regionDistribution}
+                  margin={{ top: 6, right: 8, left: -14, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
                   <XAxis dataKey="region" stroke={AXIS_STROKE} tick={AXIS_TICK} />
-                  <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} />
+                  <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} width={38} />
                   <Tooltip
                     cursor={{ fill: 'rgba(214, 167, 61, 0.08)' }}
                     content={(props) => <LedgerTooltip {...props} />}

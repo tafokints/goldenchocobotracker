@@ -78,7 +78,7 @@ export default function CardDetails({
 
   return (
     <div
-      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/75 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="card-details-title"
@@ -88,13 +88,11 @@ export default function CardDetails({
         }
       }}
     >
-      <div
-        ref={modalRef}
-        className="bg-chocobo-surface border border-chocobo-gold/55 rounded-lg p-5 sm:p-6 w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/15 shadow-2xl"
-      >
-        <div className="pb-4 space-y-3">
+      <div className="bg-chocobo-surface border-t sm:border border-chocobo-gold/55 rounded-t-2xl sm:rounded-lg w-full sm:w-[min(92vw,42rem)] max-h-[92dvh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+        {/* Sticky Sheet / Modal Header */}
+        <div className="shrink-0 bg-chocobo-surface border-b border-chocobo-gold/15 px-4 pt-3 pb-3 sm:px-6 sm:pt-5 sm:pb-4 space-y-2.5 sm:space-y-3">
           {showStepper && (
-            <div className="flex items-center justify-between gap-2 pb-3 border-b border-chocobo-gold/15">
+            <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-chocobo-gold/15">
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
@@ -102,7 +100,7 @@ export default function CardDetails({
                   disabled={!onPrev}
                   aria-label="Previous card"
                   title="Previous card (←)"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border border-chocobo-gold/30 bg-chocobo-recessed text-chocobo-light hover:border-chocobo-gold hover:text-chocobo-gold disabled:opacity-35 disabled:hover:border-chocobo-gold/30 disabled:hover:text-chocobo-light disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+                  className="inline-flex items-center justify-center gap-1 min-h-[38px] sm:min-h-0 px-3 sm:px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border border-chocobo-gold/30 bg-chocobo-recessed text-chocobo-light hover:border-chocobo-gold hover:text-chocobo-gold disabled:opacity-35 disabled:hover:border-chocobo-gold/30 disabled:hover:text-chocobo-light disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
                 >
                   <span aria-hidden="true">&larr;</span>
                   <span>Prev</span>
@@ -113,7 +111,7 @@ export default function CardDetails({
                   disabled={!onNext}
                   aria-label="Next card"
                   title="Next card (→)"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium border border-chocobo-gold/30 bg-chocobo-recessed text-chocobo-light hover:border-chocobo-gold hover:text-chocobo-gold disabled:opacity-35 disabled:hover:border-chocobo-gold/30 disabled:hover:text-chocobo-light disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+                  className="inline-flex items-center justify-center gap-1 min-h-[38px] sm:min-h-0 px-3 sm:px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border border-chocobo-gold/30 bg-chocobo-recessed text-chocobo-light hover:border-chocobo-gold hover:text-chocobo-gold disabled:opacity-35 disabled:hover:border-chocobo-gold/30 disabled:hover:text-chocobo-light disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
                 >
                   <span>Next</span>
                   <span aria-hidden="true">&rarr;</span>
@@ -133,7 +131,7 @@ export default function CardDetails({
                   type="button"
                   onClick={onClose}
                   aria-label="Close card details"
-                  className="text-chocobo-muted hover:text-chocobo-gold rounded-md px-2 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+                  className="inline-flex items-center justify-center min-w-[38px] min-h-[38px] sm:min-w-0 sm:min-h-0 text-chocobo-muted hover:text-chocobo-gold rounded-md border border-chocobo-gold/20 sm:border-transparent px-2 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
                 >
                   ✕
                 </button>
@@ -141,12 +139,12 @@ export default function CardDetails({
             </div>
           )}
 
-          <div className="flex justify-between items-start gap-4">
-            <div>
+          <div className="flex justify-between items-start gap-3">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2
                   id="card-details-title"
-                  className="font-display text-xl font-bold text-chocobo-gold tabular-nums"
+                  className="font-display text-lg sm:text-xl font-bold text-chocobo-gold tabular-nums"
                 >
                   Golden Chocobo #{paddedId}
                 </h2>
@@ -165,23 +163,23 @@ export default function CardDetails({
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-1.5">
+              <div className="flex flex-wrap items-center gap-2 mt-2">
                 <Link
                   href={`/card/${paddedId}`}
-                  className="text-xs text-chocobo-light/85 hover:text-chocobo-gold underline transition-colors"
+                  className="inline-flex items-center justify-center min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded border border-chocobo-gold/30 bg-chocobo-recessed text-xs text-chocobo-light/90 hover:border-chocobo-gold hover:text-chocobo-gold transition-colors"
                 >
-                  Open shareable card page &rarr;
+                  Full Card Page &rarr;
                 </Link>
                 <Link
                   href={`/submit?card=${paddedId}`}
-                  className="text-xs text-chocobo-gold hover:underline font-semibold"
+                  className="inline-flex items-center justify-center min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded border border-chocobo-gold/65 text-xs text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark font-semibold transition-colors"
                 >
                   Suggest Update
                 </Link>
                 <CopyLinkButton
                   path={`/card/${paddedId}`}
-                  label="Copy Share Link"
-                  className="text-xs text-chocobo-light/85 hover:text-chocobo-gold underline transition-colors"
+                  label="Copy Link"
+                  className="inline-flex items-center justify-center min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded border border-chocobo-gold/30 bg-chocobo-recessed text-xs text-chocobo-light/90 hover:border-chocobo-gold hover:text-chocobo-gold transition-colors"
                 />
               </div>
             </div>
@@ -190,7 +188,7 @@ export default function CardDetails({
                 type="button"
                 onClick={onClose}
                 aria-label="Close card details"
-                className="text-chocobo-muted hover:text-chocobo-gold rounded-md px-2 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+                className="inline-flex items-center justify-center min-w-[38px] min-h-[38px] sm:min-w-0 sm:min-h-0 text-chocobo-muted hover:text-chocobo-gold rounded-md border border-chocobo-gold/20 sm:border-transparent px-2 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold shrink-0"
               >
                 ✕
               </button>
@@ -198,13 +196,31 @@ export default function CardDetails({
           </div>
         </div>
 
-        <div className="space-y-5 pt-4">
+        {/* Scrollable Sheet Body */}
+        <div
+          ref={modalRef}
+          className="flex-1 overflow-y-auto px-4 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-5 space-y-4 sm:space-y-5"
+        >
+          {/* Card Photo — Shown Upfront So Mobile Users See the Card Immediately */}
+          {card.resolvedImage && (
+            <div className="relative aspect-[3/4] max-w-[210px] sm:max-w-[260px] mx-auto bg-black/35 border border-chocobo-gold/25 rounded-md overflow-hidden">
+              <Image
+                src={card.resolvedImage}
+                alt={`Golden Chocobo Card #${paddedId}`}
+                fill
+                quality={80}
+                sizes="(max-width: 640px) 210px, 260px"
+                className="object-contain"
+              />
+            </div>
+          )}
+
           {/* Basic Info */}
           <div>
             <h3 className="text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
               Basic Information
             </h3>
-            <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md space-y-1.5 text-sm">
+            <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-3.5 sm:p-4 rounded-md space-y-1.5 text-sm">
               <p className="text-chocobo-light">
                 <span className="text-chocobo-muted font-medium">Status:</span>{' '}
                 {card.found ? 'Found' : 'Unpulled'}
@@ -241,7 +257,7 @@ export default function CardDetails({
                         href={pullSourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-chocobo-gold hover:underline"
+                        className="text-chocobo-gold hover:underline inline-block py-0.5"
                       >
                         View Discovery Post
                       </a>
@@ -258,7 +274,7 @@ export default function CardDetails({
                             ? 'sponsored noopener noreferrer'
                             : 'noopener noreferrer'
                         }
-                        className="text-chocobo-gold hover:underline"
+                        className="text-chocobo-gold hover:underline inline-block py-0.5"
                       >
                         View on {marketplaceLabel}
                         {isMarketplaceAffiliate ? ' (Paid Link)' : ''}
@@ -276,7 +292,7 @@ export default function CardDetails({
               <h3 className="text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
                 Recent Reported Sale
               </h3>
-              <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md">
+              <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-3.5 sm:p-4 rounded-md">
                 <p className="text-emerald-400 text-xl font-bold tabular-nums">
                   ${card.price.toLocaleString()}
                 </p>
@@ -295,7 +311,7 @@ export default function CardDetails({
               <h3 className="text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
                 Grading Information
               </h3>
-              <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md space-y-1">
+              <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-3.5 sm:p-4 rounded-md space-y-1">
                 <p className="text-sky-300 text-lg font-bold tabular-nums">
                   {formatGradingDisplay(card.grading)}
                 </p>
@@ -307,7 +323,7 @@ export default function CardDetails({
                         href={certLookupUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-chocobo-gold hover:underline font-semibold"
+                        className="text-chocobo-gold hover:underline font-semibold inline-block py-0.5"
                       >
                         {card.grading.certNumber} (Verify &rarr;)
                       </a>
@@ -331,47 +347,30 @@ export default function CardDetails({
               <h3 className="text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
                 Price History
               </h3>
-              <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md max-h-60 overflow-y-auto">
-                <div className="space-y-2">
+              <div className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-3.5 sm:p-4 rounded-md max-h-60 overflow-y-auto">
+                <div className="space-y-2.5">
                   {card.priceHistory.map((entry, index) => (
                     <div
                       key={`${entry.date}-${entry.price}-${index}`}
-                      className="border-b border-chocobo-gold/20 pb-2 last:border-b-0 last:pb-0"
+                      className="border-b border-chocobo-gold/20 pb-2.5 last:border-b-0 last:pb-0"
                     >
-                      <div className="flex justify-between items-start gap-2">
-                        <div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-3">
+                        <div className="flex items-baseline justify-between sm:block gap-2">
                           <p className="text-emerald-400 font-bold tabular-nums">
                             ${entry.price.toLocaleString()}
                           </p>
                           <p className="text-chocobo-muted text-xs tabular-nums">{entry.date}</p>
                         </div>
-                        <div className="text-right text-xs text-chocobo-muted">
-                          {entry.soldBy && <p>From: {entry.soldBy}</p>}
-                          {entry.soldTo && <p>To: {entry.soldTo}</p>}
-                        </div>
+                        {(entry.soldBy || entry.soldTo) && (
+                          <div className="sm:text-right text-xs text-chocobo-muted space-y-0.5">
+                            {entry.soldBy && <p>From: {entry.soldBy}</p>}
+                            {entry.soldTo && <p>To: {entry.soldTo}</p>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* Image */}
-          {card.resolvedImage && (
-            <div>
-              <h3 className="text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
-                Card Photo
-              </h3>
-              <div className="relative aspect-[3/4] max-w-sm mx-auto bg-black/35 border border-chocobo-gold/20 rounded-md overflow-hidden">
-                <Image
-                  src={card.resolvedImage}
-                  alt={`Golden Chocobo Card #${paddedId}`}
-                  fill
-                  quality={80}
-                  sizes="(max-width: 640px) 90vw, 384px"
-                  className="object-contain"
-                />
               </div>
             </div>
           )}

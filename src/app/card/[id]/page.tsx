@@ -146,33 +146,36 @@ export default async function CardPage({ params }: CardPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-6">
-        <div className="max-w-4xl mx-auto space-y-5">
+      <main className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-5 sm:space-y-6">
+        <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5">
           <nav
             aria-label="Breadcrumb and card navigation"
-            className="flex flex-wrap items-center justify-between gap-4 text-sm"
+            className="flex items-center justify-between gap-2 text-xs sm:text-sm"
           >
-            <Link href="/" className="text-chocobo-muted hover:text-chocobo-gold transition-colors">
+            <Link
+              href="/"
+              className="inline-flex items-center min-h-[36px] sm:min-h-0 px-2.5 py-1.5 sm:p-0 rounded-md sm:rounded-none border border-chocobo-gold/20 sm:border-0 bg-chocobo-surface sm:bg-transparent text-chocobo-muted hover:text-chocobo-gold transition-colors"
+            >
               &larr; All 77 Cards
             </Link>
-            <div className="flex items-center gap-4 tabular-nums">
+            <div className="flex items-center gap-2 sm:gap-4 tabular-nums">
               <Link
                 href={`/card/${prevId}`}
-                className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
+                className="inline-flex items-center min-h-[36px] sm:min-h-0 px-2.5 py-1.5 sm:p-0 rounded-md sm:rounded-none border border-chocobo-gold/25 sm:border-0 bg-chocobo-surface sm:bg-transparent text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
               >
                 &larr; #{prevId}
               </Link>
               <Link
                 href={`/card/${nextId}`}
-                className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
+                className="inline-flex items-center min-h-[36px] sm:min-h-0 px-2.5 py-1.5 sm:p-0 rounded-md sm:rounded-none border border-chocobo-gold/25 sm:border-0 bg-chocobo-surface sm:bg-transparent text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
               >
                 #{nextId} &rarr;
               </Link>
             </div>
           </nav>
 
-          <article className="bg-chocobo-surface border border-chocobo-gold/40 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            <div className="w-full">
+          <article className="bg-chocobo-surface border border-chocobo-gold/40 rounded-lg p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-start">
+            <div className="w-full max-w-[240px] sm:max-w-[300px] md:max-w-none mx-auto">
               {card.resolvedImage ? (
                 <div className="relative aspect-[3/4] w-full bg-black/35 rounded-lg overflow-hidden border border-chocobo-gold/35">
                   <Image
@@ -180,7 +183,7 @@ export default async function CardPage({ params }: CardPageProps) {
                     alt={`Golden Chocobo Card #${parsed.padded} of 77`}
                     fill
                     priority
-                    sizes="(max-width: 768px) 92vw, 400px"
+                    sizes="(max-width: 640px) 240px, (max-width: 768px) 300px, 400px"
                     className="object-contain"
                   />
                 </div>
@@ -193,7 +196,7 @@ export default async function CardPage({ params }: CardPageProps) {
                   }`}
                 >
                   <span
-                    className={`font-display text-5xl font-bold tabular-nums ${
+                    className={`font-display text-4xl sm:text-5xl font-bold tabular-nums ${
                       card.found ? 'text-chocobo-gold/80' : 'text-chocobo-muted/45'
                     }`}
                   >
@@ -207,10 +210,10 @@ export default async function CardPage({ params }: CardPageProps) {
               )}
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               <div>
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="font-display text-2xl md:text-3xl font-bold text-chocobo-gold tabular-nums">
+                <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+                  <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-chocobo-gold tabular-nums">
                     Golden Chocobo #{parsed.padded}/77
                   </h1>
                   <span
@@ -228,17 +231,21 @@ export default async function CardPage({ params }: CardPageProps) {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-chocobo-muted mt-1">
+                <p className="text-xs sm:text-sm text-chocobo-muted mt-1">
                   Magic: The Gathering &times; Final Fantasy &mdash; Serialized Traveling Chocobo
                 </p>
-                <div className="pt-3 flex flex-wrap gap-2">
+                <div className="pt-3 grid grid-cols-1 sm:flex sm:flex-wrap gap-2">
                   <Link
                     href={`/submit?card=${parsed.padded}`}
-                    className="inline-block border border-chocobo-gold/75 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-semibold py-1.5 px-3 rounded transition-colors"
+                    className="inline-flex items-center justify-center min-h-[40px] sm:min-h-0 border border-chocobo-gold/75 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-semibold py-2 sm:py-1.5 px-3.5 sm:px-3 rounded transition-colors"
                   >
                     Suggest Update for #{parsed.padded} &rarr;
                   </Link>
-                  <CopyLinkButton path={`/card/${parsed.padded}`} label="Copy Share Link" />
+                  <CopyLinkButton
+                    path={`/card/${parsed.padded}`}
+                    label="Copy Share Link"
+                    className="inline-flex items-center justify-center min-h-[40px] sm:min-h-0 border border-chocobo-gold/60 hover:bg-chocobo-gold/15 text-chocobo-light text-xs font-semibold py-2 sm:py-1.5 px-3.5 sm:px-3 rounded transition-colors"
+                  />
                 </div>
               </div>
 
@@ -375,22 +382,24 @@ export default async function CardPage({ params }: CardPageProps) {
                   <h2 className="font-sans text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
                     Sale History
                   </h2>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {card.priceHistory.map((entry, idx) => (
                       <div
                         key={`${entry.date}-${entry.price}-${idx}`}
-                        className="flex justify-between items-start border-b border-chocobo-gold/20 pb-2 last:border-b-0 last:pb-0 text-sm"
+                        className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4 border-b border-chocobo-gold/20 pb-2.5 last:border-b-0 last:pb-0 text-sm"
                       >
-                        <div>
+                        <div className="flex items-baseline justify-between sm:block gap-2">
                           <p className="text-emerald-400 font-bold tabular-nums">
                             ${entry.price.toLocaleString()}
                           </p>
                           <p className="text-xs text-chocobo-muted tabular-nums">{entry.date}</p>
                         </div>
-                        <div className="text-right text-xs text-chocobo-muted">
-                          {entry.soldBy && <p>From: {entry.soldBy}</p>}
-                          {entry.soldTo && <p>To: {entry.soldTo}</p>}
-                        </div>
+                        {(entry.soldBy || entry.soldTo) && (
+                          <div className="sm:text-right text-xs text-chocobo-muted space-y-0.5">
+                            {entry.soldBy && <p>From: {entry.soldBy}</p>}
+                            {entry.soldTo && <p>To: {entry.soldTo}</p>}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -403,22 +412,22 @@ export default async function CardPage({ params }: CardPageProps) {
           {(nearbyFoundCards.length > 0 || displayedGrails.length > 0) && (
             <section
               aria-label="Explore nearby found cards and unpulled grails"
-              className="bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-5 space-y-4"
+              className="bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-4 sm:p-5 space-y-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-display text-base sm:text-lg font-bold text-chocobo-gold">
                   Explore Nearby &amp; Unpulled Grails
                 </h2>
-                <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-2 text-xs">
                   <Link
                     href="/?view=matrix"
-                    className="text-chocobo-muted hover:text-chocobo-gold transition-colors"
+                    className="inline-flex items-center min-h-[34px] sm:min-h-0 px-2.5 py-1 sm:p-0 rounded border border-chocobo-gold/20 sm:border-0 bg-chocobo-recessed sm:bg-transparent text-chocobo-muted hover:text-chocobo-gold transition-colors"
                   >
                     1–77 Wall &rarr;
                   </Link>
                   <Link
                     href="/?quick=unpulled-iconic"
-                    className="text-chocobo-gold hover:text-chocobo-gold-bright font-medium transition-colors"
+                    className="inline-flex items-center min-h-[34px] sm:min-h-0 px-2.5 py-1 sm:p-0 rounded border border-chocobo-gold/30 sm:border-0 bg-chocobo-recessed sm:bg-transparent text-chocobo-gold hover:text-chocobo-gold-bright font-medium transition-colors"
                   >
                     Unpulled Grails &rarr;
                   </Link>
@@ -492,7 +501,7 @@ export default async function CardPage({ params }: CardPageProps) {
                           <Link
                             key={grail.id}
                             href={`/card/${grailPadded}`}
-                            className="inline-flex items-center gap-1.5 rounded-md border border-chocobo-gold/30 bg-chocobo-recessed/80 hover:border-chocobo-gold hover:bg-chocobo-gold/10 px-2.5 py-1.5 text-xs transition-colors"
+                            className="inline-flex items-center gap-1.5 min-h-[36px] sm:min-h-0 rounded-md border border-chocobo-gold/30 bg-chocobo-recessed/80 hover:border-chocobo-gold hover:bg-chocobo-gold/10 px-2.5 py-1.5 text-xs transition-colors"
                           >
                             <span className="text-amber-300 leading-none" aria-hidden="true">
                               ★

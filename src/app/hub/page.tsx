@@ -19,10 +19,10 @@ export default async function HubPage() {
   const trackerList = await listPublishedTrackers();
 
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-chocobo-gold/20 pb-4">
+    <main className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-5 sm:space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-3 sm:gap-4 border-b border-chocobo-gold/20 pb-3.5 sm:pb-4">
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold">
+          <h1 className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold">
             Serialized Card Trackers
           </h1>
           <p className="text-xs sm:text-sm text-chocobo-muted mt-1">
@@ -31,13 +31,13 @@ export default async function HubPage() {
         </div>
         <Link
           href="/admin/trackers"
-          className="text-xs border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light px-3 py-1.5 rounded transition-colors"
+          className="inline-flex items-center justify-center min-h-[38px] sm:min-h-0 text-xs border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light px-3 py-2 sm:py-1.5 rounded transition-colors"
         >
           Manage Trackers
         </Link>
       </div>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-5" aria-label="Published trackers">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5" aria-label="Published trackers">
         {trackerList.map((tracker) => {
           const href = tracker.slug === DEFAULT_TRACKER_SLUG ? '/' : `/t/${tracker.slug}`;
           const statsHref =
@@ -46,7 +46,7 @@ export default async function HubPage() {
           return (
             <article
               key={tracker.id}
-              className="bg-chocobo-surface border rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-all hover:border-chocobo-gold hover:-translate-y-0.5"
+              className="bg-chocobo-surface border rounded-lg p-4 sm:p-6 flex flex-col justify-between gap-4 transition-all hover:border-chocobo-gold hover:-translate-y-0.5"
               style={{ borderColor: `${tracker.accentHex}4D` }}
             >
               <div className="space-y-2">

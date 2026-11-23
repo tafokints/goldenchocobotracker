@@ -46,7 +46,7 @@ export default async function DynamicTrackerPage({ params }: TrackerPageProps) {
 
   return (
     <main
-      className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-4"
+      className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-3 sm:space-y-4"
       style={
         {
           '--tracker-accent': tracker.themeConfig.accentHex,
@@ -58,7 +58,7 @@ export default async function DynamicTrackerPage({ params }: TrackerPageProps) {
       {/* Compact Hero + Progress Band */}
       <section
         aria-label="Overall tracker progress"
-        className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-chocobo-surface border border-chocobo-gold/25 rounded-lg px-5 py-4"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-center bg-chocobo-surface border border-chocobo-gold/25 rounded-lg px-3.5 py-3 sm:px-5 sm:py-4"
       >
         <div className="lg:col-span-6 space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
@@ -68,7 +68,7 @@ export default async function DynamicTrackerPage({ params }: TrackerPageProps) {
             <span className="text-xs text-chocobo-muted">{tracker.setName}</span>
           </div>
           <h1
-            className="font-display text-2xl sm:text-3xl font-bold tracking-wide text-chocobo-gold"
+            className="font-display text-xl sm:text-3xl font-bold tracking-wide text-chocobo-gold leading-tight"
             style={{ color: tracker.themeConfig.accentHex }}
           >
             {tracker.name}
@@ -78,18 +78,18 @@ export default async function DynamicTrackerPage({ params }: TrackerPageProps) {
           )}
         </div>
 
-        <div className="lg:col-span-6 space-y-3">
+        <div className="lg:col-span-6 space-y-2.5 sm:space-y-3">
           <ProgressBar current={foundCount} total={totalCount} />
-          <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end gap-2 text-xs">
             <Link
               href={`/t/${tracker.slug}/stats`}
-              className="border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-1.5 px-3 rounded transition-colors"
+              className="inline-flex items-center justify-center min-h-[38px] sm:min-h-0 border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-1.5 px-3 rounded transition-colors"
             >
               Tracker Stats
             </Link>
             <Link
               href={`/t/${tracker.slug}/submit`}
-              className="border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-1.5 px-3 rounded transition-colors"
+              className="inline-flex items-center justify-center min-h-[38px] sm:min-h-0 border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-1.5 px-3 rounded transition-colors"
             >
               Submit Update
             </Link>

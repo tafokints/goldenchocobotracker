@@ -91,36 +91,36 @@ export default async function DynamicTrackerCardPage({
   const certLookupUrl = getGradingCertUrl(card.grading?.service, card.grading?.certNumber);
 
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-6">
-      <div className="max-w-4xl mx-auto space-y-5">
+    <main className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-5 sm:space-y-6">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5">
         <nav
           aria-label="Breadcrumb and card navigation"
-          className="flex flex-wrap items-center justify-between gap-4 text-sm"
+          className="flex items-center justify-between gap-2 text-xs sm:text-sm"
         >
           <Link
             href={`/t/${tracker.slug}`}
-            className="text-chocobo-muted hover:text-chocobo-gold transition-colors"
+            className="inline-flex items-center min-h-[36px] sm:min-h-0 px-2.5 py-1.5 sm:p-0 rounded-md sm:rounded-none border border-chocobo-gold/20 sm:border-0 bg-chocobo-surface sm:bg-transparent text-chocobo-muted hover:text-chocobo-gold transition-colors truncate"
           >
             &larr; {tracker.name}
           </Link>
-          <div className="flex items-center gap-4 tabular-nums">
+          <div className="flex items-center gap-2 sm:gap-4 tabular-nums shrink-0">
             <Link
               href={`/t/${tracker.slug}/card/${prevNum.toString().padStart(padWidth, '0')}${seriesSuffix}`}
-              className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
+              className="inline-flex items-center min-h-[36px] sm:min-h-0 px-2.5 py-1.5 sm:p-0 rounded-md sm:rounded-none border border-chocobo-gold/25 sm:border-0 bg-chocobo-surface sm:bg-transparent text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
             >
               &larr; #{prevNum.toString().padStart(padWidth, '0')}
             </Link>
             <Link
               href={`/t/${tracker.slug}/card/${nextNum.toString().padStart(padWidth, '0')}${seriesSuffix}`}
-              className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
+              className="inline-flex items-center min-h-[36px] sm:min-h-0 px-2.5 py-1.5 sm:p-0 rounded-md sm:rounded-none border border-chocobo-gold/25 sm:border-0 bg-chocobo-surface sm:bg-transparent text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
             >
               #{nextNum.toString().padStart(padWidth, '0')} &rarr;
             </Link>
           </div>
         </nav>
 
-        <article className="bg-chocobo-surface border border-chocobo-gold/40 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <div className="w-full">
+        <article className="bg-chocobo-surface border border-chocobo-gold/40 rounded-lg p-4 sm:p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 items-start">
+          <div className="w-full max-w-[240px] sm:max-w-[300px] md:max-w-none mx-auto">
             {card.resolvedImage ? (
               <div className="relative aspect-[3/4] w-full bg-black/35 rounded-lg overflow-hidden border border-chocobo-gold/35">
                 <Image
@@ -128,7 +128,7 @@ export default async function DynamicTrackerCardPage({
                   alt={`${activeSeries.name} #${padded}/${activeSeries.serialMax}`}
                   fill
                   priority
-                  sizes="(max-width: 768px) 92vw, 400px"
+                  sizes="(max-width: 640px) 240px, (max-width: 768px) 300px, 400px"
                   className="object-contain"
                 />
               </div>
@@ -141,7 +141,7 @@ export default async function DynamicTrackerCardPage({
                 }`}
               >
                 <span
-                  className={`font-display text-5xl font-bold tabular-nums ${
+                  className={`font-display text-4xl sm:text-5xl font-bold tabular-nums ${
                     card.found ? 'text-chocobo-gold/80' : 'text-chocobo-muted/45'
                   }`}
                 >
@@ -157,10 +157,10 @@ export default async function DynamicTrackerCardPage({
             )}
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="font-display text-2xl md:text-3xl font-bold text-chocobo-gold tabular-nums">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-chocobo-gold tabular-nums">
                   {activeSeries.name} #{padded}/{activeSeries.serialMax}
                 </h1>
                 <span
@@ -173,15 +173,19 @@ export default async function DynamicTrackerCardPage({
                   {card.found ? 'Found' : 'Unpulled'}
                 </span>
               </div>
-              <p className="text-sm text-chocobo-muted mt-1">{tracker.setName}</p>
-              <div className="pt-3 flex flex-wrap gap-2">
+              <p className="text-xs sm:text-sm text-chocobo-muted mt-1">{tracker.setName}</p>
+              <div className="pt-3 grid grid-cols-1 sm:flex sm:flex-wrap gap-2">
                 <Link
                   href={`/t/${tracker.slug}/submit?series=${encodeURIComponent(activeSeries.slug)}&card=${serialNum}`}
-                  className="inline-block border border-chocobo-gold/70 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-semibold py-1.5 px-3 rounded transition-colors"
+                  className="inline-flex items-center justify-center min-h-[40px] sm:min-h-0 border border-chocobo-gold/70 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-semibold py-2 sm:py-1.5 px-3.5 sm:px-3 rounded transition-colors"
                 >
                   Suggest Update for #{padded} &rarr;
                 </Link>
-                <CopyLinkButton path={sharePath} label="Copy Share Link" />
+                <CopyLinkButton
+                  path={sharePath}
+                  label="Copy Share Link"
+                  className="inline-flex items-center justify-center min-h-[40px] sm:min-h-0 border border-chocobo-gold/60 hover:bg-chocobo-gold/15 text-chocobo-light text-xs font-semibold py-2 sm:py-1.5 px-3.5 sm:px-3 rounded transition-colors"
+                />
               </div>
             </div>
 
@@ -320,18 +324,20 @@ export default async function DynamicTrackerCardPage({
                   {card.priceHistory.map((entry, idx) => (
                     <div
                       key={`${entry.date}-${entry.price}-${idx}`}
-                      className="flex justify-between items-start py-2 first:pt-0 last:pb-0 text-sm"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4 py-2.5 first:pt-0 last:pb-0 text-sm"
                     >
-                      <div>
+                      <div className="flex items-baseline justify-between sm:block gap-2">
                         <p className="text-emerald-400 font-semibold tabular-nums">
                           ${entry.price.toLocaleString()}
                         </p>
                         <p className="text-xs text-chocobo-muted tabular-nums">{entry.date}</p>
                       </div>
-                      <div className="text-right text-xs text-chocobo-muted">
-                        {entry.soldBy && <p>From: {entry.soldBy}</p>}
-                        {entry.soldTo && <p>To: {entry.soldTo}</p>}
-                      </div>
+                      {(entry.soldBy || entry.soldTo) && (
+                        <div className="sm:text-right text-xs text-chocobo-muted space-y-0.5">
+                          {entry.soldBy && <p>From: {entry.soldBy}</p>}
+                          {entry.soldTo && <p>To: {entry.soldTo}</p>}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

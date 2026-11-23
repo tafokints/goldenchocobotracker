@@ -34,11 +34,11 @@ export default function LatestActivityStrip({
   return (
     <section
       aria-label="Latest verified activity"
-      className="w-full bg-chocobo-surface/80 border border-chocobo-gold/20 rounded-lg px-3.5 py-2.5"
+      className="w-full bg-chocobo-surface/80 border border-chocobo-gold/20 rounded-lg px-3 sm:px-3.5 py-2 sm:py-2.5"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-chocobo-muted shrink-0">
+      <div className="flex flex-nowrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+          <span className="hidden sm:inline text-[11px] font-semibold uppercase tracking-wider text-chocobo-muted shrink-0">
             Latest
           </span>
           <span
@@ -48,7 +48,7 @@ export default function LatestActivityStrip({
           </span>
           <Link
             href={`${cardHrefPrefix}/${latest.paddedId}`}
-            className="text-chocobo-light hover:text-chocobo-gold font-medium truncate transition-colors"
+            className="text-chocobo-light hover:text-chocobo-gold font-medium truncate transition-colors py-1 -my-1"
           >
             {latest.title}
           </Link>
@@ -62,9 +62,9 @@ export default function LatestActivityStrip({
             type="button"
             onClick={() => setExpanded((prev) => !prev)}
             aria-expanded={expanded}
-            className="text-xs font-medium text-chocobo-gold hover:text-chocobo-gold-bright transition-colors shrink-0"
+            className="text-xs font-medium text-chocobo-gold hover:text-chocobo-gold-bright transition-colors shrink-0 py-1.5 px-1 -my-1.5 whitespace-nowrap"
           >
-            {expanded ? 'Hide history ▲' : `Recent (${events.length}) ▾`}
+            {expanded ? 'Hide ▲' : `Recent (${events.length}) ▾`}
           </button>
         )}
       </div>

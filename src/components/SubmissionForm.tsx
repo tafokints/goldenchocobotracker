@@ -200,7 +200,7 @@ export default function SubmissionForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl bg-chocobo-surface border border-chocobo-gold/30 rounded-lg p-6 md:p-7 space-y-5"
+      className="w-full max-w-xl bg-chocobo-surface border border-chocobo-gold/30 rounded-lg p-4 sm:p-6 md:p-7 space-y-5"
     >
       {!submissionsReady && (
         <div

@@ -25,7 +25,8 @@ const inter = Inter({
 const siteUrl = getSiteUrl();
 
 export const viewport: Viewport = {
-  themeColor: '#D6A73D',
+  themeColor: '#1B1612',
+  viewportFit: 'cover',
 };
 
 export const metadata: Metadata = {
@@ -111,7 +112,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Chocobo Tracker',
   },
   other: {

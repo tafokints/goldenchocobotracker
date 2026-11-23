@@ -173,7 +173,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
       )}
 
       {/* Unified Dark Toolbar */}
-      <div className="w-full bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-3 space-y-3">
+      <div className="w-full bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-2.5 sm:p-3 space-y-2.5 sm:space-y-3">
         <FilterControls
           embedded
           searchQuery={searchQuery}
@@ -193,8 +193,12 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
           }}
         />
 
-        <div className="pt-2.5 border-t border-chocobo-gold/15 flex flex-wrap items-center justify-between gap-2.5">
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Quick filters">
+        <div className="pt-2 sm:pt-2.5 border-t border-chocobo-gold/15 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
+          <div
+            className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"
+            role="group"
+            aria-label="Quick filters"
+          >
             {(
               [
                 ['all', 'All'],
@@ -209,7 +213,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                   setQuickFilter(key);
                   setPage(1);
                 }}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                className={`shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-colors ${
                   quickFilter === key
                     ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold font-semibold'
                     : 'bg-chocobo-recessed/70 text-chocobo-muted border-chocobo-gold/20 hover:border-chocobo-gold/50 hover:text-chocobo-light'
@@ -265,7 +269,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
             No cards match your current filters.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
             {visibleCards.map((card) => {
               const paddedId = card.id.toString().padStart(padWidth, '0');
               const cardPageHref = hasMultipleSeries
@@ -279,7 +283,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
               return (
                 <article
                   key={`${activeSeries.slug}-${card.id}`}
-                  className={`rounded-lg p-3.5 flex flex-col h-full transition-all ${
+                  className={`rounded-lg p-2.5 sm:p-3.5 flex flex-col h-full transition-all ${
                     card.found
                       ? 'bg-chocobo-surface border border-chocobo-gold/45 hover:border-chocobo-gold hover:-translate-y-0.5'
                       : 'bg-chocobo-recessed/75 border border-chocobo-light/10 hover:border-chocobo-gold/30'
@@ -288,7 +292,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                   {card.resolvedImage && slideIndex !== undefined ? (
                     <button
                       type="button"
-                      className="relative aspect-[3/4] w-full mb-3 bg-black/35 rounded-md overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+                      className="relative aspect-[3/4] w-full mb-2 sm:mb-3 bg-black/35 rounded-md overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
                       onClick={() => {
                         setLightboxIndex(slideIndex);
                         setLightboxOpen(true);
@@ -302,13 +306,13 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                         quality={75}
                         priority={imgRank < 2}
                         loading={imgRank < 4 ? 'eager' : 'lazy'}
-                        sizes="(max-width: 640px) 85vw, (max-width: 768px) 44vw, (max-width: 1024px) 28vw, 220px"
+                        sizes="(max-width: 640px) 46vw, (max-width: 768px) 44vw, (max-width: 1024px) 28vw, 220px"
                         className="object-contain"
                       />
                     </button>
                   ) : (
                     <div
-                      className={`aspect-[3/4] w-full mb-3 rounded-md border flex flex-col items-center justify-center p-4 text-center select-none ${
+                      className={`aspect-[3/4] w-full mb-2 sm:mb-3 rounded-md border flex flex-col items-center justify-center p-2.5 sm:p-4 text-center select-none ${
                         card.found
                           ? 'border-chocobo-gold/25 bg-chocobo-recessed/80'
                           : 'border-chocobo-light/10 bg-chocobo-dark/80'
@@ -316,24 +320,24 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                       aria-hidden="true"
                     >
                       <span
-                        className={`font-display text-3xl font-bold tabular-nums ${
+                        className={`font-display text-2xl sm:text-3xl font-bold tabular-nums ${
                           card.found ? 'text-chocobo-gold/80' : 'text-chocobo-muted/45'
                         }`}
                       >
                         #{paddedId}
                       </span>
-                      <span className="text-[11px] uppercase tracking-widest text-chocobo-muted/60 mt-1.5">
+                      <span className="text-[10px] sm:text-[11px] uppercase tracking-widest text-chocobo-muted/60 mt-1 sm:mt-1.5">
                         {card.found ? 'Photo Pending' : 'Unpulled'}
                       </span>
-                      <span className="text-[11px] text-chocobo-muted/40 mt-0.5 tabular-nums">
+                      <span className="text-[10px] sm:text-[11px] text-chocobo-muted/40 mt-0.5 tabular-nums">
                         of {activeSeries.serialMax}
                       </span>
                     </div>
                   )}
 
                   {/* Card Header Row */}
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-lg font-bold text-chocobo-gold tabular-nums">
+                  <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-chocobo-gold tabular-nums">
                       <Link
                         href={cardPageHref}
                         className="hover:text-chocobo-gold-bright transition-colors"
@@ -342,7 +346,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                       </Link>
                     </h3>
                     <span
-                      className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${
+                      className={`inline-block rounded px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold ${
                         card.found
                           ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/30'
                           : 'bg-white/5 text-chocobo-muted border border-white/10'
@@ -353,13 +357,13 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                   </div>
 
                   {/* Card Metadata */}
-                  <div className="flex-1 flex flex-col mt-2.5 text-xs">
-                    <div className="space-y-1.5 pb-3">
+                  <div className="flex-1 flex flex-col mt-2 sm:mt-2.5 text-[11px] sm:text-xs">
+                    <div className="space-y-1 sm:space-y-1.5 pb-2.5 sm:pb-3">
                       {typeof card.price === 'number' && (
-                        <div className="flex items-baseline justify-between gap-2">
+                        <div className="flex items-baseline justify-between gap-1.5">
                           <span className="text-sm font-semibold text-emerald-400 tabular-nums">
                             {formatCompactUsd(card.price)}
-                            <span className="text-xs font-normal text-chocobo-muted ml-1">
+                            <span className="hidden sm:inline text-xs font-normal text-chocobo-muted ml-1">
                               (${card.price.toLocaleString()})
                             </span>
                           </span>
@@ -367,10 +371,10 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                       )}
 
                       {card.grading && (
-                        <p className="text-sky-300 font-medium">
+                        <p className="text-sky-300 font-medium leading-snug">
                           {formatCardGrading(card.grading as GradingWithOptionalLabel)}
                           {card.grading.dateGraded && (
-                            <span className="text-chocobo-muted font-normal ml-1.5 tabular-nums">
+                            <span className="hidden sm:inline text-chocobo-muted font-normal ml-1.5 tabular-nums">
                               &middot; {card.grading.dateGraded}
                             </span>
                           )}
@@ -385,19 +389,19 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                             </p>
                           )}
                           {card.dateFound && (
-                            <p className="text-chocobo-muted tabular-nums">
+                            <p className="text-chocobo-muted tabular-nums truncate">
                               {card.dateFound}
                               {card.region ? ` · ${card.region}` : ''}
                             </p>
                           )}
                           {(pullSourceUrl || marketplaceUrl) && (
-                            <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
+                            <div className="flex flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-1 pt-0.5 sm:pt-1">
                               {pullSourceUrl && (
                                 <a
                                   href={pullSourceUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-chocobo-gold hover:underline"
+                                  className="text-chocobo-gold hover:underline py-0.5"
                                 >
                                   Source
                                 </a>
@@ -411,7 +415,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                                       ? 'sponsored noopener noreferrer'
                                       : 'noopener noreferrer'
                                   }
-                                  className="text-chocobo-gold hover:underline"
+                                  className="text-chocobo-gold hover:underline py-0.5"
                                 >
                                   {marketplaceLabel}
                                   {isMarketplaceAffiliate ? ' (Paid Link)' : ''}
@@ -424,17 +428,17 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                     </div>
 
                     {/* Pinned Card Footer — Always Aligned on Baseline */}
-                    <div className="mt-auto pt-2.5 border-t border-chocobo-gold/15 flex items-center justify-between gap-2">
+                    <div className="mt-auto pt-2 sm:pt-2.5 border-t border-chocobo-gold/15 flex items-center justify-between gap-1.5 sm:gap-2">
                       <button
                         type="button"
                         onClick={() => setSelectedCardForDetails(card)}
-                        className="text-xs font-semibold text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
+                        className="text-[11px] sm:text-xs font-semibold text-chocobo-gold hover:text-chocobo-gold-bright transition-colors py-1.5 sm:py-0.5 -my-1 sm:my-0"
                       >
                         Quick View
                       </button>
                       <Link
                         href={cardPageHref}
-                        className="text-xs text-chocobo-muted hover:text-chocobo-light transition-colors"
+                        className="text-[11px] sm:text-xs text-chocobo-muted hover:text-chocobo-light transition-colors py-1.5 sm:py-0.5 -my-1 sm:my-0"
                         aria-label={`Open full page for ${activeSeries.name} #${paddedId}`}
                       >
                         Details &rarr;

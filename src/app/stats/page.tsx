@@ -174,26 +174,26 @@ export default async function StatsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-chocobo-gold/20 pb-4">
+      <main className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-5 sm:space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-3 sm:gap-4 border-b border-chocobo-gold/20 pb-3.5 sm:pb-4">
           <div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold">
+            <h1 className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold">
               Market &amp; Pull Statistics
             </h1>
             <p className="text-xs sm:text-sm text-chocobo-muted mt-1">
               Verified pull velocity, reported sale medians, raw vs. graded premiums, and iconic serials.
             </p>
           </div>
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2 sm:gap-3 text-xs w-full sm:w-auto">
             <a
               href="/api/export?format=csv"
-              className="border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-1.5 px-3 rounded transition-colors"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center min-h-[38px] sm:min-h-0 border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-2 sm:py-1.5 px-3 rounded transition-colors"
             >
               Download CSV
             </a>
             <a
               href="/feed.xml"
-              className="border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-1.5 px-3 rounded transition-colors"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center min-h-[38px] sm:min-h-0 border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-2 sm:py-1.5 px-3 rounded transition-colors"
             >
               RSS Feed
             </a>
@@ -205,57 +205,57 @@ export default async function StatsPage() {
             No cards found yet. Check back later for stats!
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-5 sm:space-y-6">
             {/* Primary Overview KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-                <p className="text-xs font-medium text-chocobo-muted">Cards Found</p>
-                <p className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold mt-1.5 tabular-nums">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+              <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+                <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Cards Found</p>
+                <p className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold mt-1 sm:mt-1.5 tabular-nums">
                   {stats.foundCount}/{stats.totalCards}
                 </p>
-                <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+                <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
                   {stats.foundPercentage.toFixed(1)}% &middot; {stats.remainingCount} unpulled
                 </p>
               </div>
 
-              <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-                <p className="text-xs font-medium text-chocobo-muted">Median Sale</p>
-                <p className="font-display text-2xl sm:text-3xl font-bold text-emerald-400 mt-1.5 tabular-nums">
+              <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+                <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Median Sale</p>
+                <p className="font-display text-xl sm:text-3xl font-bold text-emerald-400 mt-1 sm:mt-1.5 tabular-nums">
                   ${Math.round(stats.medianPrice).toLocaleString()}
                 </p>
-                <p className="text-xs text-chocobo-muted mt-1">
+                <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1">
                   Across {stats.pricedCount} priced cards
                 </p>
               </div>
 
-              <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-                <p className="text-xs font-medium text-chocobo-muted">Average Sale</p>
-                <p className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold mt-1.5 tabular-nums">
+              <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+                <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Average Sale</p>
+                <p className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold mt-1 sm:mt-1.5 tabular-nums">
                   ${Math.round(stats.averagePrice).toLocaleString()}
                 </p>
-                <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+                <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
                   {formatCompactUsd(stats.lowestPrice)} &ndash; {formatCompactUsd(stats.highestPrice)}
                 </p>
               </div>
 
-              <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-                <p className="text-xs font-medium text-chocobo-muted">Graded Pop</p>
-                <p className="font-display text-2xl sm:text-3xl font-bold text-sky-400 mt-1.5 tabular-nums">
+              <div className="bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+                <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Graded Pop</p>
+                <p className="font-display text-xl sm:text-3xl font-bold text-sky-400 mt-1 sm:mt-1.5 tabular-nums">
                   {stats.gradingStats.totalGraded}
                 </p>
-                <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+                <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
                   Avg Grade: {stats.gradingStats.averageGrade.toFixed(1)}
                 </p>
               </div>
 
-              <div className="bg-chocobo-surface p-4 rounded-lg border border-chocobo-gold/30">
-                <p className="text-xs font-medium text-chocobo-muted">Pull Pace</p>
-                <p className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold mt-1.5 tabular-nums">
+              <div className="col-span-2 sm:col-span-1 bg-chocobo-surface p-3.5 sm:p-4 rounded-lg border border-chocobo-gold/30">
+                <p className="text-[11px] sm:text-xs font-medium text-chocobo-muted">Pull Pace</p>
+                <p className="font-display text-xl sm:text-3xl font-bold text-chocobo-gold mt-1 sm:mt-1.5 tabular-nums">
                   {stats.discoveryVelocity.avgDaysBetweenPulls !== null
                     ? `${stats.discoveryVelocity.avgDaysBetweenPulls.toFixed(1)}d`
                     : '—'}
                 </p>
-                <p className="text-xs text-chocobo-muted mt-1 tabular-nums">
+                <p className="text-[11px] sm:text-xs text-chocobo-muted mt-1 tabular-nums">
                   {stats.discoveryVelocity.daysSinceLastPull !== null
                     ? `${stats.discoveryVelocity.daysSinceLastPull}d since last pull`
                     : 'Avg days between pulls'}
@@ -352,8 +352,74 @@ export default async function StatsPage() {
                   })}
                 </div>
 
-                {/* Grouped Pop Ledger Table */}
-                <div className="overflow-x-auto rounded-md border border-chocobo-gold/20">
+                {/* Mobile Zero-Overflow Pop Ledger Cards (< sm) */}
+                <div className="sm:hidden space-y-3">
+                  {popReport.groups.map((group) => {
+                    const groupShare = ((group.totalCount / popReport.totalGraded) * 100).toFixed(1);
+                    return (
+                      <div
+                        key={`mobile-${group.service}`}
+                        className="rounded-md border border-chocobo-gold/20 overflow-hidden bg-chocobo-recessed/50"
+                      >
+                        <div className="bg-chocobo-recessed px-3 py-2 flex items-center justify-between gap-2 border-b border-chocobo-gold/20 text-xs">
+                          <span className="inline-flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded bg-sky-950/80 border border-sky-400/35 text-sky-300 font-semibold tracking-wide">
+                              {group.service}
+                            </span>
+                            <span className="text-chocobo-light font-medium tabular-nums">
+                              {group.totalCount} {group.totalCount === 1 ? 'slab' : 'slabs'}
+                            </span>
+                          </span>
+                          <span className="text-chocobo-muted tabular-nums">{groupShare}%</span>
+                        </div>
+                        <div className="divide-y divide-chocobo-gold/10">
+                          {group.tiers.map((tier) => {
+                            const tierPct = (tier.cards.length / popReport.totalGraded) * 100;
+                            return (
+                              <div
+                                key={`mobile-${group.service}-${tier.key}`}
+                                className="px-3 py-2.5 space-y-2"
+                              >
+                                <div className="flex items-center justify-between gap-2 text-xs">
+                                  <span className="font-medium text-chocobo-light">
+                                    {tier.label}
+                                  </span>
+                                  <span className="tabular-nums text-chocobo-muted shrink-0">
+                                    <strong className="text-chocobo-gold">{tier.cards.length}</strong>{' '}
+                                    ({tierPct.toFixed(1)}%)
+                                  </span>
+                                </div>
+                                <div
+                                  className="w-full h-1.5 rounded-full bg-chocobo-dark border border-chocobo-gold/15 overflow-hidden"
+                                  aria-hidden="true"
+                                >
+                                  <div
+                                    className="h-full bg-sky-400/75 rounded-full"
+                                    style={{ width: `${Math.max(4, tierPct)}%` }}
+                                  />
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {tier.cards.map((cardRef) => (
+                                    <Link
+                                      key={cardRef.id}
+                                      href={`/card/${cardRef.paddedId}`}
+                                      className="inline-flex items-center justify-center min-h-[34px] px-2.5 py-1 rounded bg-chocobo-recessed border border-chocobo-gold/30 hover:border-chocobo-gold hover:bg-chocobo-gold/15 font-display text-xs font-semibold text-chocobo-gold tabular-nums transition-colors"
+                                    >
+                                      #{cardRef.paddedId}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop Grouped Pop Ledger Table (sm+) */}
+                <div className="hidden sm:block overflow-x-auto rounded-md border border-chocobo-gold/20">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
                       <tr className="bg-chocobo-recessed text-[11px] uppercase tracking-wider text-chocobo-muted border-b border-chocobo-gold/20">
@@ -532,23 +598,43 @@ export default async function StatsPage() {
                     <Link
                       key={flip.cardId}
                       href={`/card/${flip.paddedId}`}
-                      className="flex flex-wrap justify-between items-center gap-2 bg-chocobo-recessed hover:bg-chocobo-gold/10 border border-chocobo-gold/20 rounded-md px-4 py-2.5 text-sm transition-colors"
+                      className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-between sm:items-center gap-2 bg-chocobo-recessed hover:bg-chocobo-gold/10 border border-chocobo-gold/20 rounded-md px-3.5 sm:px-4 py-3 sm:py-2.5 text-sm transition-colors"
                     >
-                      <span className="font-semibold text-chocobo-gold tabular-nums">
-                        <span className="font-display">#{flip.paddedId}</span>{' '}
-                        <span className="text-xs font-normal text-chocobo-muted">
-                          ({flip.salesCount} sales)
+                      <div className="flex items-center justify-between sm:justify-start gap-2">
+                        <span className="font-semibold text-chocobo-gold tabular-nums">
+                          <span className="font-display">#{flip.paddedId}</span>{' '}
+                          <span className="text-xs font-normal text-chocobo-muted">
+                            ({flip.salesCount} sales)
+                          </span>
+                        </span>
+                        <span
+                          className={`sm:hidden text-xs font-semibold px-2 py-0.5 rounded tabular-nums ${
+                            flip.changePct >= 0
+                              ? 'bg-emerald-950/80 text-emerald-300'
+                              : 'bg-red-950/80 text-red-300'
+                          }`}
+                        >
+                          {flip.changePct >= 0 ? '+' : ''}
+                          {flip.changePct.toFixed(1)}%
+                        </span>
+                      </div>
+                      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs sm:text-sm text-chocobo-light tabular-nums">
+                        <span className="whitespace-nowrap">
+                          ${flip.firstPrice.toLocaleString()}{' '}
+                          <span className="text-chocobo-muted">({flip.firstDate})</span>
+                        </span>
+                        <span className="text-chocobo-muted" aria-hidden="true">
+                          &rarr;
+                        </span>
+                        <span className="whitespace-nowrap">
+                          <strong className="text-emerald-400">
+                            ${flip.latestPrice.toLocaleString()}
+                          </strong>{' '}
+                          <span className="text-chocobo-muted">({flip.latestDate})</span>
                         </span>
                       </span>
-                      <span className="text-xs sm:text-sm text-chocobo-light tabular-nums">
-                        ${flip.firstPrice.toLocaleString()} ({flip.firstDate}) &rarr;{' '}
-                        <strong className="text-emerald-400">
-                          ${flip.latestPrice.toLocaleString()}
-                        </strong>{' '}
-                        ({flip.latestDate})
-                      </span>
                       <span
-                        className={`text-xs font-semibold px-2 py-0.5 rounded tabular-nums ${
+                        className={`hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded tabular-nums ${
                           flip.changePct >= 0
                             ? 'bg-emerald-950/80 text-emerald-300'
                             : 'bg-red-950/80 text-red-300'

@@ -19,9 +19,9 @@ export default function CompactMatrixView({
   onSelectCard,
 }: CompactMatrixViewProps) {
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-chocobo-muted bg-chocobo-surface border border-chocobo-gold/20 rounded-lg px-4 py-2">
-        <div className="flex flex-wrap items-center gap-4">
+    <div className="space-y-2.5 sm:space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] sm:text-xs text-chocobo-muted bg-chocobo-surface border border-chocobo-gold/20 rounded-lg px-3 sm:px-4 py-2">
+        <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1">
           <span className="inline-flex items-center gap-1.5 text-chocobo-light">
             <span className="w-2.5 h-2.5 rounded-sm bg-chocobo-gold inline-block" /> Found
           </span>
@@ -33,10 +33,11 @@ export default function CompactMatrixView({
             <span className="text-amber-300">★</span> Iconic / Grail
           </span>
         </div>
-        <span>Click any tile for full details</span>
+        <span className="hidden sm:inline">Click any tile for full details</span>
+        <span className="sm:hidden">Tap any tile for details</span>
       </div>
 
-      <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-11 gap-2">
+      <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-11 gap-1.5 sm:gap-2">
         {cards.map((card) => {
           const padded = card.id.toString().padStart(padWidth, '0');
           const iconic = getIconicLabel(card.id, iconicMap);

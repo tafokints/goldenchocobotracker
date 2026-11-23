@@ -39,10 +39,10 @@ export default function SiteHeader() {
 
   return (
     <header className="w-full border-b border-chocobo-gold/20 bg-chocobo-dark/95">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center justify-between gap-3 sm:gap-4">
         <Link
           href="/"
-          className="font-display text-lg sm:text-xl font-bold tracking-wide text-chocobo-gold hover:text-chocobo-gold-bright transition-colors truncate"
+          className="font-display text-base sm:text-xl font-bold tracking-wide text-chocobo-gold hover:text-chocobo-gold-bright transition-colors truncate py-1"
         >
           Golden Chocobo
         </Link>
@@ -87,7 +87,7 @@ export default function SiteHeader() {
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-primary-nav"
           aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          className="sm:hidden inline-flex items-center justify-center p-2 -mr-1.5 rounded-md border border-chocobo-gold/25 bg-chocobo-surface/80 text-chocobo-gold hover:border-chocobo-gold/60 hover:bg-chocobo-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+          className="sm:hidden inline-flex items-center justify-center min-w-[42px] min-h-[42px] -mr-1 rounded-md border border-chocobo-gold/25 bg-chocobo-surface/80 text-chocobo-gold hover:border-chocobo-gold/60 hover:bg-chocobo-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
         >
           {mobileMenuOpen ? (
             <XMarkIcon className="h-5 w-5" aria-hidden="true" />
