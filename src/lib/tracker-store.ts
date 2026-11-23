@@ -111,15 +111,37 @@ export async function readSeriesCardsFromPostgres(
       .where(inArray(priceEvents.itemId, itemIds))
       .orderBy(desc(priceEvents.eventDate), desc(priceEvents.createdAt));
 
+    const seenByItemId = new Map<string, Map<string, PriceHistoryEntry>>();
+
     for (const ev of events) {
       const list = eventsByItemId.get(ev.itemId) || [];
-      list.push({
-        price: Math.round(ev.priceCents / 100),
-        date: ev.eventDate,
+      let seenForItem = seenByItemId.get(ev.itemId);
+      if (!seenForItem) {
+        seenForItem = new Map<string, PriceHistoryEntry>();
+        seenByItemId.set(ev.itemId, seenForItem);
+      }
+
+      const price = Math.round(ev.priceCents / 100);
+      const normalizedDate = ev.eventDate.trim();
+      const dedupeKey = `${price}|${normalizedDate}`;
+      const existingEntry = seenForItem.get(dedupeKey);
+
+      if (existingEntry) {
+        if (!existingEntry.soldBy && ev.soldBy) existingEntry.soldBy = ev.soldBy;
+        if (!existingEntry.soldTo && ev.soldTo) existingEntry.soldTo = ev.soldTo;
+        if (!existingEntry.sourceUrl && ev.sourceUrl) existingEntry.sourceUrl = ev.sourceUrl;
+        continue;
+      }
+
+      const entry: PriceHistoryEntry = {
+        price,
+        date: normalizedDate,
         soldBy: ev.soldBy ?? undefined,
         soldTo: ev.soldTo ?? undefined,
         sourceUrl: ev.sourceUrl ?? undefined,
-      });
+      };
+      seenForItem.set(dedupeKey, entry);
+      list.push(entry);
       eventsByItemId.set(ev.itemId, list);
     }
   }
@@ -168,6 +190,7 @@ export async function readSeriesCardsFromPostgres(
           ? {
               service: row.gradingService,
               grade: row.grade,
+              gradeLabel: row.gradeLabel ?? undefined,
               certNumber: row.certNumber ?? undefined,
               dateGraded: row.dateGraded ?? undefined,
             }
@@ -251,6 +274,7 @@ export interface UpsertSerialPatch {
   grading?: {
     service: string;
     grade: number;
+    gradeLabel?: string;
     certNumber?: string;
     dateGraded?: string;
   };
@@ -347,6 +371,9 @@ export async function applyCardPatch(
           ? patch.grading.service
           : (existing?.gradingService ?? null),
         grade: patch.grading ? patch.grading.grade : (existing?.grade ?? null),
+        gradeLabel: patch.grading
+          ? (patch.grading.gradeLabel ?? null)
+          : (existing?.gradeLabel ?? null),
         certNumber: patch.grading
           ? (patch.grading.certNumber ?? null)
           : (existing?.certNumber ?? null),
@@ -375,16 +402,32 @@ export async function applyCardPatch(
           : null);
 
       if (priceEventToInsert) {
-        await db.insert(priceEvents).values({
-          itemId: savedItem.id,
-          priceCents: Math.round(priceEventToInsert.price * 100),
-          currency: 'USD',
-          eventType: 'sale',
-          eventDate: priceEventToInsert.date,
-          sourceUrl: priceEventToInsert.sourceUrl ?? null,
-          soldBy: priceEventToInsert.soldBy ?? null,
-          soldTo: priceEventToInsert.soldTo ?? null,
-        });
+        const priceCents = Math.round(priceEventToInsert.price * 100);
+        const eventDate = priceEventToInsert.date.trim();
+        const [existingEvent] = await db
+          .select({ id: priceEvents.id })
+          .from(priceEvents)
+          .where(
+            and(
+              eq(priceEvents.itemId, savedItem.id),
+              eq(priceEvents.priceCents, priceCents),
+              eq(priceEvents.eventDate, eventDate)
+            )
+          )
+          .limit(1);
+
+        if (!existingEvent) {
+          await db.insert(priceEvents).values({
+            itemId: savedItem.id,
+            priceCents,
+            currency: 'USD',
+            eventType: 'sale',
+            eventDate,
+            sourceUrl: priceEventToInsert.sourceUrl ?? null,
+            soldBy: priceEventToInsert.soldBy ?? null,
+            soldTo: priceEventToInsert.soldTo ?? null,
+          });
+        }
       }
 
       await db.insert(auditLogs).values({
@@ -413,14 +456,32 @@ export async function applyCardPatch(
   }
 
   const current = cards[cardIndex];
-  const updatedHistory: PriceHistoryEntry[] = [...(current.priceHistory || [])];
-  if (patch.addPriceHistoryEntry) {
-    updatedHistory.push(patch.addPriceHistoryEntry);
-  } else if (patch.price !== undefined) {
-    updatedHistory.push({
-      price: patch.price,
-      date: patch.priceDate || new Date().toISOString().split('T')[0],
-    });
+  const updatedHistory: PriceHistoryEntry[] = [];
+  const seenKeys = new Set<string>();
+  for (const entry of current.priceHistory || []) {
+    const normalizedDate = entry.date.trim();
+    const key = `${Math.round(entry.price * 100)}|${normalizedDate}`;
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    updatedHistory.push({ ...entry, date: normalizedDate });
+  }
+
+  const incomingEntry: PriceHistoryEntry | null =
+    patch.addPriceHistoryEntry ??
+    (patch.price !== undefined
+      ? {
+          price: patch.price,
+          date: patch.priceDate || new Date().toISOString().split('T')[0],
+        }
+      : null);
+
+  if (incomingEntry) {
+    const normalizedDate = incomingEntry.date.trim();
+    const incomingKey = `${Math.round(incomingEntry.price * 100)}|${normalizedDate}`;
+    if (!seenKeys.has(incomingKey)) {
+      seenKeys.add(incomingKey);
+      updatedHistory.push({ ...incomingEntry, date: normalizedDate });
+    }
   }
   updatedHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 

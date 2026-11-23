@@ -77,6 +77,7 @@ export const publicSubmissionSchema = z
       .union([z.literal(''), z.coerce.number().finite().min(0).max(10)])
       .optional()
       .transform((v) => (typeof v === 'number' ? v : undefined)),
+    gradeLabel: optionalShortText(60),
     certNumber: optionalShortText(40),
     dateGraded: z
       .union([z.literal(''), isoDateSchema])
@@ -220,6 +221,7 @@ export const reviewSubmissionSchema = z.object({
         .union([z.literal(''), z.coerce.number().finite().min(0).max(10)])
         .optional()
         .transform((v) => (typeof v === 'number' ? v : undefined)),
+      gradeLabel: optionalShortText(60),
       certNumber: optionalShortText(40),
       dateGraded: z
         .union([z.literal(''), isoDateSchema])

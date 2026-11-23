@@ -1,6 +1,7 @@
 'use client';
 
 import { formatCompactUsd } from '@/lib/format';
+import { formatGradingDisplay } from '@/lib/grading';
 import { GOLDEN_CHOCOBO_ICONIC_NUMBERS, getIconicLabel } from '@/lib/iconic-numbers';
 import type { ResolvedCard } from '@/lib/types';
 
@@ -48,7 +49,9 @@ export default function CompactMatrixView({
               onClick={() => onSelectCard(card)}
               title={`${card.name} — ${card.found ? `Found${card.foundBy ? ` by ${card.foundBy}` : ''}` : 'Unpulled'}${
                 iconic ? ` · ${iconic}` : ''
-              }${hasPrice ? ` · $${card.price!.toLocaleString()}` : ''}`}
+              }${card.grading ? ` · ${formatGradingDisplay(card.grading)}` : ''}${
+                hasPrice ? ` · $${card.price!.toLocaleString()}` : ''
+              }`}
               className={`relative aspect-square rounded-md border p-1.5 flex flex-col items-center justify-center transition-all hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold ${
                 card.found
                   ? 'bg-chocobo-gold/20 border-chocobo-gold/75 text-chocobo-gold hover:bg-chocobo-gold/30'

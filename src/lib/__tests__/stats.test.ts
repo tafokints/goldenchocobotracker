@@ -89,4 +89,80 @@ describe('computeCardStats', () => {
     // Iconic watchlist includes #01 (found) within totalCards=3
     expect(stats.iconicWatchlist.some((i) => i.cardId === 1 && i.found)).toBe(true);
   });
+
+  it('deduplicates identical (price, date) entries per card so resaleFlips has no fake 0% flips', () => {
+    const cards: ResolvedCard[] = [
+      {
+        id: 1,
+        name: 'Golden Chocobo #01',
+        found: true,
+        foundBy: 'CollectorA',
+        dateFound: '2025-06-20',
+        price: 1400000,
+        priceDate: '2026-11-15',
+        // Duplicate identical (price, date) rows — must NOT become a fake 0% resale flip
+        priceHistory: [
+          { price: 1400000, date: '2026-11-15', soldBy: 'Collectr' },
+          { price: 1400000, date: '2026-11-15' },
+        ],
+        grading: { service: 'PSA', grade: 10, gradeLabel: 'MBA Gold Diamond' },
+        resolvedImage: null,
+      },
+      {
+        id: 2,
+        name: 'Golden Chocobo #02',
+        found: true,
+        foundBy: 'CollectorB',
+        dateFound: '2025-07-01',
+        price: 65000,
+        priceDate: '2025-10-23',
+        // Real multi-sale history containing a duplicate (70000, 2025-09-14) AND two distinct $70k sales on different dates
+        priceHistory: [
+          { price: 70000, date: '2025-08-24' },
+          { price: 70000, date: '2025-09-14' },
+          { price: 70000, date: '2025-09-14' },
+          { price: 65000, date: '2025-10-23' },
+        ],
+        grading: { service: 'CGC', grade: 10, gradeLabel: 'Pristine 10' },
+        resolvedImage: null,
+      },
+      {
+        id: 3,
+        name: 'Golden Chocobo #03',
+        found: true,
+        foundBy: 'CollectorC',
+        dateFound: '2025-08-24',
+        price: 70000,
+        priceDate: '2025-08-24',
+        // Same (price, date) as card #02, but on a different card — must be preserved in stats.priceHistory
+        priceHistory: [{ price: 70000, date: '2025-08-24' }],
+        resolvedImage: null,
+      },
+    ];
+
+    const stats = computeCardStats(cards, {
+      iconicMap: { 1: 'First Print', 2: 'Runner-Up' },
+    });
+
+    // Only card #02 is a genuine multi-sale flip; card #01's duplicate rows do NOT produce a 0% flip
+    expect(stats.resaleFlips).toHaveLength(1);
+    expect(stats.resaleFlips[0].cardId).toBe(2);
+    expect(stats.resaleFlips[0].salesCount).toBe(3);
+    expect(stats.resaleFlips[0].firstPrice).toBe(70000);
+    expect(stats.resaleFlips[0].latestPrice).toBe(65000);
+
+    // Price history timeline should have 1 (#01) + 3 (#02) + 1 (#03) = 5 deduplicated entries
+    expect(stats.priceHistory).toHaveLength(5);
+    expect(stats.priceHistory.filter((e) => e.cardId === 1)).toHaveLength(1);
+    expect(stats.priceHistory.filter((e) => e.cardId === 2)).toHaveLength(3);
+    expect(stats.priceHistory.filter((e) => e.cardId === 3)).toHaveLength(1);
+
+    // Iconic watchlist surfaces prestige gradeLabel formatting
+    expect(stats.iconicWatchlist.find((i) => i.cardId === 1)?.gradingLabel).toBe(
+      'PSA 10 · MBA Gold Diamond'
+    );
+    expect(stats.iconicWatchlist.find((i) => i.cardId === 2)?.gradingLabel).toBe(
+      'CGC Pristine 10'
+    );
+  });
 });

@@ -40,28 +40,34 @@ export default async function HubPage() {
       <section className="grid grid-cols-1 md:grid-cols-2 gap-5" aria-label="Published trackers">
         {trackerList.map((tracker) => {
           const href = tracker.slug === DEFAULT_TRACKER_SLUG ? '/' : `/t/${tracker.slug}`;
+          const statsHref =
+            tracker.slug === DEFAULT_TRACKER_SLUG ? '/stats' : `/t/${tracker.slug}/stats`;
+
           return (
             <article
               key={tracker.id}
-              className="bg-chocobo-surface border rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-colors hover:border-chocobo-gold"
-              style={{ borderColor: `${tracker.accentHex}55` }}
+              className="bg-chocobo-surface border rounded-lg p-5 sm:p-6 flex flex-col justify-between gap-4 transition-all hover:border-chocobo-gold hover:-translate-y-0.5"
+              style={{ borderColor: `${tracker.accentHex}4D` }}
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-chocobo-gold/20 text-chocobo-gold">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-gold">
                     {tracker.game}
                   </span>
-                  <span className="text-xs text-chocobo-light/70">
-                    {tracker.seriesCount} {tracker.seriesCount === 1 ? 'series' : 'series'}
+                  <span className="text-xs text-chocobo-muted tabular-nums">
+                    {tracker.seriesCount} series &middot; {tracker.totalSerials.toLocaleString()}{' '}
+                    serials
                   </span>
                 </div>
-                <h2 className="text-xl font-bold" style={{ color: tracker.accentHex }}>
+                <h2 className="font-display text-xl font-bold" style={{ color: tracker.accentHex }}>
                   <Link href={href} className="hover:underline">
                     {tracker.name}
                   </Link>
                 </h2>
-                <p className="text-xs text-chocobo-light/75">{tracker.setName}</p>
-                <p className="text-sm text-chocobo-light/90">{tracker.description}</p>
+                <p className="text-xs text-chocobo-muted">{tracker.setName}</p>
+                <p className="text-sm text-chocobo-light/85 leading-relaxed">
+                  {tracker.description}
+                </p>
               </div>
 
               <div className="space-y-4">
@@ -69,13 +75,13 @@ export default async function HubPage() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href={href}
-                    className="flex-1 text-center bg-chocobo-gold hover:bg-yellow-400 text-chocobo-dark font-bold py-2 px-4 rounded text-sm transition-colors"
+                    className="flex-1 text-center bg-chocobo-gold hover:bg-chocobo-gold-bright text-chocobo-dark font-semibold py-2 px-4 rounded-md text-sm transition-colors"
                   >
                     Open Tracker &rarr;
                   </Link>
                   <Link
-                    href={tracker.slug === DEFAULT_TRACKER_SLUG ? '/stats' : `/t/${tracker.slug}/stats`}
-                    className="border border-chocobo-gold/70 hover:bg-chocobo-gold/15 text-chocobo-gold font-semibold py-2 px-4 rounded text-sm transition-colors"
+                    href={statsHref}
+                    className="border border-chocobo-gold/55 hover:border-chocobo-gold hover:bg-chocobo-gold/10 text-chocobo-gold font-semibold py-2 px-4 rounded-md text-sm transition-colors"
                   >
                     Stats
                   </Link>

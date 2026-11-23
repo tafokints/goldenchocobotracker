@@ -204,6 +204,7 @@ export async function POST(request: NextRequest) {
     soldTo: data.soldTo,
     gradingService: data.gradingService,
     grade: data.grade,
+    gradeLabel: data.gradeLabel,
     certNumber: data.certNumber,
     dateGraded: data.dateGraded,
     notes: data.notes,

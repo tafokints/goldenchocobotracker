@@ -2,6 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import type { SubmissionPayload, SubmissionStatus, SubmissionType } from '@/db/schema';
+import { COMMON_GRADE_LABELS, formatGradingDisplay } from '@/lib/grading';
+
+const QUEUE_INPUT_CLASS =
+  'w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded px-2.5 py-1.5';
 
 interface CurrentItemSnapshot {
   status: string;
@@ -14,6 +18,7 @@ interface CurrentItemSnapshot {
   latestPriceDate: string | null;
   gradingService: string | null;
   grade: number | null;
+  gradeLabel: string | null;
   certNumber: string | null;
   dateGraded: string | null;
 }
@@ -50,6 +55,7 @@ interface EditOverrideDraft {
   soldTo: string;
   gradingService: string;
   grade: string;
+  gradeLabel: string;
   certNumber: string;
   dateGraded: string;
   notes: string;
@@ -77,6 +83,7 @@ function createDraftFromSubmission(item: EnrichedSubmission): EditOverrideDraft 
     soldTo: p.soldTo || '',
     gradingService: p.gradingService || '',
     grade: p.grade !== undefined ? String(p.grade) : '',
+    gradeLabel: p.gradeLabel || '',
     certNumber: p.certNumber || '',
     dateGraded: p.dateGraded || '',
     notes: p.notes || '',
@@ -96,6 +103,7 @@ function buildOverridesPayload(draft: EditOverrideDraft) {
     soldTo: draft.soldTo.trim() || undefined,
     gradingService: draft.gradingService.trim() || undefined,
     grade: draft.grade.trim() !== '' ? Number(draft.grade) : undefined,
+    gradeLabel: draft.gradeLabel.trim() || undefined,
     certNumber: draft.certNumber.trim() || undefined,
     dateGraded: draft.dateGraded.trim() || undefined,
     notes: draft.notes.trim() || undefined,
@@ -255,7 +263,7 @@ export default function ModerationQueue() {
             return (
               <article
                 key={item.id}
-                className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-5 space-y-4"
+                className="bg-chocobo-surface border border-chocobo-gold/30 rounded-lg p-5 space-y-4"
               >
                 <div className="flex flex-wrap justify-between items-start gap-2 border-b border-chocobo-gold/30 pb-3">
                   <div>
@@ -316,9 +324,15 @@ export default function ModerationQueue() {
                         </p>
                         <p>
                           Grading:{' '}
-                          {cur.gradingService
-                            ? `${cur.gradingService} ${cur.grade ?? ''}${cur.certNumber ? ` (#${cur.certNumber})` : ''}`
-                            : '—'}
+                          {cur.gradingService && cur.grade !== null
+                            ? `${formatGradingDisplay({
+                                service: cur.gradingService,
+                                grade: cur.grade,
+                                gradeLabel: cur.gradeLabel,
+                              })}${cur.certNumber ? ` (#${cur.certNumber})` : ''}`
+                            : cur.gradingService
+                              ? `${cur.gradingService}${cur.certNumber ? ` (#${cur.certNumber})` : ''}`
+                              : '—'}
                         </p>
                       </>
                     ) : (
@@ -346,7 +360,16 @@ export default function ModerationQueue() {
                     )}
                     {p.gradingService && (
                       <p>
-                        Grading: <strong>{p.gradingService} {p.grade}</strong>
+                        Grading:{' '}
+                        <strong>
+                          {p.grade !== undefined
+                            ? formatGradingDisplay({
+                                service: p.gradingService,
+                                grade: p.grade,
+                                gradeLabel: p.gradeLabel,
+                              })
+                            : p.gradingService}
+                        </strong>
                         {p.certNumber ? ` · Cert #${p.certNumber}` : ''}
                         {p.dateGraded ? ` (${p.dateGraded})` : ''}
                       </p>
@@ -381,7 +404,7 @@ export default function ModerationQueue() {
                           type="text"
                           value={draft.foundBy}
                           onChange={(e) => updateDraftField(item.id, 'foundBy', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -390,7 +413,7 @@ export default function ModerationQueue() {
                           type="date"
                           value={draft.dateFound}
                           onChange={(e) => updateDraftField(item.id, 'dateFound', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -399,7 +422,7 @@ export default function ModerationQueue() {
                           type="url"
                           value={draft.sourceUrl}
                           onChange={(e) => updateDraftField(item.id, 'sourceUrl', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -408,7 +431,7 @@ export default function ModerationQueue() {
                           type="url"
                           value={draft.marketplaceUrl}
                           onChange={(e) => updateDraftField(item.id, 'marketplaceUrl', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -418,7 +441,7 @@ export default function ModerationQueue() {
                           min="0"
                           value={draft.price}
                           onChange={(e) => updateDraftField(item.id, 'price', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -427,7 +450,7 @@ export default function ModerationQueue() {
                           type="date"
                           value={draft.saleDate}
                           onChange={(e) => updateDraftField(item.id, 'saleDate', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -437,7 +460,7 @@ export default function ModerationQueue() {
                           value={draft.gradingService}
                           onChange={(e) => updateDraftField(item.id, 'gradingService', e.target.value)}
                           placeholder="PSA, BGS, CGC"
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                       <label className="space-y-1">
@@ -449,8 +472,25 @@ export default function ModerationQueue() {
                           max="10"
                           value={draft.grade}
                           onChange={(e) => updateDraftField(item.id, 'grade', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Slab Tier / Label</span>
+                        <input
+                          type="text"
+                          list={`queue-grade-labels-${item.id}`}
+                          maxLength={60}
+                          value={draft.gradeLabel}
+                          onChange={(e) => updateDraftField(item.id, 'gradeLabel', e.target.value)}
+                          placeholder="e.g., Pristine 10, MBA Gold Diamond"
+                          className={QUEUE_INPUT_CLASS}
+                        />
+                        <datalist id={`queue-grade-labels-${item.id}`}>
+                          {COMMON_GRADE_LABELS.map((tier) => (
+                            <option key={tier} value={tier} />
+                          ))}
+                        </datalist>
                       </label>
                       <label className="space-y-1">
                         <span className="block text-chocobo-light/80">Cert Number</span>
@@ -458,7 +498,7 @@ export default function ModerationQueue() {
                           type="text"
                           value={draft.certNumber}
                           onChange={(e) => updateDraftField(item.id, 'certNumber', e.target.value)}
-                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                          className={QUEUE_INPUT_CLASS}
                         />
                       </label>
                     </div>
@@ -491,7 +531,7 @@ export default function ModerationQueue() {
                         setNotesById((prev) => ({ ...prev, [item.id]: e.target.value }))
                       }
                       placeholder="Optional review note..."
-                      className="flex-1 bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3 text-sm"
+                      className="flex-1 bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3 text-sm"
                     />
                     <button
                       type="button"

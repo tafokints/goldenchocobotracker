@@ -5,6 +5,8 @@
 @layer base {
   html {
     color-scheme: dark;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(214, 167, 61, 0.32) #16120E;
   }
 
   body {
@@ -17,6 +19,41 @@
   h1,
   h2 {
     font-family: var(--font-display), Georgia, serif;
+  }
+
+  ::selection {
+    background-color: rgba(214, 167, 61, 0.28);
+    color: #F6EFE4;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #D6A73D;
+    outline-offset: 2px;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #16120E;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(214, 167, 61, 0.28);
+    border-radius: 9999px;
+    border: 2px solid #16120E;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(214, 167, 61, 0.5);
   }
 }
 

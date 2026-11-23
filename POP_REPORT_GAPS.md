@@ -24,7 +24,7 @@
 - [ ] Identify the **4 missing CGC 10** serial numbers (and confirm which 2 are **Pristine 10** vs. **Gem Mint 10**).
 - [ ] Identify the **4 missing CGC 9.5** serial numbers.
 - [ ] Identify the **1 missing CGC 8.5** serial number (check if `#38` was regraded/re-holdered).
-- [ ] Optional schema enhancement: support distinguishing `CGC Pristine 10` vs. `CGC Gem Mint 10` (and `BGS Black Label 10` / `BGS Pristine 10`) in the tracker UI.
+- [x] Optional schema enhancement: support distinguishing `CGC Pristine 10` vs. `CGC Gem Mint 10` (and `BGS Black Label 10` / `BGS Pristine 10` / `MBA Gold Diamond`) in the tracker UI.
 
 ---
 
@@ -75,7 +75,7 @@
 ## 5. Pending Sales / Auction Follow-Ups
 
 - [ ] **#71/77 (`PSA 8`)** — Featured in Goldin's 2026 Fall TCG Elite Auction (Lot #67, active bidding at \$85,400 w/ buyer's premium). Closes **2026-11-30** — add final realized sale price after close.
-- [ ] Clean up duplicate `(price, date)` `priceHistory` entries created by the Admin Dashboard's Update Price tab on `#22`, `#38`, `#45`, and `#47`.
+- [x] Clean up duplicate `(price, date)` `priceHistory` entries created by the Admin Dashboard's Update Price tab on `#22`, `#38`, `#45`, and `#47` (removed 4 duplicates via `scripts/dedupe-price-events.ts` and prevented duplicates on future writes).
 
 ---
 

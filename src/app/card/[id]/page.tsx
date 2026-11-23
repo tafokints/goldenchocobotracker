@@ -5,10 +5,12 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import AffiliateLinks from '@/components/AffiliateLinks';
 import CopyLinkButton from '@/components/CopyLinkButton';
 import { resolveCardLinks } from '@/lib/affiliate';
+import { formatCompactUsd } from '@/lib/format';
+import { formatGradingDisplay } from '@/lib/grading';
 import { getGradingCertUrl } from '@/lib/grading-certs';
-import { getIconicLabel } from '@/lib/iconic-numbers';
+import { getIconicLabel, isIconicNumber } from '@/lib/iconic-numbers';
 import { getSiteUrl } from '@/lib/site-config';
-import { getCardById } from '@/lib/tracker-store';
+import { getCardById, getCards } from '@/lib/tracker-store';
 import { PULL_CHANNEL_LABELS } from '@/lib/types';
 import { TOTAL_CHOCOBO_CARDS } from '@/lib/validation';
 
@@ -85,7 +87,8 @@ export default async function CardPage({ params }: CardPageProps) {
     permanentRedirect(`/card/${parsed.padded}`);
   }
 
-  const card = await getCardById(parsed.id);
+  const allCards = await getCards();
+  const card = allCards.find((item) => item.id === parsed.id) ?? null;
   if (!card) {
     notFound();
   }
@@ -97,6 +100,27 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const prevId = (parsed.id === 1 ? TOTAL_CHOCOBO_CARDS : parsed.id - 1).toString().padStart(2, '0');
   const nextId = (parsed.id === TOTAL_CHOCOBO_CARDS ? 1 : parsed.id + 1).toString().padStart(2, '0');
+
+  const nearbyFoundCards = allCards
+    .filter((item) => item.found && item.id !== parsed.id)
+    .sort((a, b) => {
+      const distDiff = Math.abs(a.id - parsed.id) - Math.abs(b.id - parsed.id);
+      return distDiff !== 0 ? distDiff : a.id - b.id;
+    })
+    .slice(0, 4)
+    .sort((a, b) => a.id - b.id);
+
+  const totalUnpulledGrailsCount = allCards.filter(
+    (item) => !item.found && isIconicNumber(item.id)
+  ).length;
+  const unpulledGrails = allCards.filter(
+    (item) => item.id !== parsed.id && !item.found && isIconicNumber(item.id)
+  );
+  const displayedGrails =
+    unpulledGrails.length > 0
+      ? unpulledGrails
+      : allCards.filter((item) => item.id !== parsed.id && isIconicNumber(item.id)).slice(0, 6);
+  const currentIsUnpulledGrail = !card.found && isIconicNumber(card.id);
 
   const siteUrl = getSiteUrl();
   const structuredData = {
@@ -150,7 +174,7 @@ export default async function CardPage({ params }: CardPageProps) {
           <article className="bg-chocobo-surface border border-chocobo-gold/40 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <div className="w-full">
               {card.resolvedImage ? (
-                <div className="relative aspect-[3/4] w-full bg-black/30 rounded-lg overflow-hidden border border-chocobo-gold/40">
+                <div className="relative aspect-[3/4] w-full bg-black/35 rounded-lg overflow-hidden border border-chocobo-gold/35">
                   <Image
                     src={card.resolvedImage}
                     alt={`Golden Chocobo Card #${parsed.padded} of 77`}
@@ -161,46 +185,56 @@ export default async function CardPage({ params }: CardPageProps) {
                   />
                 </div>
               ) : (
-                <div className="aspect-[3/4] w-full rounded-lg border border-chocobo-gold/30 bg-gradient-to-b from-chocobo-gold/15 via-black/40 to-black/60 flex flex-col items-center justify-center p-6 text-center">
-                  <span className="text-5xl font-bold text-chocobo-gold/80 tabular-nums">
+                <div
+                  className={`aspect-[3/4] w-full rounded-lg border flex flex-col items-center justify-center p-6 text-center select-none ${
+                    card.found
+                      ? 'border-chocobo-gold/25 bg-chocobo-recessed/80'
+                      : 'border-chocobo-light/10 bg-chocobo-dark/85'
+                  }`}
+                >
+                  <span
+                    className={`font-display text-5xl font-bold tabular-nums ${
+                      card.found ? 'text-chocobo-gold/80' : 'text-chocobo-muted/45'
+                    }`}
+                  >
                     #{parsed.padded}
                   </span>
-                  <span className="text-sm uppercase tracking-widest text-chocobo-light/70 mt-3">
-                    {card.found ? 'Photo Pending' : 'Undiscovered'}
+                  <span className="text-xs uppercase tracking-widest text-chocobo-muted/70 mt-3">
+                    {card.found ? 'Photo Pending' : 'Unpulled'}
                   </span>
-                  <span className="text-xs text-chocobo-gold/70 mt-1">Serialized / 77</span>
+                  <span className="text-xs text-chocobo-muted/50 mt-1">Serialized / 77</span>
                 </div>
               )}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl md:text-3xl font-bold text-chocobo-gold tabular-nums">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1 className="font-display text-2xl md:text-3xl font-bold text-chocobo-gold tabular-nums">
                     Golden Chocobo #{parsed.padded}/77
                   </h1>
                   <span
-                    className={`inline-block rounded px-2.5 py-1 text-xs font-bold ${
+                    className={`inline-block rounded px-2.5 py-0.5 text-xs font-semibold ${
                       card.found
-                        ? 'bg-green-800/60 text-green-300'
-                        : 'bg-gray-700/60 text-gray-300'
+                        ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-white/5 text-chocobo-muted border border-white/10'
                     }`}
                   >
-                    {card.found ? 'Found' : 'Not Found'}
+                    {card.found ? 'Found' : 'Unpulled'}
                   </span>
                   {iconicLabel && (
-                    <span className="inline-block rounded px-2.5 py-1 text-xs font-bold bg-yellow-500/20 border border-yellow-400/50 text-yellow-200">
+                    <span className="inline-block rounded px-2.5 py-0.5 text-xs font-medium bg-amber-950/75 border border-chocobo-gold/40 text-amber-200">
                       ★ {iconicLabel}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-chocobo-light/75 mt-1">
-                  Magic: The Gathering &times; Final Fantasy — Serialized Traveling Chocobo
+                <p className="text-sm text-chocobo-muted mt-1">
+                  Magic: The Gathering &times; Final Fantasy &mdash; Serialized Traveling Chocobo
                 </p>
                 <div className="pt-3 flex flex-wrap gap-2">
                   <Link
                     href={`/submit?card=${parsed.padded}`}
-                    className="inline-block border border-chocobo-gold/80 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-bold py-1.5 px-3 rounded transition-colors"
+                    className="inline-block border border-chocobo-gold/75 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-semibold py-1.5 px-3 rounded transition-colors"
                   >
                     Suggest Update for #{parsed.padded} &rarr;
                   </Link>
@@ -208,34 +242,40 @@ export default async function CardPage({ params }: CardPageProps) {
                 </div>
               </div>
 
-              <section aria-label="Discovery details" className="bg-chocobo-light/10 p-4 rounded space-y-2">
-                <h2 className="text-sm uppercase tracking-wider font-bold text-chocobo-gold">
+              <section
+                aria-label="Discovery details"
+                className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md space-y-2 text-sm"
+              >
+                <h2 className="font-sans text-xs uppercase tracking-wider font-semibold text-chocobo-gold">
                   Discovery Details
                 </h2>
                 {card.found ? (
                   <>
                     <p className="text-chocobo-light">
-                      <span className="font-bold">Found by:</span> {card.foundBy || 'Unknown'}
+                      <span className="text-chocobo-muted font-medium">Found by:</span>{' '}
+                      {card.foundBy || 'Unknown'}
                     </p>
                     {card.dateFound && (
-                      <p className="text-chocobo-light">
-                        <span className="font-bold">Date found:</span> {card.dateFound}
+                      <p className="text-chocobo-light tabular-nums">
+                        <span className="text-chocobo-muted font-medium">Date found:</span>{' '}
+                        {card.dateFound}
                       </p>
                     )}
                     {card.pullChannel && (
                       <p className="text-chocobo-light">
-                        <span className="font-bold">Pull Origin:</span>{' '}
+                        <span className="text-chocobo-muted font-medium">Pull Origin:</span>{' '}
                         {PULL_CHANNEL_LABELS[card.pullChannel]}
                       </p>
                     )}
                     {card.region && (
                       <p className="text-chocobo-light">
-                        <span className="font-bold">Region:</span> {card.region}
+                        <span className="text-chocobo-muted font-medium">Region:</span>{' '}
+                        {card.region}
                       </p>
                     )}
                     {pullSourceUrl && (
                       <p className="text-chocobo-light">
-                        <span className="font-bold">Pull Source:</span>{' '}
+                        <span className="text-chocobo-muted font-medium">Pull Source:</span>{' '}
                         <a
                           href={pullSourceUrl}
                           target="_blank"
@@ -248,7 +288,7 @@ export default async function CardPage({ params }: CardPageProps) {
                     )}
                     {marketplaceUrl && (
                       <p className="text-chocobo-light">
-                        <span className="font-bold">Marketplace Listing:</span>{' '}
+                        <span className="text-chocobo-muted font-medium">Marketplace Listing:</span>{' '}
                         <a
                           href={marketplaceUrl}
                           target="_blank"
@@ -266,22 +306,25 @@ export default async function CardPage({ params }: CardPageProps) {
                     )}
                   </>
                 ) : (
-                  <p className="text-chocobo-light/85 text-sm">
+                  <p className="text-chocobo-muted text-sm">
                     This serialized copy has not yet been reported pulled.
                   </p>
                 )}
               </section>
 
               {typeof card.price === 'number' && (
-                <section aria-label="Reported sale price" className="bg-chocobo-light/10 p-4 rounded">
-                  <h2 className="text-sm uppercase tracking-wider font-bold text-chocobo-gold">
+                <section
+                  aria-label="Reported sale price"
+                  className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md"
+                >
+                  <h2 className="font-sans text-xs uppercase tracking-wider font-semibold text-chocobo-gold">
                     Latest Reported Sale
                   </h2>
-                  <p className="text-2xl font-bold text-green-400 tabular-nums mt-1">
+                  <p className="text-2xl font-bold text-emerald-400 tabular-nums mt-1">
                     ${card.price.toLocaleString()}
                   </p>
                   {card.priceDate && (
-                    <p className="text-xs text-chocobo-light/75 mt-0.5">
+                    <p className="text-xs text-chocobo-muted mt-0.5 tabular-nums">
                       Reported {card.priceDate}
                     </p>
                   )}
@@ -289,16 +332,19 @@ export default async function CardPage({ params }: CardPageProps) {
               )}
 
               {card.grading && (
-                <section aria-label="Grading details" className="bg-chocobo-light/10 p-4 rounded">
-                  <h2 className="text-sm uppercase tracking-wider font-bold text-chocobo-gold">
+                <section
+                  aria-label="Grading details"
+                  className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md space-y-1"
+                >
+                  <h2 className="font-sans text-xs uppercase tracking-wider font-semibold text-chocobo-gold">
                     Grading
                   </h2>
-                  <p className="text-xl font-bold text-blue-400 mt-1">
-                    {card.grading.service} {card.grading.grade}
+                  <p className="text-xl font-bold text-sky-300 tabular-nums mt-1">
+                    {formatGradingDisplay(card.grading)}
                   </p>
                   {card.grading.certNumber && (
-                    <p className="text-sm text-chocobo-light">
-                      Cert #:{' '}
+                    <p className="text-sm text-chocobo-light tabular-nums">
+                      <span className="text-chocobo-muted">Cert #:</span>{' '}
                       {certLookupUrl ? (
                         <a
                           href={certLookupUrl}
@@ -314,7 +360,7 @@ export default async function CardPage({ params }: CardPageProps) {
                     </p>
                   )}
                   {card.grading.dateGraded && (
-                    <p className="text-xs text-chocobo-light/75">
+                    <p className="text-xs text-chocobo-muted tabular-nums">
                       Graded on {card.grading.dateGraded}
                     </p>
                   )}
@@ -322,23 +368,26 @@ export default async function CardPage({ params }: CardPageProps) {
               )}
 
               {card.priceHistory && card.priceHistory.length > 0 && (
-                <section aria-label="Price history" className="bg-chocobo-light/10 p-4 rounded">
-                  <h2 className="text-sm uppercase tracking-wider font-bold text-chocobo-gold mb-2">
+                <section
+                  aria-label="Price history"
+                  className="bg-chocobo-recessed/80 border border-chocobo-gold/15 p-4 rounded-md"
+                >
+                  <h2 className="font-sans text-xs uppercase tracking-wider font-semibold text-chocobo-gold mb-2">
                     Sale History
                   </h2>
                   <div className="space-y-2">
                     {card.priceHistory.map((entry, idx) => (
                       <div
                         key={`${entry.date}-${entry.price}-${idx}`}
-                        className="flex justify-between items-start border-b border-chocobo-gold/25 pb-2 last:border-b-0 last:pb-0 text-sm"
+                        className="flex justify-between items-start border-b border-chocobo-gold/20 pb-2 last:border-b-0 last:pb-0 text-sm"
                       >
                         <div>
-                          <p className="text-green-400 font-bold tabular-nums">
+                          <p className="text-emerald-400 font-bold tabular-nums">
                             ${entry.price.toLocaleString()}
                           </p>
-                          <p className="text-xs text-chocobo-light/75">{entry.date}</p>
+                          <p className="text-xs text-chocobo-muted tabular-nums">{entry.date}</p>
                         </div>
-                        <div className="text-right text-xs text-chocobo-light/75">
+                        <div className="text-right text-xs text-chocobo-muted">
                           {entry.soldBy && <p>From: {entry.soldBy}</p>}
                           {entry.soldTo && <p>To: {entry.soldTo}</p>}
                         </div>
@@ -349,6 +398,120 @@ export default async function CardPage({ params }: CardPageProps) {
               )}
             </div>
           </article>
+
+          {/* Discovery Continuity Strip */}
+          {(nearbyFoundCards.length > 0 || displayedGrails.length > 0) && (
+            <section
+              aria-label="Explore nearby found cards and unpulled grails"
+              className="bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-5 space-y-4"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="font-display text-base sm:text-lg font-bold text-chocobo-gold">
+                  Explore Nearby &amp; Unpulled Grails
+                </h2>
+                <div className="flex items-center gap-3 text-xs">
+                  <Link
+                    href="/?view=matrix"
+                    className="text-chocobo-muted hover:text-chocobo-gold transition-colors"
+                  >
+                    1–77 Wall &rarr;
+                  </Link>
+                  <Link
+                    href="/?quick=unpulled-iconic"
+                    className="text-chocobo-gold hover:text-chocobo-gold-bright font-medium transition-colors"
+                  >
+                    Unpulled Grails &rarr;
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {nearbyFoundCards.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-chocobo-muted">
+                      Nearby Found Cards
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {nearbyFoundCards.map((neighbor) => {
+                        const neighborPadded = neighbor.id.toString().padStart(2, '0');
+                        const neighborIconic = getIconicLabel(neighbor.id);
+
+                        return (
+                          <Link
+                            key={neighbor.id}
+                            href={`/card/${neighborPadded}`}
+                            className="group rounded-md border border-chocobo-gold/20 bg-chocobo-recessed/80 hover:border-chocobo-gold/60 hover:bg-chocobo-gold/10 px-3 py-2 transition-colors"
+                          >
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className="font-display text-sm font-bold text-chocobo-gold group-hover:text-chocobo-gold-bright tabular-nums">
+                                #{neighborPadded}
+                                {neighborIconic && (
+                                  <span
+                                    aria-label={neighborIconic}
+                                    className="ml-1 text-xs text-amber-300 font-sans"
+                                  >
+                                    ★
+                                  </span>
+                                )}
+                              </span>
+                              {typeof neighbor.price === 'number' ? (
+                                <span className="text-[11px] font-semibold text-emerald-400 tabular-nums">
+                                  {formatCompactUsd(neighbor.price)}
+                                </span>
+                              ) : neighbor.grading ? (
+                                <span className="text-[11px] font-medium text-sky-300 tabular-nums">
+                                  {neighbor.grading.service} {neighbor.grading.grade}
+                                </span>
+                              ) : null}
+                            </div>
+                            <p className="text-[11px] text-chocobo-muted truncate mt-0.5 tabular-nums">
+                              {neighbor.foundBy || neighbor.dateFound || 'Verified Pull'}
+                            </p>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {displayedGrails.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-chocobo-muted tabular-nums">
+                      {unpulledGrails.length > 0
+                        ? currentIsUnpulledGrail
+                          ? `Other Unpulled Grails (${unpulledGrails.length} more)`
+                          : `Unpulled Iconic Grails (${totalUnpulledGrailsCount} left)`
+                        : 'Iconic Grails'}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {displayedGrails.map((grail) => {
+                        const grailPadded = grail.id.toString().padStart(2, '0');
+                        const grailLabel = getIconicLabel(grail.id);
+
+                        return (
+                          <Link
+                            key={grail.id}
+                            href={`/card/${grailPadded}`}
+                            className="inline-flex items-center gap-1.5 rounded-md border border-chocobo-gold/30 bg-chocobo-recessed/80 hover:border-chocobo-gold hover:bg-chocobo-gold/10 px-2.5 py-1.5 text-xs transition-colors"
+                          >
+                            <span className="text-amber-300 leading-none" aria-hidden="true">
+                              ★
+                            </span>
+                            <span className="font-display font-bold text-chocobo-gold tabular-nums">
+                              #{grailPadded}
+                            </span>
+                            {grailLabel && (
+                              <span className="text-chocobo-light/85">{grailLabel}</span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
         </div>
 
         <AffiliateLinks />

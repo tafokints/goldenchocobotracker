@@ -99,6 +99,12 @@ export const updateGradingSchema = z.object({
   grading: z.object({
     service: z.string().trim().min(1, 'Grading service is required').max(40),
     grade: z.coerce.number().finite().min(0).max(10),
+    gradeLabel: z
+      .string()
+      .trim()
+      .max(60, 'Grade label is too long')
+      .optional()
+      .transform((v) => (v ? v : undefined)),
     dateGraded: z.union([z.literal(''), isoDateSchema]).optional().transform((v) => v || undefined),
     certNumber: z.string().trim().max(40).optional().transform((v) => v || undefined),
   }),

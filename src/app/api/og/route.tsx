@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { formatGradingDisplay } from '@/lib/grading';
 import { getIconicLabel } from '@/lib/iconic-numbers';
 import { computeCardStats } from '@/lib/stats';
 import { getCards } from '@/lib/tracker-store';
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
                 )}
                 {card.grading && (
                   <div style={{ color: '#60A5FA', fontWeight: 700 }}>
-                    {card.grading.service} {card.grading.grade}
+                    {formatGradingDisplay(card.grading)}
                   </div>
                 )}
               </div>

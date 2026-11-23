@@ -26,6 +26,8 @@ export interface PriceHistoryEntry {
 export interface GradingInfo {
   service: string;
   grade: number;
+  /** Optional prestige slab tier or designation (e.g., "Pristine 10", "Black Label 10", "MBA Gold Diamond"). */
+  gradeLabel?: string;
   dateGraded?: string;
   certNumber?: string;
 }

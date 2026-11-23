@@ -6,8 +6,122 @@ import { formatCompactUsd } from '@/lib/format';
 import { getSiteUrl } from '@/lib/site-config';
 import { computeCardStats } from '@/lib/stats';
 import { getCards } from '@/lib/tracker-store';
+import type { ResolvedCard } from '@/lib/types';
 
 export const revalidate = 300;
+
+const CANONICAL_SERVICES = ['PSA', 'BGS', 'CGC', 'TAG'] as const;
+
+type GradingWithOptionalLabel = NonNullable<ResolvedCard['grading']> & {
+  gradeLabel?: string;
+};
+
+interface PopReportTier {
+  key: string;
+  label: string;
+  grade: number;
+  gradeLabel?: string;
+  cards: Array<{ id: number; paddedId: string }>;
+}
+
+interface PopReportServiceGroup {
+  service: string;
+  totalCount: number;
+  tiers: PopReportTier[];
+}
+
+function normalizeServiceName(raw: string): string {
+  const upper = raw.trim().toUpperCase();
+  if (upper === 'BECKETT') return 'BGS';
+  return upper || 'OTHER';
+}
+
+function getTierPrestigeRank(gradeLabel?: string): number {
+  if (!gradeLabel) return 0;
+  const lower = gradeLabel.toLowerCase();
+  if (lower.includes('black label')) return 4;
+  if (lower.includes('pristine')) return 3;
+  if (lower.includes('mba') || lower.includes('gold')) return 2;
+  return 1;
+}
+
+function formatPopTierLabel(grade: number, gradeLabel?: string): string {
+  const cleanLabel = gradeLabel?.trim();
+  if (!cleanLabel) return `Grade ${grade}`;
+  return cleanLabel.includes(String(grade)) ? cleanLabel : `${grade} · ${cleanLabel}`;
+}
+
+function buildPopulationReport(cards: ResolvedCard[]): {
+  totalGraded: number;
+  groups: PopReportServiceGroup[];
+} {
+  const gradedCards = cards.filter(
+    (card): card is ResolvedCard & { grading: GradingWithOptionalLabel } =>
+      card.found && Boolean(card.grading)
+  );
+
+  const serviceMap = new Map<string, Map<string, PopReportTier>>();
+
+  for (const card of gradedCards) {
+    const grading = card.grading as GradingWithOptionalLabel;
+    const service = normalizeServiceName(grading.service);
+    const cleanLabel = grading.gradeLabel?.trim() || undefined;
+    const tierKey = `${grading.grade}::${cleanLabel?.toLowerCase() ?? ''}`;
+
+    let tierMap = serviceMap.get(service);
+    if (!tierMap) {
+      tierMap = new Map<string, PopReportTier>();
+      serviceMap.set(service, tierMap);
+    }
+
+    let tier = tierMap.get(tierKey);
+    if (!tier) {
+      tier = {
+        key: tierKey,
+        label: formatPopTierLabel(grading.grade, cleanLabel),
+        grade: grading.grade,
+        gradeLabel: cleanLabel,
+        cards: [],
+      };
+      tierMap.set(tierKey, tier);
+    }
+
+    tier.cards.push({
+      id: card.id,
+      paddedId: card.id.toString().padStart(2, '0'),
+    });
+  }
+
+  const orderedServices = [
+    ...CANONICAL_SERVICES.filter((svc) => serviceMap.has(svc)),
+    ...Array.from(serviceMap.keys())
+      .filter((svc) => !CANONICAL_SERVICES.includes(svc as (typeof CANONICAL_SERVICES)[number]))
+      .sort((a, b) => a.localeCompare(b)),
+  ];
+
+  const groups: PopReportServiceGroup[] = orderedServices.map((service) => {
+    const tiers = Array.from(serviceMap.get(service)!.values())
+      .map((tier) => ({
+        ...tier,
+        cards: [...tier.cards].sort((a, b) => a.id - b.id),
+      }))
+      .sort((a, b) => {
+        if (b.grade !== a.grade) return b.grade - a.grade;
+        const prestigeDiff =
+          getTierPrestigeRank(b.gradeLabel) - getTierPrestigeRank(a.gradeLabel);
+        if (prestigeDiff !== 0) return prestigeDiff;
+        return a.label.localeCompare(b.label);
+      });
+
+    const totalCount = tiers.reduce((sum, t) => sum + t.cards.length, 0);
+    return { service, totalCount, tiers };
+  });
+
+  return {
+    totalGraded: gradedCards.length,
+    groups,
+  };
+}
 
 export const metadata: Metadata = {
   title: 'Statistics & Market Analytics',
@@ -31,6 +145,7 @@ export const metadata: Metadata = {
 export default async function StatsPage() {
   const cards = await getCards();
   const stats = computeCardStats(cards);
+  const popReport = buildPopulationReport(cards);
 
   const firstMonth = stats.findsByMonth[0]?.month ?? '2025-06';
   const latestMonth =
@@ -186,7 +301,7 @@ export default async function StatsPage() {
                   </div>
                   <div className="bg-chocobo-recessed border border-sky-400/25 rounded-md p-4">
                     <p className="text-xs font-medium text-sky-300">
-                      Graded (PSA / BGS / CGC) &middot; {stats.rawVsGraded.gradedCount} priced sales
+                      Graded (PSA / BGS / CGC / TAG) &middot; {stats.rawVsGraded.gradedCount} priced sales
                     </p>
                     <p className="font-display text-2xl font-bold text-sky-400 mt-1 tabular-nums">
                       Median: ${Math.round(stats.rawVsGraded.gradedMedian).toLocaleString()}
@@ -195,6 +310,144 @@ export default async function StatsPage() {
                       Average: ${Math.round(stats.rawVsGraded.gradedAverage).toLocaleString()}
                     </p>
                   </div>
+                </div>
+              </section>
+            )}
+
+            {/* Tracked Population Report */}
+            {popReport.totalGraded > 0 && (
+              <section
+                aria-label="Tracked population report"
+                className="bg-chocobo-surface p-5 sm:p-6 rounded-lg border border-chocobo-gold/25 space-y-4"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <div>
+                    <h2 className="font-display text-lg sm:text-xl font-bold text-chocobo-gold">
+                      Tracked Population Report
+                    </h2>
+                    <p className="text-xs text-chocobo-muted mt-0.5">
+                      Verified slabs grouped by grading service and tier &middot; click any serial to inspect
+                    </p>
+                  </div>
+                  <span className="text-xs text-chocobo-muted tabular-nums">
+                    {popReport.totalGraded} graded of {stats.foundCount} found (
+                    {((popReport.totalGraded / stats.foundCount) * 100).toFixed(0)}%)
+                  </span>
+                </div>
+
+                {/* Service Subtotal Strip */}
+                <div className="flex flex-wrap gap-2">
+                  {popReport.groups.map((group) => {
+                    const servicePct = ((group.totalCount / popReport.totalGraded) * 100).toFixed(0);
+                    return (
+                      <div
+                        key={group.service}
+                        className="inline-flex items-center gap-2 bg-chocobo-recessed border border-chocobo-gold/20 rounded-md px-3 py-1.5 text-xs tabular-nums"
+                      >
+                        <span className="font-semibold text-sky-300">{group.service}</span>
+                        <span className="text-chocobo-light font-semibold">{group.totalCount}</span>
+                        <span className="text-chocobo-muted">({servicePct}%)</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Grouped Pop Ledger Table */}
+                <div className="overflow-x-auto rounded-md border border-chocobo-gold/20">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-chocobo-recessed text-[11px] uppercase tracking-wider text-chocobo-muted border-b border-chocobo-gold/20">
+                        <th scope="col" className="py-2.5 px-3.5 font-semibold">
+                          Grade Tier
+                        </th>
+                        <th scope="col" className="py-2.5 px-3 font-semibold text-right whitespace-nowrap">
+                          Pop
+                        </th>
+                        <th scope="col" className="py-2.5 px-3 font-semibold text-right whitespace-nowrap">
+                          % of Graded
+                        </th>
+                        <th scope="col" className="py-2.5 px-3.5 font-semibold">
+                          Tracked Serials
+                        </th>
+                      </tr>
+                    </thead>
+                    {popReport.groups.map((group) => {
+                      const groupShare = ((group.totalCount / popReport.totalGraded) * 100).toFixed(1);
+                      return (
+                        <tbody
+                          key={group.service}
+                          className="divide-y divide-chocobo-gold/10 border-t border-chocobo-gold/25 first:border-t-0"
+                        >
+                          <tr className="bg-chocobo-recessed/70">
+                            <th
+                              scope="colgroup"
+                              colSpan={4}
+                              className="py-2 px-3.5 text-xs font-semibold text-chocobo-light"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="inline-flex items-center gap-2">
+                                  <span className="px-2 py-0.5 rounded bg-sky-950/80 border border-sky-400/35 text-sky-300 font-semibold tracking-wide">
+                                    {group.service}
+                                  </span>
+                                  <span className="text-chocobo-muted font-normal tabular-nums">
+                                    {group.totalCount} {group.totalCount === 1 ? 'slab' : 'slabs'}
+                                  </span>
+                                </span>
+                                <span className="text-chocobo-muted font-normal tabular-nums">
+                                  {groupShare}% of graded pop
+                                </span>
+                              </div>
+                            </th>
+                          </tr>
+                          {group.tiers.map((tier) => {
+                            const tierPct = (tier.cards.length / popReport.totalGraded) * 100;
+                            return (
+                              <tr
+                                key={`${group.service}-${tier.key}`}
+                                className="hover:bg-chocobo-gold/[0.04] transition-colors"
+                              >
+                                <td className="py-2.5 px-3.5 font-medium text-chocobo-light whitespace-nowrap">
+                                  {tier.label}
+                                </td>
+                                <td className="py-2.5 px-3 text-right font-semibold text-chocobo-gold tabular-nums whitespace-nowrap">
+                                  {tier.cards.length}
+                                </td>
+                                <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                                  <div className="inline-flex items-center justify-end gap-2">
+                                    <div
+                                      className="hidden sm:block w-14 h-1.5 rounded-full bg-chocobo-recessed border border-chocobo-gold/15 overflow-hidden"
+                                      aria-hidden="true"
+                                    >
+                                      <div
+                                        className="h-full bg-sky-400/75 rounded-full"
+                                        style={{ width: `${Math.max(4, tierPct)}%` }}
+                                      />
+                                    </div>
+                                    <span className="text-xs text-chocobo-muted tabular-nums w-11 text-right">
+                                      {tierPct.toFixed(1)}%
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="py-2.5 px-3.5">
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {tier.cards.map((cardRef) => (
+                                      <Link
+                                        key={cardRef.id}
+                                        href={`/card/${cardRef.paddedId}`}
+                                        className="inline-flex items-center px-2 py-0.5 rounded bg-chocobo-recessed border border-chocobo-gold/30 hover:border-chocobo-gold hover:bg-chocobo-gold/15 font-display text-xs font-semibold text-chocobo-gold tabular-nums transition-colors"
+                                      >
+                                        #{cardRef.paddedId}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      );
+                    })}
+                  </table>
                 </div>
               </section>
             )}

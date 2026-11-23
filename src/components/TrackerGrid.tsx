@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
 import { formatCompactUsd } from '@/lib/format';
+import { formatGradingDisplay } from '@/lib/grading';
 import {
   GOLDEN_CHOCOBO_ICONIC_NUMBERS,
   getIconicLabel,
@@ -21,6 +22,24 @@ const CardDetails = dynamic(() => import('./CardDetails'), { ssr: false });
 type QuickFilter = 'all' | 'graded' | 'priced' | 'iconic' | 'unpulled-iconic';
 type ViewMode = 'grid' | 'matrix';
 
+const VALID_STATUS_FILTERS = new Set(['all', 'found', 'not-found']);
+const VALID_SORT_ORDERS = new Set([
+  'id-asc',
+  'id-desc',
+  'price-desc',
+  'price-asc',
+  'date-desc',
+  'date-asc',
+]);
+const VALID_QUICK_FILTERS = new Set<QuickFilter>([
+  'all',
+  'graded',
+  'priced',
+  'iconic',
+  'unpulled-iconic',
+]);
+const VALID_VIEW_MODES = new Set<ViewMode>(['grid', 'matrix']);
+
 interface TrackerGridProps {
   initialCards: ResolvedCard[];
 }
@@ -31,10 +50,123 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
   const [sortOrder, setSortOrder] = useState('id-asc');
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [hasReadUrl, setHasReadUrl] = useState(false);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [selectedCardForDetails, setSelectedCardForDetails] = useState<ResolvedCard | null>(null);
+
+  // Read initial filter & view state from URL query params safely after hydration
+  useEffect(() => {
+    const applyParamsFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+
+      setSearchQuery(params.get('q') ?? '');
+
+      const status = params.get('status');
+      setStatusFilter(status && VALID_STATUS_FILTERS.has(status) ? status : 'all');
+
+      const sort = params.get('sort');
+      setSortOrder(sort && VALID_SORT_ORDERS.has(sort) ? sort : 'id-asc');
+
+      const quick = params.get('quick');
+      setQuickFilter(
+        quick && VALID_QUICK_FILTERS.has(quick as QuickFilter) ? (quick as QuickFilter) : 'all'
+      );
+
+      const view = params.get('view');
+      setViewMode(view && VALID_VIEW_MODES.has(view as ViewMode) ? (view as ViewMode) : 'grid');
+    };
+
+    applyParamsFromUrl();
+    setHasReadUrl(true);
+
+    window.addEventListener('popstate', applyParamsFromUrl);
+    return () => window.removeEventListener('popstate', applyParamsFromUrl);
+  }, []);
+
+  // Keep URL query params synced without triggering full navigation or losing unrelated params
+  useEffect(() => {
+    if (!hasReadUrl) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const trimmedQuery = searchQuery.trim();
+
+    if (trimmedQuery) {
+      params.set('q', trimmedQuery);
+    } else {
+      params.delete('q');
+    }
+
+    if (statusFilter !== 'all') {
+      params.set('status', statusFilter);
+    } else {
+      params.delete('status');
+    }
+
+    if (sortOrder !== 'id-asc') {
+      params.set('sort', sortOrder);
+    } else {
+      params.delete('sort');
+    }
+
+    if (quickFilter !== 'all') {
+      params.set('quick', quickFilter);
+    } else {
+      params.delete('quick');
+    }
+
+    if (viewMode !== 'grid') {
+      params.set('view', viewMode);
+    } else {
+      params.delete('view');
+    }
+
+    const qs = params.toString();
+    const nextUrl = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState(window.history.state, '', nextUrl);
+    }
+  }, [hasReadUrl, searchQuery, statusFilter, sortOrder, quickFilter, viewMode]);
+
+  const quickFilterCounts = useMemo(() => {
+    let graded = 0;
+    let priced = 0;
+    let iconic = 0;
+    let unpulledIconic = 0;
+
+    for (const card of initialCards) {
+      if (card.grading) graded++;
+      if (typeof card.price === 'number') priced++;
+      if (isIconicNumber(card.id)) {
+        iconic++;
+        if (!card.found) unpulledIconic++;
+      }
+    }
+
+    return {
+      all: initialCards.length,
+      graded,
+      priced,
+      iconic,
+      'unpulled-iconic': unpulledIconic,
+    };
+  }, [initialCards]);
+
+  const hasActiveFilters =
+    searchQuery.trim().length > 0 ||
+    statusFilter !== 'all' ||
+    sortOrder !== 'id-asc' ||
+    quickFilter !== 'all';
+
+  const resetFilters = useCallback(() => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setSortOrder('id-asc');
+    setQuickFilter('all');
+  }, []);
 
   const filteredAndSortedCards = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -83,6 +215,23 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
         }
       });
   }, [initialCards, searchQuery, statusFilter, sortOrder, quickFilter]);
+
+  const selectedCardIndex = useMemo(() => {
+    if (!selectedCardForDetails) return -1;
+    return filteredAndSortedCards.findIndex((card) => card.id === selectedCardForDetails.id);
+  }, [filteredAndSortedCards, selectedCardForDetails]);
+
+  const handlePrevCard = useCallback(() => {
+    if (selectedCardIndex > 0) {
+      setSelectedCardForDetails(filteredAndSortedCards[selectedCardIndex - 1]);
+    }
+  }, [filteredAndSortedCards, selectedCardIndex]);
+
+  const handleNextCard = useCallback(() => {
+    if (selectedCardIndex >= 0 && selectedCardIndex < filteredAndSortedCards.length - 1) {
+      setSelectedCardForDetails(filteredAndSortedCards[selectedCardIndex + 1]);
+    }
+  }, [filteredAndSortedCards, selectedCardIndex]);
 
   const { lightboxSlides, cardIdToSlideIndex } = useMemo(() => {
     const slides: Array<{ src: string; alt: string }> = [];
@@ -136,24 +285,46 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
                 ['iconic', '★ Grails'],
                 ['unpulled-iconic', '★ Unpulled Grails'],
               ] as Array<[QuickFilter, string]>
-            ).map(([key, label]) => (
+            ).map(([key, label]) => {
+              const isSelected = quickFilter === key;
+              const count = quickFilterCounts[key];
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setQuickFilter(key)}
+                  aria-pressed={isSelected}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+                    isSelected
+                      ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold font-semibold'
+                      : 'bg-chocobo-recessed/70 text-chocobo-muted border-chocobo-gold/20 hover:border-chocobo-gold/50 hover:text-chocobo-light'
+                  }`}
+                >
+                  {label}{' '}
+                  <span
+                    className={`tabular-nums ${
+                      isSelected ? 'text-chocobo-dark/75' : 'text-chocobo-muted/75'
+                    }`}
+                  >
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+
+            {hasActiveFilters && (
               <button
-                key={key}
                 type="button"
-                onClick={() => setQuickFilter(key)}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                  quickFilter === key
-                    ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold font-semibold'
-                    : 'bg-chocobo-recessed/70 text-chocobo-muted border-chocobo-gold/20 hover:border-chocobo-gold/50 hover:text-chocobo-light'
-                }`}
+                onClick={resetFilters}
+                className="px-2.5 py-1 rounded-md text-xs font-medium text-chocobo-gold border border-chocobo-gold/35 bg-chocobo-recessed/70 hover:bg-chocobo-gold/15 hover:border-chocobo-gold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
               >
-                {label}
+                Reset filters
               </button>
-            ))}
+            )}
           </div>
 
           <div className="flex items-center gap-3 ml-auto">
-            <span className="text-xs text-chocobo-muted tabular-nums hidden sm:inline">
+            <span className="text-xs text-chocobo-muted tabular-nums">
               {filteredAndSortedCards.length} of {initialCards.length}
             </span>
             <div
@@ -193,8 +364,17 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
       <section className="w-full" aria-label="Golden Chocobo Cards">
         <h2 className="sr-only">Golden Chocobo Card Collection</h2>
         {filteredAndSortedCards.length === 0 ? (
-          <div className="text-center py-12 bg-chocobo-surface border border-chocobo-gold/20 rounded-lg text-chocobo-muted text-sm">
-            No cards match your current filters.
+          <div className="text-center py-12 px-4 bg-chocobo-surface border border-chocobo-gold/20 rounded-lg space-y-3">
+            <p className="text-chocobo-muted text-sm">No cards match your current filters.</p>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-semibold border border-chocobo-gold/60 text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
+              >
+                Reset filters
+              </button>
+            )}
           </div>
         ) : viewMode === 'matrix' ? (
           <CompactMatrixView
@@ -304,7 +484,7 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
 
                       {card.grading && (
                         <p className="text-sky-300 font-medium">
-                          {card.grading.service} {card.grading.grade}
+                          {formatGradingDisplay(card.grading)}
                           {card.grading.dateGraded && (
                             <span className="text-chocobo-muted font-normal ml-1.5 tabular-nums">
                               &middot; {card.grading.dateGraded}
@@ -398,6 +578,17 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
           card={selectedCardForDetails}
           isOpen={Boolean(selectedCardForDetails)}
           onClose={() => setSelectedCardForDetails(null)}
+          onPrev={selectedCardIndex > 0 ? handlePrevCard : undefined}
+          onNext={
+            selectedCardIndex >= 0 && selectedCardIndex < filteredAndSortedCards.length - 1
+              ? handleNextCard
+              : undefined
+          }
+          positionLabel={
+            selectedCardIndex >= 0
+              ? `${selectedCardIndex + 1} of ${filteredAndSortedCards.length}`
+              : undefined
+          }
         />
       )}
     </>

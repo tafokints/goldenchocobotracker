@@ -53,6 +53,7 @@ export interface SubmissionPayload {
   soldTo?: string;
   gradingService?: string;
   grade?: number;
+  gradeLabel?: string;
   certNumber?: string;
   dateGraded?: string;
   notes?: string;
@@ -116,6 +117,7 @@ export const serialItems = pgTable(
     latestPriceDate: text('latest_price_date'),
     gradingService: text('grading_service'),
     grade: doublePrecision('grade'),
+    gradeLabel: text('grade_label'),
     certNumber: text('cert_number'),
     dateGraded: text('date_graded'),
     notes: text('notes'),

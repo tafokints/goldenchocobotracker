@@ -46,7 +46,7 @@ export default async function DynamicTrackerPage({ params }: TrackerPageProps) {
 
   return (
     <main
-      className="flex min-h-screen flex-col items-center p-6 md:p-12"
+      className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-4"
       style={
         {
           '--tracker-accent': tracker.themeConfig.accentHex,
@@ -55,41 +55,46 @@ export default async function DynamicTrackerPage({ params }: TrackerPageProps) {
         } as React.CSSProperties
       }
     >
-      <header className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex flex-wrap gap-4">
-        <div>
+      {/* Compact Hero + Progress Band */}
+      <section
+        aria-label="Overall tracker progress"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-chocobo-surface border border-chocobo-gold/25 rounded-lg px-5 py-4"
+      >
+        <div className="lg:col-span-6 space-y-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-gold">
+              {tracker.game}
+            </span>
+            <span className="text-xs text-chocobo-muted">{tracker.setName}</span>
+          </div>
           <h1
-            className="text-2xl md:text-4xl font-bold"
+            className="font-display text-2xl sm:text-3xl font-bold tracking-wide text-chocobo-gold"
             style={{ color: tracker.themeConfig.accentHex }}
           >
             {tracker.name}
           </h1>
-          <p className="text-xs text-chocobo-light/75 mt-1">{tracker.setName}</p>
+          {tracker.description && (
+            <p className="text-xs sm:text-sm text-chocobo-muted">{tracker.description}</p>
+          )}
         </div>
-        <nav className="flex items-center flex-wrap gap-4" aria-label="Tracker navigation">
-          <Link href="/hub" className="text-chocobo-light/80 hover:text-chocobo-gold">
-            All Trackers
-          </Link>
-          <Link
-            href={`/t/${tracker.slug}/stats`}
-            className="text-chocobo-gold hover:text-yellow-400 font-semibold"
-          >
-            Stats
-          </Link>
-          <Link
-            href={`/t/${tracker.slug}/submit`}
-            className="text-chocobo-gold hover:text-yellow-400 font-semibold"
-          >
-            Submit Update
-          </Link>
-        </nav>
-      </header>
 
-      <section
-        aria-label="Overall tracker progress"
-        className="w-full max-w-5xl mt-6 text-center bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold/30"
-      >
-        <ProgressBar current={foundCount} total={totalCount} />
-        <p className="text-chocobo-light/85 mt-3 text-sm">{tracker.description}</p>
+        <div className="lg:col-span-6 space-y-3">
+          <ProgressBar current={foundCount} total={totalCount} />
+          <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
+            <Link
+              href={`/t/${tracker.slug}/stats`}
+              className="border border-chocobo-light/15 hover:border-chocobo-gold/50 text-chocobo-muted hover:text-chocobo-light py-1.5 px-3 rounded transition-colors"
+            >
+              Tracker Stats
+            </Link>
+            <Link
+              href={`/t/${tracker.slug}/submit`}
+              className="border border-chocobo-gold/60 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold font-semibold py-1.5 px-3 rounded transition-colors"
+            >
+              Submit Update
+            </Link>
+          </div>
+        </div>
       </section>
 
       <MultiTrackerGrid trackerSlug={tracker.slug} seriesList={tracker.series} />

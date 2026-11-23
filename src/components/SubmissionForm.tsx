@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import type { SubmissionType } from '@/db/schema';
+import { COMMON_GRADE_LABELS, formatGradingDisplay } from '@/lib/grading';
 import TurnstileWidget from './TurnstileWidget';
 
 interface SubmissionFormProps {
@@ -63,6 +64,7 @@ export default function SubmissionForm({
   const [soldTo, setSoldTo] = useState('');
   const [gradingService, setGradingService] = useState('PSA');
   const [grade, setGrade] = useState('');
+  const [gradeLabel, setGradeLabel] = useState('');
   const [certNumber, setCertNumber] = useState('');
   const [dateGraded, setDateGraded] = useState('');
   const [notes, setNotes] = useState('');
@@ -100,6 +102,7 @@ export default function SubmissionForm({
     setSoldBy('');
     setSoldTo('');
     setGrade('');
+    setGradeLabel('');
     setCertNumber('');
     setDateGraded('');
     setNotes('');
@@ -153,6 +156,7 @@ export default function SubmissionForm({
       } else if (submissionType === 'grading_update') {
         formData.set('gradingService', gradingService);
         formData.set('grade', grade);
+        if (gradeLabel) formData.set('gradeLabel', gradeLabel);
         formData.set('certNumber', certNumber);
         formData.set('dateGraded', dateGraded);
       }
@@ -439,6 +443,38 @@ export default function SubmissionForm({
               placeholder="e.g., 10 or 9.5"
               className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
             />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="grade-label" className="block text-chocobo-gold text-xs font-bold uppercase tracking-wide mb-2">
+              Slab Tier / Designation (optional)
+            </label>
+            <input
+              id="grade-label"
+              type="text"
+              list="submission-common-grade-labels"
+              maxLength={60}
+              value={gradeLabel}
+              onChange={(e) => setGradeLabel(e.target.value)}
+              placeholder="e.g., Pristine 10, Black Label 10, Gem Mint 10, MBA Gold Diamond"
+              className="w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
+            />
+            <datalist id="submission-common-grade-labels">
+              {COMMON_GRADE_LABELS.map((tier) => (
+                <option key={tier} value={tier} />
+              ))}
+            </datalist>
+            {gradingService && grade !== '' && !Number.isNaN(parseFloat(grade)) && (
+              <p className="text-xs text-chocobo-muted mt-1.5">
+                Display preview:{' '}
+                <span className="text-chocobo-gold font-semibold">
+                  {formatGradingDisplay({
+                    service: gradingService,
+                    grade: parseFloat(grade),
+                    gradeLabel: gradeLabel || undefined,
+                  })}
+                </span>
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="cert-number" className="block text-chocobo-gold text-xs font-bold uppercase tracking-wide mb-2">

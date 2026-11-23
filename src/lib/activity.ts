@@ -1,3 +1,4 @@
+import { formatGradingDisplay } from '@/lib/grading';
 import { GOLDEN_CHOCOBO_ICONIC_NUMBERS, getIconicLabel } from '@/lib/iconic-numbers';
 import type { ResolvedCard } from '@/lib/types';
 
@@ -100,6 +101,7 @@ export function buildRecentActivity(
     if (card.grading && card.grading.dateGraded) {
       const ts = new Date(card.grading.dateGraded).getTime();
       if (!Number.isNaN(ts)) {
+        const gradeDisplay = formatGradingDisplay(card.grading);
         events.push({
           id: `grade-${card.id}-${card.grading.dateGraded}`,
           cardId: card.id,
@@ -107,8 +109,8 @@ export function buildRecentActivity(
           type: 'grading',
           date: card.grading.dateGraded,
           timestamp: ts,
-          title: `#${paddedId} Graded ${card.grading.service} ${card.grading.grade}`,
-          summary: `#${paddedId} received ${card.grading.service} ${card.grading.grade}${
+          title: `#${paddedId} Graded ${gradeDisplay}`,
+          summary: `#${paddedId} received ${gradeDisplay}${
             card.grading.certNumber ? ` (Cert #${card.grading.certNumber})` : ''
           }.`,
           iconicLabel,

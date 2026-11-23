@@ -1,5 +1,6 @@
+import { formatGradingDisplay } from '@/lib/grading';
 import { GOLDEN_CHOCOBO_ICONIC_NUMBERS } from '@/lib/iconic-numbers';
-import { PULL_CHANNEL_LABELS, type ResolvedCard } from './types';
+import { PULL_CHANNEL_LABELS, type PriceHistoryEntry, type ResolvedCard } from './types';
 
 export interface IconicWatchItem {
   cardId: number;
@@ -75,6 +76,24 @@ export function computeMedian(values: number[]): number {
   return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
 }
 
+export function dedupeCardPriceHistory(
+  entries: PriceHistoryEntry[] | undefined
+): PriceHistoryEntry[] {
+  if (!entries || entries.length === 0) return [];
+  const seen = new Set<string>();
+  const deduped: PriceHistoryEntry[] = [];
+
+  for (const entry of entries) {
+    const normalizedDate = entry.date.trim();
+    const key = `${Math.round(entry.price * 100)}|${normalizedDate}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push({ ...entry, date: normalizedDate });
+  }
+
+  return deduped;
+}
+
 export function computeCardStats(
   cards: ResolvedCard[],
   options?: { iconicMap?: Record<number, string>; nowMs?: number }
@@ -99,7 +118,7 @@ export function computeCardStats(
         foundBy: card?.foundBy,
         dateFound: card?.dateFound,
         price: card?.price,
-        gradingLabel: card?.grading ? `${card.grading.service} ${card.grading.grade}` : undefined,
+        gradingLabel: card?.grading ? formatGradingDisplay(card.grading) : undefined,
       };
     })
     .filter((item) => item.cardId >= 1 && item.cardId <= totalCards)
@@ -216,10 +235,10 @@ export function computeCardStats(
       return { month, count, cumulative: runningTotal };
     });
 
-  // Price history timeline
+  // Price history timeline (deduplicated per card by price + date)
   const priceHistory = foundCards
     .flatMap((card) =>
-      (card.priceHistory || []).map((entry) => ({
+      dedupeCardPriceHistory(card.priceHistory).map((entry) => ({
         date: entry.date,
         price: entry.price,
         cardId: card.id,
@@ -229,17 +248,17 @@ export function computeCardStats(
     .filter((entry) => !Number.isNaN(new Date(entry.date).getTime()))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Multi-sale resale / flip tracker
+  // Multi-sale resale / flip tracker (deduplicated per card so duplicate entries never create fake 0% flips)
   const resaleFlips: ResaleFlipItem[] = foundCards
-    .filter((c) => (c.priceHistory?.length || 0) >= 2)
     .map((card) => {
-      const sorted = [...card.priceHistory]
+      const sorted = dedupeCardPriceHistory(card.priceHistory)
         .filter((e) => !Number.isNaN(new Date(e.date).getTime()))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      if (sorted.length < 2) return null;
       const first = sorted[0];
       const latest = sorted[sorted.length - 1];
       const changePct =
-        first && first.price > 0 ? ((latest.price - first.price) / first.price) * 100 : 0;
+        first.price > 0 ? ((latest.price - first.price) / first.price) * 100 : 0;
       return {
         cardId: card.id,
         paddedId: card.id.toString().padStart(padWidth, '0'),
@@ -251,7 +270,7 @@ export function computeCardStats(
         salesCount: sorted.length,
       };
     })
-    .filter((f) => f.salesCount >= 2)
+    .filter((f): f is ResaleFlipItem => f !== null)
     .sort((a, b) => b.latestPrice - a.latestPrice);
 
   // Pull channel & region distributions

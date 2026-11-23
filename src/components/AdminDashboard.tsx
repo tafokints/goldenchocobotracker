@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { COMMON_GRADE_LABELS, formatGradingDisplay } from '@/lib/grading';
 import type { ResolvedCard } from '@/lib/types';
+
+const DARK_INPUT_CLASS =
+  'w-full bg-chocobo-recessed text-chocobo-light placeholder:text-chocobo-muted/65 border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2 px-3';
 
 interface AdminDashboardProps {
   initialCards: ResolvedCard[];
@@ -36,6 +40,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
   // Grading fields
   const [gradingService, setGradingService] = useState('');
   const [grade, setGrade] = useState('');
+  const [gradeLabel, setGradeLabel] = useState('');
   const [dateGraded, setDateGraded] = useState('');
   const [certNumber, setCertNumber] = useState('');
 
@@ -73,6 +78,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
     setImageUrl(card.image || card.resolvedImage || '');
     setGradingService(card.grading?.service || '');
     setGrade(card.grading?.grade !== undefined ? card.grading.grade.toString() : '');
+    setGradeLabel(card.grading?.gradeLabel || '');
     setDateGraded(card.grading?.dateGraded || '');
     setCertNumber(card.grading?.certNumber || '');
   };
@@ -114,26 +120,26 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
   const paddedSelected = selectedCard ? selectedCard.toString().padStart(2, '0') : '';
 
   return (
-    <div className="w-full max-w-2xl bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 space-y-6">
+    <div className="w-full max-w-2xl bg-chocobo-surface border border-chocobo-gold/30 rounded-lg p-6 space-y-6">
       <div className="flex flex-wrap justify-between items-center gap-2 border-b border-chocobo-gold/30 pb-4">
         <div>
           <h2 className="text-xl font-bold text-chocobo-gold">Card Management</h2>
-          <p className="text-xs text-chocobo-light/75">Signed in as {adminLabel}</p>
+          <p className="text-xs text-chocobo-muted">Signed in as {adminLabel}</p>
         </div>
-        <span className="text-xs text-chocobo-gold/90">
+        <span className="text-xs text-chocobo-gold/90 tabular-nums">
           {cards.filter((c) => c.found).length} / {cards.length} Found
         </span>
       </div>
 
       <div>
-        <label htmlFor="admin-card-select" className="block text-chocobo-gold text-sm font-bold mb-2">
+        <label htmlFor="admin-card-select" className="block text-chocobo-gold text-xs font-bold uppercase tracking-wide mb-2">
           Select Card
         </label>
         <select
           id="admin-card-select"
           value={selectedCard ?? ''}
           onChange={(e) => handleCardSelect(parseInt(e.target.value, 10) || null)}
-          className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+          className="w-full bg-chocobo-recessed text-chocobo-light border border-chocobo-gold/30 focus:outline-none focus:border-chocobo-gold rounded py-2.5 px-3"
         >
           <option value="">Choose a card...</option>
           {cards.map((card) => (
@@ -200,7 +206,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               value={foundBy}
               onChange={(e) => setFoundBy(e.target.value)}
               placeholder="Collector or shop handle"
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              className={DARK_INPUT_CLASS}
             />
           </div>
           <div>
@@ -210,7 +216,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               required
               value={dateFound}
               onChange={(e) => setDateFound(e.target.value)}
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              className={DARK_INPUT_CLASS}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -221,7 +227,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               <select
                 value={pullChannel}
                 onChange={(e) => setPullChannel(e.target.value)}
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               >
                 <option value="">Unspecified</option>
                 <option value="lgs">Local Game Store (LGS)</option>
@@ -241,7 +247,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
                 placeholder="e.g., US, Japan, Canada, Europe"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
           </div>
@@ -254,7 +260,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               value={sourceUrl}
               onChange={(e) => setSourceUrl(e.target.value)}
               placeholder="https://www.instagram.com/p/..."
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              className={DARK_INPUT_CLASS}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -267,7 +273,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={marketplaceUrl}
                 onChange={(e) => setMarketplaceUrl(e.target.value)}
                 placeholder="https://www.ebay.com/itm/..."
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
             <div>
@@ -277,7 +283,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={marketplaceLabel}
                 onChange={(e) => setMarketplaceLabel(e.target.value)}
                 placeholder="eBay"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
           </div>
@@ -319,7 +325,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="50000"
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              className={DARK_INPUT_CLASS}
             />
           </div>
           <div>
@@ -330,7 +336,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               type="date"
               value={priceDate}
               onChange={(e) => setPriceDate(e.target.value)}
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              className={DARK_INPUT_CLASS}
             />
           </div>
           <button
@@ -365,7 +371,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="/images/chocobo-01.jpg or https://..."
-              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              className={DARK_INPUT_CLASS}
             />
           </div>
           <button
@@ -390,6 +396,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 grading: {
                   service: gradingService,
                   grade: parseFloat(grade),
+                  gradeLabel: gradeLabel || undefined,
                   dateGraded: dateGraded || undefined,
                   certNumber: certNumber || undefined,
                 },
@@ -409,7 +416,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={gradingService}
                 onChange={(e) => setGradingService(e.target.value)}
                 placeholder="PSA, BGS, CGC"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
             <div>
@@ -423,9 +430,41 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={grade}
                 onChange={(e) => setGrade(e.target.value)}
                 placeholder="10"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
+          </div>
+          <div>
+            <label htmlFor="admin-grade-label" className="block text-chocobo-gold text-sm font-bold mb-1">
+              Slab Tier / Designation (optional)
+            </label>
+            <input
+              id="admin-grade-label"
+              type="text"
+              list="admin-common-grade-labels"
+              maxLength={60}
+              value={gradeLabel}
+              onChange={(e) => setGradeLabel(e.target.value)}
+              placeholder="e.g., Pristine 10, Black Label 10, Gem Mint 10, MBA Gold Diamond"
+              className={DARK_INPUT_CLASS}
+            />
+            <datalist id="admin-common-grade-labels">
+              {COMMON_GRADE_LABELS.map((tier) => (
+                <option key={tier} value={tier} />
+              ))}
+            </datalist>
+            {gradingService && grade !== '' && !Number.isNaN(parseFloat(grade)) && (
+              <p className="text-xs text-chocobo-muted mt-1.5">
+                Display preview:{' '}
+                <span className="text-chocobo-gold font-semibold">
+                  {formatGradingDisplay({
+                    service: gradingService,
+                    grade: parseFloat(grade),
+                    gradeLabel: gradeLabel || undefined,
+                  })}
+                </span>
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -437,7 +476,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={certNumber}
                 onChange={(e) => setCertNumber(e.target.value)}
                 placeholder="e.g., 104829104"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
             <div>
@@ -448,7 +487,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 type="date"
                 value={dateGraded}
                 onChange={(e) => setDateGraded(e.target.value)}
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
           </div>
@@ -494,7 +533,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={historyPrice}
                 onChange={(e) => setHistoryPrice(e.target.value)}
                 placeholder="75000"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
             <div>
@@ -504,7 +543,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 required
                 value={saleDate}
                 onChange={(e) => setSaleDate(e.target.value)}
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
           </div>
@@ -518,7 +557,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={soldBy}
                 onChange={(e) => setSoldBy(e.target.value)}
                 placeholder="Previous owner"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
             <div>
@@ -530,7 +569,7 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 value={soldTo}
                 onChange={(e) => setSoldTo(e.target.value)}
                 placeholder="New owner"
-                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+                className={DARK_INPUT_CLASS}
               />
             </div>
           </div>

@@ -25,7 +25,15 @@ export async function POST(request: NextRequest) {
     const { cardId, grading } = parsed.data;
     const updatedCard = await applyCardPatch(
       cardId,
-      { grading },
+      {
+        grading: {
+          service: grading.service,
+          grade: grading.grade,
+          gradeLabel: grading.gradeLabel,
+          dateGraded: grading.dateGraded,
+          certNumber: grading.certNumber,
+        },
+      },
       {
         id: adminCheck.session.user.githubId || adminCheck.session.user.githubLogin || 'admin',
         login: adminCheck.session.user.githubLogin,

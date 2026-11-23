@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/auth';
 import { auditLogs, getDb, hasDatabaseEnv, submissions, trackers, type SubmissionPayload } from '@/db';
 import { notifyDiscordPublicMilestone } from '@/lib/discord';
+import { formatGradingDisplay } from '@/lib/grading';
 import { deleteQuarantinedImage, promoteQuarantinedImage } from '@/lib/r2';
 import { reviewSubmissionSchema } from '@/lib/submission-validation';
 import { applyCardPatch, getCardsFresh, type UpsertSerialPatch } from '@/lib/tracker-store';
@@ -132,6 +133,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     patch.grading = {
       service: merged.gradingService,
       grade: merged.grade,
+      gradeLabel: merged.gradeLabel,
       certNumber: merged.certNumber,
       dateGraded: merged.dateGraded,
     };
@@ -182,7 +184,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
       price: merged.price,
       gradingLabel:
         merged.gradingService && merged.grade !== undefined
-          ? `${merged.gradingService} ${merged.grade}`
+          ? formatGradingDisplay({
+              service: merged.gradingService,
+              grade: merged.grade,
+              gradeLabel: merged.gradeLabel,
+            })
           : undefined,
     });
   }
