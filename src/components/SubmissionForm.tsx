@@ -54,6 +54,8 @@ export default function SubmissionForm({
   // Type-specific fields
   const [foundBy, setFoundBy] = useState('');
   const [dateFound, setDateFound] = useState('');
+  const [pullChannel, setPullChannel] = useState('');
+  const [region, setRegion] = useState('');
   const [price, setPrice] = useState('');
   const [saleDate, setSaleDate] = useState('');
   const [platform, setPlatform] = useState('');
@@ -90,6 +92,8 @@ export default function SubmissionForm({
     if (fileInputRef.current) fileInputRef.current.value = '';
     setFoundBy('');
     setDateFound('');
+    setPullChannel('');
+    setRegion('');
     setPrice('');
     setSaleDate('');
     setPlatform('');
@@ -138,6 +142,8 @@ export default function SubmissionForm({
       if (submissionType === 'new_find') {
         formData.set('foundBy', foundBy);
         formData.set('dateFound', dateFound);
+        if (pullChannel) formData.set('pullChannel', pullChannel);
+        if (region) formData.set('region', region);
       } else if (submissionType === 'price_sale') {
         formData.set('price', price);
         formData.set('saleDate', saleDate);
@@ -284,6 +290,37 @@ export default function SubmissionForm({
               required
               value={dateFound}
               onChange={(e) => setDateFound(e.target.value)}
+              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+            />
+          </div>
+          <div>
+            <label htmlFor="pull-channel" className="block text-chocobo-gold text-xs font-bold uppercase tracking-wide mb-2">
+              Where Was It Pulled? (optional)
+            </label>
+            <select
+              id="pull-channel"
+              value={pullChannel}
+              onChange={(e) => setPullChannel(e.target.value)}
+              className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
+            >
+              <option value="">Unspecified</option>
+              <option value="lgs">Local Game Store (LGS)</option>
+              <option value="personal_box">Personal Collector Box</option>
+              <option value="breaker">Live Breaker / Whatnot</option>
+              <option value="retail">Big Box Retail</option>
+              <option value="gift_bundle">Gift / Collector Bundle</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="pull-region" className="block text-chocobo-gold text-xs font-bold uppercase tracking-wide mb-2">
+              Country / Region (optional)
+            </label>
+            <input
+              id="pull-region"
+              type="text"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              placeholder="e.g., US, Japan, Canada, UK"
               className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2.5 px-3"
             />
           </div>

@@ -12,6 +12,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import type { AffiliateProductLink, CommunityResourceLink } from '@/lib/affiliate';
+import type { PullChannel } from '@/lib/types';
 
 export interface TrackerThemeConfig {
   accentHex: string;
@@ -25,6 +26,7 @@ export interface TrackerSeoConfig {
   description?: string;
   ogImage?: string;
   keywords?: string[];
+  iconicNumbers?: Record<string, string>;
 }
 
 export type SubmissionType =
@@ -39,6 +41,8 @@ export type SubmissionStatus = 'pending' | 'approved' | 'rejected';
 export interface SubmissionPayload {
   foundBy?: string;
   dateFound?: string;
+  pullChannel?: PullChannel;
+  region?: string;
   sourceUrl?: string;
   marketplaceUrl?: string;
   marketplaceLabel?: string;
@@ -102,6 +106,8 @@ export const serialItems = pgTable(
     status: text('status').$type<'unfound' | 'verified'>().notNull().default('unfound'),
     foundBy: text('found_by'),
     dateFound: text('date_found'),
+    pullChannel: text('pull_channel').$type<PullChannel>(),
+    region: text('region'),
     sourceUrl: text('source_url'),
     marketplaceUrl: text('marketplace_url'),
     marketplaceLabel: text('marketplace_label'),

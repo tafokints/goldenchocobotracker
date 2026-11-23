@@ -3,9 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import AffiliateLinks from '@/components/AffiliateLinks';
+import CopyLinkButton from '@/components/CopyLinkButton';
 import { resolveCardLinks } from '@/lib/affiliate';
-import { getCardById } from '@/lib/tracker-store';
+import { getGradingCertUrl } from '@/lib/grading-certs';
+import { getIconicLabel } from '@/lib/iconic-numbers';
 import { getSiteUrl } from '@/lib/site-config';
+import { getCardById } from '@/lib/tracker-store';
+import { PULL_CHANNEL_LABELS } from '@/lib/types';
 import { TOTAL_CHOCOBO_CARDS } from '@/lib/validation';
 
 export const revalidate = 300;
@@ -47,7 +51,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
 
   const title = `Golden Chocobo #${parsed.padded}/77`;
   const description = `Serialized Golden Chocobo #${parsed.padded} of 77 from MTG × Final Fantasy: ${statusSummary}. View pull details, grading, and reported sale history.`;
-  const ogImage = card.resolvedImage || '/images/chocobo-01.jpg';
+  const ogImage = `/api/og?card=${parsed.padded}`;
 
   return {
     title,
@@ -59,7 +63,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
       title: `${title} | Golden Chocobo Tracker`,
       description,
       url: `${getSiteUrl()}/card/${parsed.padded}`,
-      images: [{ url: ogImage, alt: `Golden Chocobo Card #${parsed.padded}/77` }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `Golden Chocobo Card #${parsed.padded}/77` }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -88,6 +92,8 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } =
     resolveCardLinks(card);
+  const iconicLabel = getIconicLabel(card.id);
+  const certLookupUrl = getGradingCertUrl(card.grading?.service, card.grading?.certNumber);
 
   const prevId = (parsed.id === 1 ? TOTAL_CHOCOBO_CARDS : parsed.id - 1).toString().padStart(2, '0');
   const nextId = (parsed.id === TOTAL_CHOCOBO_CARDS ? 1 : parsed.id + 1).toString().padStart(2, '0');
@@ -182,17 +188,23 @@ export default async function CardPage({ params }: CardPageProps) {
                   >
                     {card.found ? 'Found' : 'Not Found'}
                   </span>
+                  {iconicLabel && (
+                    <span className="inline-block rounded px-2.5 py-1 text-xs font-bold bg-yellow-500/20 border border-yellow-400/50 text-yellow-200">
+                      ★ {iconicLabel}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-chocobo-light/75 mt-1">
                   Magic: The Gathering &times; Final Fantasy — Serialized Traveling Chocobo
                 </p>
-                <div className="pt-3">
+                <div className="pt-3 flex flex-wrap gap-2">
                   <Link
                     href={`/submit?card=${parsed.padded}`}
                     className="inline-block border border-chocobo-gold/80 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-bold py-1.5 px-3 rounded transition-colors"
                   >
                     Suggest Update for #{parsed.padded} &rarr;
                   </Link>
+                  <CopyLinkButton path={`/card/${parsed.padded}`} label="Copy Share Link" />
                 </div>
               </div>
 
@@ -208,6 +220,17 @@ export default async function CardPage({ params }: CardPageProps) {
                     {card.dateFound && (
                       <p className="text-chocobo-light">
                         <span className="font-bold">Date found:</span> {card.dateFound}
+                      </p>
+                    )}
+                    {card.pullChannel && (
+                      <p className="text-chocobo-light">
+                        <span className="font-bold">Pull Origin:</span>{' '}
+                        {PULL_CHANNEL_LABELS[card.pullChannel]}
+                      </p>
+                    )}
+                    {card.region && (
+                      <p className="text-chocobo-light">
+                        <span className="font-bold">Region:</span> {card.region}
                       </p>
                     )}
                     {pullSourceUrl && (
@@ -274,7 +297,21 @@ export default async function CardPage({ params }: CardPageProps) {
                     {card.grading.service} {card.grading.grade}
                   </p>
                   {card.grading.certNumber && (
-                    <p className="text-sm text-chocobo-light">Cert #: {card.grading.certNumber}</p>
+                    <p className="text-sm text-chocobo-light">
+                      Cert #:{' '}
+                      {certLookupUrl ? (
+                        <a
+                          href={certLookupUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-chocobo-gold hover:underline font-semibold"
+                        >
+                          {card.grading.certNumber} (Verify &rarr;)
+                        </a>
+                      ) : (
+                        card.grading.certNumber
+                      )}
+                    </p>
                   )}
                   {card.grading.dateGraded && (
                     <p className="text-xs text-chocobo-light/75">

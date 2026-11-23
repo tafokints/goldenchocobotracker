@@ -55,10 +55,24 @@ export const safeImageUrlSchema = z
     { message: 'Image URL must be a safe relative path (/images/...) or http(s) URL' }
   );
 
+export const pullChannelSchema = z
+  .enum(['lgs', 'personal_box', 'breaker', 'retail', 'gift_bundle', 'unknown'])
+  .optional();
+
 export const submitCardSchema = z.object({
   cardId: cardIdSchema,
   foundBy: z.string().trim().min(1, 'Found By is required').max(120, 'Found By is too long'),
   dateFound: isoDateSchema,
+  pullChannel: z
+    .union([z.literal(''), z.enum(['lgs', 'personal_box', 'breaker', 'retail', 'gift_bundle', 'unknown'])])
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  region: z
+    .string()
+    .trim()
+    .max(60)
+    .optional()
+    .transform((v) => (v ? v : undefined)),
   link: optionalSafeHttpUrlSchema,
   sourceUrl: optionalSafeHttpUrlSchema,
   marketplaceUrl: optionalSafeHttpUrlSchema,

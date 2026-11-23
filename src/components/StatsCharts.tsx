@@ -1,10 +1,12 @@
 'use client';
 
 import {
+  Area,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
+  ComposedChart,
   Line,
   LineChart,
   Pie,
@@ -23,6 +25,8 @@ interface StatsChartsProps {
   findsByMonth: ComputedStats['findsByMonth'];
   priceHistory: ComputedStats['priceHistory'];
   gradingStats: ComputedStats['gradingStats'];
+  pullChannelDistribution?: ComputedStats['pullChannelDistribution'];
+  regionDistribution?: ComputedStats['regionDistribution'];
 }
 
 export default function StatsCharts({
@@ -30,12 +34,47 @@ export default function StatsCharts({
   findsByMonth,
   priceHistory,
   gradingStats,
+  pullChannelDistribution = [],
+  regionDistribution = [],
 }: StatsChartsProps) {
   return (
     <div className="space-y-8">
+      {/* Cumulative Discovery Curve + Monthly Pulls */}
+      {findsByMonth.length > 0 && (
+        <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+          <div className="flex flex-wrap justify-between items-baseline gap-2 mb-4">
+            <h2 className="text-xl font-bold text-chocobo-gold">
+              Cumulative Discovery Curve &amp; Monthly Pulls
+            </h2>
+            <span className="text-xs text-chocobo-light/70">
+              Bars = monthly finds · Line = cumulative total found
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={320}>
+            <ComposedChart data={findsByMonth}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(214, 167, 61, 0.2)" />
+              <XAxis dataKey="month" stroke="#D6A73D" />
+              <YAxis yAxisId="left" allowDecimals={false} stroke="#D6A73D" />
+              <YAxis yAxisId="right" orientation="right" allowDecimals={false} stroke="#4ADE80" />
+              <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #D6A73D' }} />
+              <Bar yAxisId="left" dataKey="count" name="Monthly Pulls" fill="rgba(214, 167, 61, 0.55)" />
+              <Area
+                yAxisId="right"
+                type="monotone"
+                dataKey="cumulative"
+                name="Cumulative Found"
+                stroke="#4ADE80"
+                fill="rgba(74, 222, 128, 0.15)"
+                strokeWidth={2.5}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
       {/* Price Range Distribution */}
       <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
-        <h2 className="text-xl font-bold text-chocobo-gold mb-4">Price Distribution</h2>
+        <h2 className="text-xl font-bold text-chocobo-gold mb-4">Sale Price Distribution</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={priceRanges}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(214, 167, 61, 0.2)" />
@@ -120,25 +159,38 @@ export default function StatsCharts({
         </div>
       )}
 
-      {/* Finds Over Time */}
-      {findsByMonth.length > 0 && (
-        <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
-          <h2 className="text-xl font-bold text-chocobo-gold mb-4">Discovery Timeline</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={findsByMonth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(214, 167, 61, 0.2)" />
-              <XAxis dataKey="month" stroke="#D6A73D" />
-              <YAxis allowDecimals={false} stroke="#D6A73D" />
-              <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #D6A73D' }} />
-              <Line
-                type="monotone"
-                dataKey="count"
-                name="Cards Found"
-                stroke="#D6A73D"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+      {/* Optional Provenance Charts (shown automatically once Pull Channel / Region data is populated) */}
+      {(pullChannelDistribution.length > 0 || regionDistribution.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {pullChannelDistribution.length > 0 && (
+            <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+              <h2 className="text-xl font-bold text-chocobo-gold mb-4">Pull Origin Breakdown</h2>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={pullChannelDistribution} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(214, 167, 61, 0.2)" />
+                  <XAxis type="number" allowDecimals={false} stroke="#D6A73D" />
+                  <YAxis type="category" dataKey="channel" width={140} stroke="#D6A73D" />
+                  <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #D6A73D' }} />
+                  <Bar dataKey="count" name="Pulls" fill="#D6A73D" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {regionDistribution.length > 0 && (
+            <div className="bg-chocobo-dark/75 p-6 rounded-lg border border-chocobo-gold">
+              <h2 className="text-xl font-bold text-chocobo-gold mb-4">Pulls by Region</h2>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={regionDistribution}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(214, 167, 61, 0.2)" />
+                  <XAxis dataKey="region" stroke="#D6A73D" />
+                  <YAxis allowDecimals={false} stroke="#D6A73D" />
+                  <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #D6A73D' }} />
+                  <Bar dataKey="count" name="Pulls" fill="#4ADE80" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       )}
     </div>

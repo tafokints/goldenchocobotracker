@@ -21,7 +21,7 @@ import {
   readCardsDirect as readRedisCardsDirect,
   writeCards as writeRedisCards,
 } from '@/lib/redis-cards';
-import type { ChocoboCard, PriceHistoryEntry, ResolvedCard } from '@/lib/types';
+import type { ChocoboCard, PriceHistoryEntry, PullChannel, ResolvedCard } from '@/lib/types';
 
 export const DEFAULT_TRACKER_SLUG = 'golden-chocobo';
 export const DEFAULT_SERIES_SLUG = 'golden-chocobo';
@@ -154,6 +154,8 @@ export async function readSeriesCardsFromPostgres(
       found: row.status === 'verified',
       foundBy: row.foundBy ?? undefined,
       dateFound: row.dateFound ?? undefined,
+      pullChannel: row.pullChannel ?? undefined,
+      region: row.region ?? undefined,
       sourceUrl: row.sourceUrl ?? undefined,
       marketplaceUrl: row.marketplaceUrl ?? undefined,
       marketplaceLabel: row.marketplaceLabel ?? undefined,
@@ -237,6 +239,8 @@ export interface UpsertSerialPatch {
   found?: boolean;
   foundBy?: string;
   dateFound?: string;
+  pullChannel?: PullChannel;
+  region?: string;
   sourceUrl?: string;
   marketplaceUrl?: string;
   marketplaceLabel?: string;
@@ -320,6 +324,9 @@ export async function applyCardPatch(
         status: nextStatus,
         foundBy: patch.foundBy !== undefined ? patch.foundBy : (existing?.foundBy ?? null),
         dateFound: patch.dateFound !== undefined ? patch.dateFound : (existing?.dateFound ?? null),
+        pullChannel:
+          patch.pullChannel !== undefined ? patch.pullChannel : (existing?.pullChannel ?? null),
+        region: patch.region !== undefined ? patch.region : (existing?.region ?? null),
         sourceUrl: patch.sourceUrl !== undefined ? patch.sourceUrl : (existing?.sourceUrl ?? null),
         marketplaceUrl:
           patch.marketplaceUrl !== undefined
@@ -424,6 +431,8 @@ export async function applyCardPatch(
     found: patch.found !== undefined ? patch.found : current.found,
     foundBy: patch.foundBy !== undefined ? patch.foundBy : current.foundBy,
     dateFound: patch.dateFound !== undefined ? patch.dateFound : current.dateFound,
+    pullChannel: patch.pullChannel !== undefined ? patch.pullChannel : current.pullChannel,
+    region: patch.region !== undefined ? patch.region : current.region,
     sourceUrl: patch.sourceUrl !== undefined ? patch.sourceUrl : current.sourceUrl,
     marketplaceUrl:
       patch.marketplaceUrl !== undefined ? patch.marketplaceUrl : current.marketplaceUrl,

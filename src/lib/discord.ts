@@ -119,3 +119,69 @@ export async function notifyDiscordNewSubmission(
     return false;
   }
 }
+
+export interface PublicMilestoneNotification {
+  trackerSlug: string;
+  trackerName: string;
+  serialNumber: number;
+  totalCards: number;
+  foundCount: number;
+  submissionType: SubmissionType;
+  foundBy?: string;
+  price?: number;
+  gradingLabel?: string;
+}
+
+/**
+ * Optional public community Discord announcement fired when an admin approves a submission.
+ * Never exposes submitter IPs or internal moderation notes.
+ */
+export async function notifyDiscordPublicMilestone(
+  info: PublicMilestoneNotification
+): Promise<boolean> {
+  const webhookUrl = process.env.DISCORD_PUBLIC_ANNOUNCEMENTS_WEBHOOK_URL?.trim();
+  if (!webhookUrl) {
+    return false;
+  }
+
+  const padWidth = Math.max(2, info.totalCards.toString().length);
+  const padded = info.serialNumber.toString().padStart(padWidth, '0');
+  const siteUrl = getSiteUrl();
+  const cardUrl =
+    info.trackerSlug === 'golden-chocobo'
+      ? `${siteUrl}/card/${padded}`
+      : `${siteUrl}/t/${info.trackerSlug}/card/${padded}`;
+
+  const details: string[] = [];
+  if (info.foundBy) details.push(`Found by **${info.foundBy}**`);
+  if (typeof info.price === 'number') {
+    details.push(`Reported sale: **$${info.price.toLocaleString()}**`);
+  }
+  if (info.gradingLabel) details.push(`Graded: **${info.gradingLabel}**`);
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: info.trackerName,
+        embeds: [
+          {
+            title: `${TYPE_LABELS[info.submissionType]}: #${padded}/${info.totalCards}`,
+            url: cardUrl,
+            description: details.join(' · ') || `Verified update published for #${padded}.`,
+            color: 0xd6a73d,
+            footer: {
+              text: `${info.foundCount}/${info.totalCards} Found (${((info.foundCount / Math.max(1, info.totalCards)) * 100).toFixed(1)}%)`,
+            },
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      }),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error('Failed to send public Discord milestone:', error);
+    return false;
+  }
+}

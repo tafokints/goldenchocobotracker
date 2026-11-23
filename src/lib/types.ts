@@ -1,3 +1,20 @@
+export type PullChannel =
+  | 'lgs'
+  | 'personal_box'
+  | 'breaker'
+  | 'retail'
+  | 'gift_bundle'
+  | 'unknown';
+
+export const PULL_CHANNEL_LABELS: Record<PullChannel, string> = {
+  lgs: 'Local Game Store (LGS)',
+  personal_box: 'Personal Collector Box',
+  breaker: 'Live Breaker / Whatnot',
+  retail: 'Big Box Retail',
+  gift_bundle: 'Gift / Collector Bundle',
+  unknown: 'Unknown / Unspecified',
+};
+
 export interface PriceHistoryEntry {
   price: number;
   date: string;
@@ -19,6 +36,10 @@ export interface ChocoboCard {
   found: boolean;
   foundBy?: string;
   dateFound?: string;
+  /** Optional pull origin channel (LGS, Breaker, Personal Box, Retail, etc.). */
+  pullChannel?: PullChannel;
+  /** Optional country/region where the card was pulled (e.g., US, Japan, Canada, Europe). */
+  region?: string;
   /** Legacy field that may hold either a pull source URL or an eBay listing URL. */
   link?: string;
   /** Explicit non-affiliate pull discovery proof URL (Instagram, Reddit, X, etc.). */

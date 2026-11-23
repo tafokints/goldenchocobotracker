@@ -15,14 +15,17 @@
         "date": "2025-07-25"
       }
     ],
-    "grading": null
+    "grading": {
+      "service": "CGC",
+      "grade": 10,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 2,
     "name": "Golden Chocobo #02",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 3,
@@ -32,8 +35,7 @@
     "dateFound": "2025-06-11",
     "link": "https://www.instagram.com/p/DKvoFlZxZh_/?img_index=1&igsh=N3U1ajlmaGE0MmVu",
     "image": "/images/chocobo-03.jpg",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 4,
@@ -43,14 +45,17 @@
     "dateFound": "2025-06-15",
     "link": "https://www.ebay.com/itm/406051967653?_skw=traveling+chocobo&epid=7080246137&itmmeta=01K0B9AN7J4KTEM8DFASWWDK1W&hash=item5e8a9552a5:g:61kAAeSwZExod~Wb&itmprp=enc%3AAQAKAAAA8FkggFvd1GGDu0w3yXCmi1fh3tp7Bdq47hOy0Mnrbxk9c8mzvws1cvyAJPt98tfV%2BE7yy03qm5e3tEBsLELqXkbezEkGPwJCW3FqRywvoGXs6vY%2BZUz7x1cxu9x1n%2FBjnKRSeu6F3PSJPxS19yrx7EFdlHJi0Coy70pFQI3H3Mwk5Wv8wp%2B8HfVXam5adAK0xq6FNmTi%2Bzguj7ZCeKZXvq%2F4J62anVl1qg07WSVgQjrqwvgxahifg1Lr87gMcnkOrq4jQhnivyyOF96Ba20GnaWtOllZVPteCjbLSjFH%2FOvIKd9Fvtv%2FySyJAN%2BtONg6lQ%3D%3D%7Ctkp%3ABk9SR_7TqumCZg&mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339113954&customid=&toolid=10001&mkevt=1",
     "priceHistory": [],
-    "grading": null
+    "grading": {
+      "service": "CGC",
+      "grade": 9.5,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 5,
     "name": "Golden Chocobo #05",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 6,
@@ -66,29 +71,25 @@
         "price": 79000,
         "date": "2025-07-21"
       }
-    ],
-    "grading": null
+    ]
   },
   {
     "id": 7,
     "name": "Golden Chocobo #07",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 8,
     "name": "Golden Chocobo #08",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 9,
     "name": "Golden Chocobo #09",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 10,
@@ -98,8 +99,7 @@
     "dateFound": "2025-06-07",
     "link": "https://x.com/hawkzii/status/1931418856926392670",
     "image": "/images/chocobo-10.jpg",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 11,
@@ -108,8 +108,7 @@
     "foundBy": "Xopher314",
     "dateFound": "2025-06-06",
     "link": "https://x.com/xopher314/status/1930984515138113547",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 12,
@@ -118,15 +117,13 @@
     "foundBy": "Grey Guardian Games",
     "dateFound": "2025-06-13",
     "link": "https://www.instagram.com/p/DK1_MnaPPTx/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 13,
     "name": "Golden Chocobo #13",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 14,
@@ -135,25 +132,27 @@
     "foundBy": "Gamers Guild",
     "dateFound": "2025-06-07",
     "link": "https://www.facebook.com/photo?fbid=1254032296726540",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 15,
     "name": "Golden Chocobo #15",
     "found": true,
     "foundBy": "Brendan Khuri",
-    "dateFound": "2025-07-16",
-    "link": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fff-mtg-golden-chocobo-tracker-v0-z7iwenu2fvcf1.jpeg%3Fwidth%3D1170%26format%3Dpjpg%26auto%3Dwebp%26s%3Dbbf81d2b66798a76a5a8c96ee4578955cdd7c5fa",
+    "dateFound": "2025-08-07",
+    "link": "https://www.ebay.com/itm/127246521344?amdata=enc%3AAQAKAAAAoFkggFvd1GGDu0w3yXCmi1dJUggjOXa29J0BuSugXQpLoq0Ryj6Yh%2FOM8OPwlBlnSm5eo5zvmLjF%2FgtEb2RJ4TVaY%2BUYvt9Um8jMeOIMtgx7WiZGD5s1acJQuBLspHndHLKcGofSs%2B2hKNuc0ETG%2FimJWjZrhhnrZj0yd6J5jAvHmSmMW0%2FW0hstXs%2Fjs%2FfGpJrWCry861g8p%2BPydKNJ7MQ%3D&mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339113954&customid=&toolid=10001&mkevt=1",
     "priceHistory": [],
-    "grading": null
+    "grading": {
+      "service": "BGS",
+      "grade": 9.5,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 16,
     "name": "Golden Chocobo #16",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 17,
@@ -169,8 +168,7 @@
         "price": 55000,
         "date": "2025-07-24"
       }
-    ],
-    "grading": null
+    ]
   },
   {
     "id": 18,
@@ -180,7 +178,11 @@
     "dateFound": "2025-07-04",
     "link": "https://www.instagram.com/p/DLtFMJFS7N-/",
     "priceHistory": [],
-    "grading": null
+    "grading": {
+      "service": "TAG",
+      "grade": 9,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 19,
@@ -188,30 +190,62 @@
     "found": true,
     "foundBy": "Josh Snider",
     "dateFound": "2025-07-12",
-    "link": "https://www.facebook.com/groups/buyandsellmtg/permalink/3647680548872549/",
+    "link": "https://www.ebay.com/itm/205695525382?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339113954&customid=&toolid=10001&mkevt=1",
     "priceHistory": [],
-    "grading": null
+    "grading": {
+      "service": "BGS",
+      "grade": 9.5,
+      "dateGraded": "2025-09-06"
+    }
   },
   {
     "id": 20,
     "name": "Golden Chocobo #20",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 21,
     "name": "Golden Chocobo #21",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 22,
     "name": "Golden Chocobo #22",
-    "found": false,
-    "priceHistory": [],
-    "grading": null
+    "found": true,
+    "priceHistory": [
+      {
+        "price": 70000,
+        "date": "2025-08-24",
+        "soldBy": "eBay"
+      },
+      {
+        "price": 70000,
+        "date": "2025-09-14",
+        "soldBy": "eBay"
+      },
+      {
+        "price": 75000,
+        "date": "2025-09-23",
+        "soldBy": "eBay"
+      },
+      {
+        "price": 65000,
+        "date": "2025-10-23",
+        "soldBy": "eBay"
+      }
+    ],
+    "foundBy": "PSA",
+    "dateFound": "2025-08-09",
+    "link": "https://ebay.us/QtCcqy",
+    "grading": {
+      "service": "PSA",
+      "grade": 8,
+      "dateGraded": "2025-08-09"
+    },
+    "price": 65000,
+    "priceDate": "2025-10-23"
   },
   {
     "id": 23,
@@ -220,8 +254,7 @@
     "foundBy": "Tyler Henry",
     "dateFound": "2025-06-15",
     "link": "https://x.com/tylernhenry/status/1934618485335744735",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 24,
@@ -238,7 +271,11 @@
         "date": "2025-07-21"
       }
     ],
-    "grading": null
+    "grading": {
+      "service": "PSA",
+      "grade": 9,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 25,
@@ -247,15 +284,13 @@
     "foundBy": "EducationFoot7084",
     "dateFound": "2025-06-16",
     "link": "https://www.reddit.com/r/MagicCardPulls/comments/1lbk17k/ff_mtg_golden_chocobo_tracker_77/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 26,
     "name": "Golden Chocobo #26",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 27,
@@ -271,15 +306,13 @@
         "price": 56999,
         "date": "2025-07-17"
       }
-    ],
-    "grading": null
+    ]
   },
   {
     "id": 28,
     "name": "Golden Chocobo #28",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 29,
@@ -288,29 +321,25 @@
     "foundBy": "Vladmir_labe_factum",
     "dateFound": "2025-08-04",
     "link": "https://www.reddit.com/r/MagicCardPulls/comments/1mhch63/i_pulled_this_from_a_collector_bundle_booster/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 30,
     "name": "Golden Chocobo #30",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 31,
     "name": "Golden Chocobo #31",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 32,
     "name": "Golden Chocobo #32",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 33,
@@ -319,8 +348,7 @@
     "foundBy": "TwinBlasters",
     "dateFound": "2025-06-09",
     "link": "https://www.youtube.com/watch?v=_DyLpTJMLIc",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 34,
@@ -330,14 +358,20 @@
     "dateFound": "2025-08-02",
     "link": "https://www.facebook.com/groups/657646125885289/posts/1278567040459858/",
     "priceHistory": [],
-    "grading": null
+    "grading": {
+      "service": "BGS",
+      "grade": 9.5,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 35,
     "name": "Golden Chocobo #35",
-    "found": false,
+    "found": true,
     "priceHistory": [],
-    "grading": null
+    "foundBy": "ADRIAN ROSAS",
+    "dateFound": "2025-09-20",
+    "link": ""
   },
   {
     "id": 36,
@@ -354,14 +388,17 @@
         "date": "2025-07-17"
       }
     ],
-    "grading": null
+    "grading": {
+      "service": "BGS",
+      "grade": 9.5,
+      "dateGraded": "2025-08-07"
+    }
   },
   {
     "id": 37,
     "name": "Golden Chocobo #37",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 38,
@@ -370,8 +407,21 @@
     "foundBy": "Jason Tompkins",
     "dateFound": "2025-07-10",
     "link": "https://www.facebook.com/groups/magicarenamtg/permalink/1762120754430585/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": [
+      {
+        "price": 67100,
+        "date": "2025-09-13",
+        "soldBy": "Goldin Auctions"
+      }
+    ],
+    "grading": {
+      "service": "CGC",
+      "grade": 8,
+      "certNumber": "6070452001",
+      "dateGraded": "2025-09-13"
+    },
+    "price": 67100,
+    "priceDate": "2025-09-13"
   },
   {
     "id": 39,
@@ -380,8 +430,7 @@
     "foundBy": "Thejewell25",
     "dateFound": "2025-07-15",
     "link": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fff-mtg-golden-chocobo-tracker-v0-cbctph8hmkcf1.jpeg%3Fwidth%3D3000%26format%3Dpjpg%26auto%3Dwebp%26s%3Dbfa874c8cf7af4f74c27aa2ba3c10498eb803ce2",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 40,
@@ -390,8 +439,7 @@
     "foundBy": "gapman (whatnot)",
     "dateFound": "2025-06-06",
     "link": "https://imgur.com/a/ONYlafS",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 41,
@@ -408,8 +456,7 @@
         "price": 40000,
         "date": "2025-06-21"
       }
-    ],
-    "grading": null
+    ]
   },
   {
     "id": 42,
@@ -418,8 +465,7 @@
     "foundBy": "Vorthos",
     "dateFound": "2025-07-04",
     "link": "https://www.facebook.com/groups/657646125885289/permalink/1256041522712410",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 43,
@@ -428,15 +474,13 @@
     "foundBy": "areiaitch",
     "dateFound": "2025-06-17",
     "link": "https://www.ebay.com/itm/267324858338?mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339113954&customid=&toolid=10001&mkevt=1",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 44,
     "name": "Golden Chocobo #44",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 45,
@@ -445,22 +489,49 @@
     "foundBy": "tpezair",
     "dateFound": "2025-06-16",
     "link": "https://www.reddit.com/r/MagicCardPulls/comments/1ld7bie/4577_golden_chocobo/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": [
+      {
+        "price": 83080,
+        "date": "2026-02-16",
+        "soldBy": "Goldin Auctions"
+      }
+    ],
+    "grading": {
+      "service": "BGS",
+      "grade": 9,
+      "dateGraded": "2026-02-16"
+    },
+    "price": 83080,
+    "priceDate": "2026-02-16"
   },
   {
     "id": 46,
     "name": "Golden Chocobo #46",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 47,
     "name": "Golden Chocobo #47",
-    "found": false,
-    "priceHistory": [],
-    "grading": null
+    "found": true,
+    "priceHistory": [
+      {
+        "price": 1400000,
+        "date": "2026-11-15",
+        "soldBy": "Pristine Collectibles (Adam Cai) — Private Sale via Collectr"
+      }
+    ],
+    "foundBy": "PSA",
+    "dateFound": "2025-08-11",
+    "link": "https://www.ebay.com/itm/306444415697?_skw=golden+chocobo",
+    "grading": {
+      "service": "PSA",
+      "grade": 10,
+      "certNumber": "123870076",
+      "dateGraded": "2026-11-15"
+    },
+    "price": 1400000,
+    "priceDate": "2026-11-15"
   },
   {
     "id": 48,
@@ -469,15 +540,13 @@
     "foundBy": "uno_mtg",
     "dateFound": "2025-07-07",
     "link": "https://www.instagram.com/reel/DL0sJOdIWzE/?igsh=bXpycnJ1cHgxYW13",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 49,
     "name": "Golden Chocobo #49",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 50,
@@ -486,15 +555,13 @@
     "foundBy": "cardsnhobbywa",
     "dateFound": "2025-07-21",
     "link": "https://www.instagram.com/p/DMYLFBFJikw/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 51,
     "name": "Golden Chocobo #51",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 52,
@@ -503,8 +570,7 @@
     "foundBy": "Anlishuo",
     "dateFound": "2025-06-22",
     "link": "https://www.reddit.com/r/mtgfinance/comments/1lifhfc/5277_golden_chocobo_pulled_in_china/",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 53,
@@ -513,15 +579,20 @@
     "foundBy": "Nathan Lucas",
     "dateFound": "2025-06-20",
     "link": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fff-mtg-golden-chocobo-tracker-v0-er8nz9gc558f1.jpeg%3Fwidth%3D1170%26format%3Dpjpg%26auto%3Dwebp%26s%3Dda9a2671bedf8e02989b876b47bd5fa41f9504d4",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": [
+      {
+        "price": 78000,
+        "date": "2025-08-07"
+      }
+    ],
+    "price": 78000,
+    "priceDate": "2025-08-07"
   },
   {
     "id": 54,
     "name": "Golden Chocobo #54",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 55,
@@ -530,8 +601,7 @@
     "foundBy": "bacaihau",
     "dateFound": "2025-06-06",
     "link": "https://x.com/SadPoor/status/1931688237547888643",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 56,
@@ -540,36 +610,39 @@
     "foundBy": "XCapnCanadaX",
     "dateFound": "2025-06-13",
     "link": "https://www.instagram.com/p/DK3U-poS0lC/?igsh=MWt3bXYzbTBzajU1Mw==",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 57,
     "name": "Golden Chocobo #57",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 58,
     "name": "Golden Chocobo #58",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 59,
     "name": "Golden Chocobo #59",
-    "found": false,
+    "found": true,
     "priceHistory": [],
-    "grading": null
+    "foundBy": "Steve Walbroehl",
+    "dateFound": "2025-12-20",
+    "link": "https://www.facebook.com/groups/657646125885289/posts/1391995222450372/",
+    "grading": {
+      "service": "CGC",
+      "grade": 9.5,
+      "dateGraded": "2025-12-20"
+    }
   },
   {
     "id": 60,
     "name": "Golden Chocobo #60",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 61,
@@ -578,8 +651,7 @@
     "foundBy": "Layton Gaming",
     "dateFound": "2025-06-06",
     "link": "https://www.instagram.com/p/DKlEguds490/?igsh=OGs2bjk5M3FibWd0",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 62,
@@ -588,8 +660,7 @@
     "foundBy": "fish_post (need more proof)",
     "dateFound": "2025-06-17",
     "link": "https://www.reddit.com/r/mtgfinance/comments/1le1hz9/comment/mydaqtf/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 63,
@@ -609,29 +680,32 @@
     "grading": {
       "service": "CGC",
       "grade": 10,
-      "dateGraded": null
+      "dateGraded": "2025-08-07"
     }
   },
   {
     "id": 64,
     "name": "Golden Chocobo #64",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 65,
     "name": "Golden Chocobo #65",
-    "found": false,
+    "found": true,
     "priceHistory": [],
-    "grading": null
+    "foundBy": "theccgplace",
+    "dateFound": "2025-08-23",
+    "link": "https://www.instagram.com/reel/DNugjhnWAVo/?igsh=YWhhbzJjb3k1cTls"
   },
   {
     "id": 66,
     "name": "Golden Chocobo #66",
-    "found": false,
+    "found": true,
     "priceHistory": [],
-    "grading": null
+    "foundBy": "Secret Door Games",
+    "dateFound": "2025-07-09",
+    "link": "https://www.facebook.com/photo?fbid=1281894023946449&set=a.506992628103263"
   },
   {
     "id": 67,
@@ -640,15 +714,13 @@
     "foundBy": "Dick and Janes",
     "dateFound": "2025-06-13",
     "link": "https://www.ebay.com/itm/277204582097",
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 68,
     "name": "Golden Chocobo #68",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 69,
@@ -664,63 +736,72 @@
         "price": 46844,
         "date": "2025-07-17"
       }
-    ],
-    "grading": null
+    ]
   },
   {
     "id": 70,
     "name": "Golden Chocobo #70",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 71,
     "name": "Golden Chocobo #71",
-    "found": false,
+    "found": true,
     "priceHistory": [],
-    "grading": null
+    "foundBy": "goldinco",
+    "dateFound": "2026-11-17",
+    "link": "https://www.instagram.com/p/Df2NjaJIDVX/",
+    "grading": {
+      "service": "PSA",
+      "grade": 8,
+      "dateGraded": "2026-11-17"
+    }
   },
   {
     "id": 72,
     "name": "Golden Chocobo #72",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 73,
     "name": "Golden Chocobo #73",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 74,
     "name": "Golden Chocobo #74",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 75,
     "name": "Golden Chocobo #75",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   },
   {
     "id": 76,
     "name": "Golden Chocobo #76",
-    "found": false,
-    "priceHistory": [],
-    "grading": null
+    "found": true,
+    "priceHistory": [
+      {
+        "price": 150000,
+        "date": "2026-08-10"
+      }
+    ],
+    "foundBy": "PandaTCG",
+    "dateFound": "2026-06-28",
+    "link": "https://x.com/dearcindyphan/status/2071624724841382390",
+    "price": 150000,
+    "priceDate": "2026-08-10"
   },
   {
     "id": 77,
     "name": "Golden Chocobo #77",
     "found": false,
-    "priceHistory": [],
-    "grading": null
+    "priceHistory": []
   }
-] 
+]

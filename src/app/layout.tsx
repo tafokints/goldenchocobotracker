@@ -44,6 +44,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   alternates: {
     canonical: '/',
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
   },
   manifest: '/manifest.json',
   icons: {
@@ -63,7 +66,7 @@ export const metadata: Metadata = {
     siteName: 'Golden Chocobo Tracker',
     images: [
       {
-        url: '/images/chocobo-01.jpg',
+        url: '/api/og?view=home',
         width: 1200,
         height: 630,
         alt: 'Golden Chocobo Tracker - MTG Final Fantasy Cards',
@@ -75,7 +78,7 @@ export const metadata: Metadata = {
     title: 'Golden Chocobo Tracker - MTG Final Fantasy Serialized Cards',
     description:
       "Track all 77 serialized Golden Chocobo cards from Magic: The Gathering's Final Fantasy collaboration.",
-    images: ['/images/chocobo-01.jpg'],
+    images: ['/api/og?view=home'],
     creator: '@goldenchocobotracker',
   },
   robots: {

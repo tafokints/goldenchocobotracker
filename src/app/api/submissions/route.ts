@@ -192,6 +192,8 @@ export async function POST(request: NextRequest) {
   const payloadJson: SubmissionPayload = {
     foundBy: data.foundBy,
     dateFound: data.dateFound,
+    pullChannel: data.pullChannel,
+    region: data.region,
     sourceUrl: data.sourceUrl || (data.submissionType === 'new_find' ? data.proofUrl : undefined),
     marketplaceUrl: data.marketplaceUrl,
     marketplaceLabel: data.marketplaceLabel,

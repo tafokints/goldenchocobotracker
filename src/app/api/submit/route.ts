@@ -22,8 +22,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const { cardId, foundBy, dateFound, link, sourceUrl, marketplaceUrl, marketplaceLabel } =
-      parsed.data;
+    const {
+      cardId,
+      foundBy,
+      dateFound,
+      pullChannel,
+      region,
+      link,
+      sourceUrl,
+      marketplaceUrl,
+      marketplaceLabel,
+    } = parsed.data;
 
     const updatedCard = await applyCardPatch(
       cardId,
@@ -31,6 +40,8 @@ export async function POST(request: Request) {
         found: true,
         foundBy,
         dateFound,
+        pullChannel,
+        region,
         sourceUrl: sourceUrl ?? link,
         marketplaceUrl,
         marketplaceLabel,

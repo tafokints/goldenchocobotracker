@@ -20,6 +20,8 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
   // Find / Pull fields
   const [foundBy, setFoundBy] = useState('');
   const [dateFound, setDateFound] = useState('');
+  const [pullChannel, setPullChannel] = useState('');
+  const [region, setRegion] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
   const [marketplaceUrl, setMarketplaceUrl] = useState('');
   const [marketplaceLabel, setMarketplaceLabel] = useState('');
@@ -61,6 +63,8 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
 
     setFoundBy(card.foundBy || '');
     setDateFound(card.dateFound || '');
+    setPullChannel(card.pullChannel || '');
+    setRegion(card.region || '');
     setSourceUrl(card.sourceUrl || '');
     setMarketplaceUrl(card.marketplaceUrl || '');
     setMarketplaceLabel(card.marketplaceLabel || '');
@@ -178,6 +182,8 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
                 cardId: selectedCard,
                 foundBy,
                 dateFound,
+                pullChannel: pullChannel || undefined,
+                region: region || undefined,
                 sourceUrl,
                 marketplaceUrl,
                 marketplaceLabel: marketplaceLabel || undefined,
@@ -206,6 +212,38 @@ export default function AdminDashboard({ initialCards, adminLabel }: AdminDashbo
               onChange={(e) => setDateFound(e.target.value)}
               className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
             />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-chocobo-gold text-sm font-bold mb-1">
+                Pull Channel (optional)
+              </label>
+              <select
+                value={pullChannel}
+                onChange={(e) => setPullChannel(e.target.value)}
+                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              >
+                <option value="">Unspecified</option>
+                <option value="lgs">Local Game Store (LGS)</option>
+                <option value="personal_box">Personal Collector Box</option>
+                <option value="breaker">Live Breaker / Whatnot</option>
+                <option value="retail">Big Box Retail</option>
+                <option value="gift_bundle">Gift / Collector Bundle</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-chocobo-gold text-sm font-bold mb-1">
+                Region / Country (optional)
+              </label>
+              <input
+                type="text"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                placeholder="e.g., US, Japan, Canada, Europe"
+                className="w-full bg-chocobo-light text-chocobo-dark border border-chocobo-gold rounded py-2 px-3"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-chocobo-gold text-sm font-bold mb-1">

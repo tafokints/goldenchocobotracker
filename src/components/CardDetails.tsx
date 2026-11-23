@@ -4,7 +4,10 @@ import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
-import type { ResolvedCard } from '@/lib/types';
+import { getGradingCertUrl } from '@/lib/grading-certs';
+import { getIconicLabel } from '@/lib/iconic-numbers';
+import { PULL_CHANNEL_LABELS, type ResolvedCard } from '@/lib/types';
+import CopyLinkButton from './CopyLinkButton';
 
 interface CardDetailsProps {
   card: ResolvedCard;
@@ -27,7 +30,10 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
   if (!isOpen) return null;
 
   const paddedId = card.id.toString().padStart(2, '0');
-  const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } = resolveCardLinks(card);
+  const iconicLabel = getIconicLabel(card.id);
+  const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } =
+    resolveCardLinks(card);
+  const certLookupUrl = getGradingCertUrl(card.grading?.service, card.grading?.certNumber);
 
   return (
     <div
@@ -42,12 +48,19 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
       }}
     >
       <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/20">
-        <div className="flex justify-between items-center pb-4 gap-4">
+        <div className="flex justify-between items-start pb-4 gap-4">
           <div>
-            <h2 id="card-details-title" className="text-xl font-bold text-chocobo-gold">
-              Golden Chocobo #{paddedId} Details
-            </h2>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-0.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 id="card-details-title" className="text-xl font-bold text-chocobo-gold">
+                Golden Chocobo #{paddedId} Details
+              </h2>
+              {iconicLabel && (
+                <span className="rounded px-2 py-0.5 text-[10px] font-bold uppercase bg-yellow-500/20 border border-yellow-400/50 text-yellow-200">
+                  ★ {iconicLabel}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-1.5">
               <Link
                 href={`/card/${paddedId}`}
                 className="text-xs text-chocobo-light/80 hover:text-chocobo-gold underline"
@@ -60,6 +73,11 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
               >
                 Suggest Update
               </Link>
+              <CopyLinkButton
+                path={`/card/${paddedId}`}
+                label="Copy Share Link"
+                className="text-xs text-chocobo-light/80 hover:text-chocobo-gold underline"
+              />
             </div>
           </div>
           <button
@@ -92,6 +110,17 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
                       <span className="font-bold">Date found:</span> {card.dateFound}
                     </p>
                   )}
+                  {card.pullChannel && (
+                    <p className="text-chocobo-light">
+                      <span className="font-bold">Pull Origin:</span>{' '}
+                      {PULL_CHANNEL_LABELS[card.pullChannel]}
+                    </p>
+                  )}
+                  {card.region && (
+                    <p className="text-chocobo-light">
+                      <span className="font-bold">Region:</span> {card.region}
+                    </p>
+                  )}
                   {pullSourceUrl && (
                     <p className="text-chocobo-light">
                       <span className="font-bold">Pull Source:</span>{' '}
@@ -111,7 +140,11 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
                       <a
                         href={marketplaceUrl}
                         target="_blank"
-                        rel={isMarketplaceAffiliate ? 'sponsored noopener noreferrer' : 'noopener noreferrer'}
+                        rel={
+                          isMarketplaceAffiliate
+                            ? 'sponsored noopener noreferrer'
+                            : 'noopener noreferrer'
+                        }
                         className="text-chocobo-gold hover:underline"
                       >
                         View on {marketplaceLabel}
@@ -143,15 +176,31 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
           {card.grading && (
             <div>
               <h3 className="text-lg font-bold text-chocobo-gold mb-2">Grading Information</h3>
-              <div className="bg-chocobo-light/10 p-4 rounded">
+              <div className="bg-chocobo-light/10 p-4 rounded space-y-1">
                 <p className="text-blue-400 text-lg font-bold">
                   {card.grading.service} {card.grading.grade}
                 </p>
                 {card.grading.certNumber && (
-                  <p className="text-chocobo-light text-sm">Cert #: {card.grading.certNumber}</p>
+                  <p className="text-chocobo-light text-sm">
+                    Cert #:{' '}
+                    {certLookupUrl ? (
+                      <a
+                        href={certLookupUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-chocobo-gold hover:underline font-semibold"
+                      >
+                        {card.grading.certNumber} (Verify &rarr;)
+                      </a>
+                    ) : (
+                      card.grading.certNumber
+                    )}
+                  </p>
                 )}
                 {card.grading.dateGraded && (
-                  <p className="text-chocobo-light/80 text-sm">Graded on: {card.grading.dateGraded}</p>
+                  <p className="text-chocobo-light/80 text-sm">
+                    Graded on: {card.grading.dateGraded}
+                  </p>
                 )}
               </div>
             </div>
@@ -196,6 +245,7 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
                   src={card.resolvedImage}
                   alt={`Golden Chocobo Card #${paddedId}`}
                   fill
+                  quality={80}
                   sizes="(max-width: 640px) 90vw, 384px"
                   className="object-contain"
                 />

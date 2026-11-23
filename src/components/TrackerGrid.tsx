@@ -5,11 +5,20 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
+import {
+  GOLDEN_CHOCOBO_ICONIC_NUMBERS,
+  getIconicLabel,
+  isIconicNumber,
+} from '@/lib/iconic-numbers';
 import type { ResolvedCard } from '@/lib/types';
+import CompactMatrixView from './CompactMatrixView';
 import FilterControls from './FilterControls';
 
 const CardLightbox = dynamic(() => import('./CardLightbox'), { ssr: false });
 const CardDetails = dynamic(() => import('./CardDetails'), { ssr: false });
+
+type QuickFilter = 'all' | 'graded' | 'priced' | 'iconic' | 'unpulled-iconic';
+type ViewMode = 'grid' | 'matrix';
 
 interface TrackerGridProps {
   initialCards: ResolvedCard[];
@@ -19,6 +28,8 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('id-asc');
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -30,18 +41,28 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
     return [...initialCards]
       .filter((card) => {
         const paddedId = card.id.toString().padStart(2, '0');
+        const iconicLabel = getIconicLabel(card.id, GOLDEN_CHOCOBO_ICONIC_NUMBERS)?.toLowerCase();
         const matchesSearch =
           !query ||
           paddedId.includes(query) ||
           card.id.toString().includes(query) ||
-          (card.foundBy?.toLowerCase().includes(query) ?? false);
+          (card.foundBy?.toLowerCase().includes(query) ?? false) ||
+          (card.region?.toLowerCase().includes(query) ?? false) ||
+          (iconicLabel?.includes(query) ?? false);
 
         const matchesStatus =
           statusFilter === 'all' ||
           (statusFilter === 'found' && card.found) ||
           (statusFilter === 'not-found' && !card.found);
 
-        return matchesSearch && matchesStatus;
+        const matchesQuick =
+          quickFilter === 'all' ||
+          (quickFilter === 'graded' && Boolean(card.grading)) ||
+          (quickFilter === 'priced' && typeof card.price === 'number') ||
+          (quickFilter === 'iconic' && isIconicNumber(card.id)) ||
+          (quickFilter === 'unpulled-iconic' && isIconicNumber(card.id) && !card.found);
+
+        return matchesSearch && matchesStatus && matchesQuick;
       })
       .sort((a, b) => {
         switch (sortOrder) {
@@ -60,7 +81,7 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
             return a.id - b.id;
         }
       });
-  }, [initialCards, searchQuery, statusFilter, sortOrder]);
+  }, [initialCards, searchQuery, statusFilter, sortOrder, quickFilter]);
 
   const { lightboxSlides, cardIdToSlideIndex } = useMemo(() => {
     const slides: Array<{ src: string; alt: string }> = [];
@@ -79,6 +100,19 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
     return { lightboxSlides: slides, cardIdToSlideIndex: indexMap };
   }, [filteredAndSortedCards]);
 
+  // Track rendered image rank so only the first 2 actual visible images get high-priority preload
+  // (avoids competing parallel LCP downloads over the initial TCP congestion window)
+  const imagePriorityRank = useMemo(() => {
+    const rankMap = new Map<number, number>();
+    let rank = 0;
+    for (const card of filteredAndSortedCards) {
+      if (card.resolvedImage) {
+        rankMap.set(card.id, rank++);
+      }
+    }
+    return rankMap;
+  }, [filteredAndSortedCards]);
+
   return (
     <>
       <FilterControls
@@ -90,17 +124,83 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
         setSortOrder={setSortOrder}
       />
 
-      <section className="w-full max-w-5xl mt-8" aria-label="Golden Chocobo Cards">
+      {/* Quick Filter Chips & Grid / Compact 1-77 Matrix View Toggle */}
+      <div className="w-full max-w-5xl mt-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Quick filters">
+          {(
+            [
+              ['all', 'All'],
+              ['graded', 'Graded'],
+              ['priced', 'Has Sale'],
+              ['iconic', '★ Iconic / Grails'],
+              ['unpulled-iconic', '★ Unpulled Grails'],
+            ] as Array<[QuickFilter, string]>
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setQuickFilter(key)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+                quickFilter === key
+                  ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold'
+                  : 'bg-chocobo-dark/75 text-chocobo-light border-chocobo-gold/40 hover:border-chocobo-gold'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className="inline-flex rounded-lg border border-chocobo-gold/60 overflow-hidden text-xs font-bold"
+          role="group"
+          aria-label="Layout view"
+        >
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            aria-pressed={viewMode === 'grid'}
+            className={`px-3 py-1.5 transition-colors ${
+              viewMode === 'grid'
+                ? 'bg-chocobo-gold text-chocobo-dark'
+                : 'bg-chocobo-dark text-chocobo-light hover:text-chocobo-gold'
+            }`}
+          >
+            Card Grid
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('matrix')}
+            aria-pressed={viewMode === 'matrix'}
+            className={`px-3 py-1.5 transition-colors ${
+              viewMode === 'matrix'
+                ? 'bg-chocobo-gold text-chocobo-dark'
+                : 'bg-chocobo-dark text-chocobo-light hover:text-chocobo-gold'
+            }`}
+          >
+            1–77 Wall
+          </button>
+        </div>
+      </div>
+
+      <section className="w-full max-w-5xl mt-6" aria-label="Golden Chocobo Cards">
         <h2 className="sr-only">Golden Chocobo Card Collection</h2>
         {filteredAndSortedCards.length === 0 ? (
           <div className="text-center py-12 bg-chocobo-dark/75 border border-chocobo-gold/40 rounded-lg text-chocobo-light">
             No cards match your current filters.
           </div>
+        ) : viewMode === 'matrix' ? (
+          <CompactMatrixView
+            cards={filteredAndSortedCards}
+            onSelectCard={setSelectedCardForDetails}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredAndSortedCards.map((card, index) => {
+            {filteredAndSortedCards.map((card) => {
               const paddedId = card.id.toString().padStart(2, '0');
               const slideIndex = cardIdToSlideIndex.get(card.id);
+              const imgRank = imagePriorityRank.get(card.id) ?? 99;
+              const iconicLabel = getIconicLabel(card.id);
               const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } =
                 resolveCardLinks(card);
 
@@ -123,8 +223,10 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
                         src={card.resolvedImage}
                         alt={`Golden Chocobo Card #${paddedId} - ${card.name}`}
                         fill
-                        priority={index < 4}
-                        sizes="(max-width: 640px) 92vw, (max-width: 768px) 46vw, (max-width: 1024px) 30vw, 230px"
+                        quality={75}
+                        priority={imgRank < 2}
+                        loading={imgRank < 4 ? 'eager' : 'lazy'}
+                        sizes="(max-width: 640px) 85vw, (max-width: 768px) 44vw, (max-width: 1024px) 28vw, 220px"
                         className="object-contain"
                       />
                     </button>
@@ -160,6 +262,12 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
                     </span>
                   </div>
 
+                  {iconicLabel && (
+                    <span className="inline-block self-start mt-1.5 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-yellow-500/20 border border-yellow-400/50 text-yellow-200">
+                      ★ {iconicLabel}
+                    </span>
+                  )}
+
                   <div className="flex-grow flex flex-col mt-2 space-y-2">
                     {typeof card.price === 'number' && (
                       <div className="text-sm text-green-400">
@@ -188,7 +296,12 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
                     {card.found && (
                       <div className="text-sm text-chocobo-light space-y-0.5">
                         {card.foundBy && <p className="truncate">Found by: {card.foundBy}</p>}
-                        {card.dateFound && <p className="text-xs text-chocobo-light/80">Date: {card.dateFound}</p>}
+                        {card.dateFound && (
+                          <p className="text-xs text-chocobo-light/80">
+                            Date: {card.dateFound}
+                            {card.region ? ` · ${card.region}` : ''}
+                          </p>
+                        )}
                         <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-xs">
                           {pullSourceUrl && (
                             <a

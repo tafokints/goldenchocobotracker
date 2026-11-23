@@ -50,6 +50,14 @@ export const publicSubmissionSchema = z
       .union([z.literal(''), isoDateSchema])
       .optional()
       .transform((v) => (v ? v : undefined)),
+    pullChannel: z
+      .union([
+        z.literal(''),
+        z.enum(['lgs', 'personal_box', 'breaker', 'retail', 'gift_bundle', 'unknown']),
+      ])
+      .optional()
+      .transform((v) => (v ? v : undefined)),
+    region: optionalShortText(60),
     sourceUrl: optionalSafeHttpUrlSchema,
     marketplaceUrl: optionalSafeHttpUrlSchema,
     marketplaceLabel: optionalShortText(60),
@@ -186,6 +194,14 @@ export const reviewSubmissionSchema = z.object({
         .union([z.literal(''), isoDateSchema])
         .optional()
         .transform((v) => (v ? v : undefined)),
+      pullChannel: z
+        .union([
+          z.literal(''),
+          z.enum(['lgs', 'personal_box', 'breaker', 'retail', 'gift_bundle', 'unknown']),
+        ])
+        .optional()
+        .transform((v) => (v ? v : undefined)),
+      region: optionalShortText(60),
       sourceUrl: optionalSafeHttpUrlSchema,
       marketplaceUrl: optionalSafeHttpUrlSchema,
       marketplaceLabel: optionalShortText(60),

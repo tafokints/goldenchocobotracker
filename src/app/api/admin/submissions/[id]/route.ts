@@ -2,9 +2,10 @@ import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/auth';
 import { auditLogs, getDb, hasDatabaseEnv, submissions, trackers, type SubmissionPayload } from '@/db';
+import { notifyDiscordPublicMilestone } from '@/lib/discord';
 import { deleteQuarantinedImage, promoteQuarantinedImage } from '@/lib/r2';
 import { reviewSubmissionSchema } from '@/lib/submission-validation';
-import { applyCardPatch, type UpsertSerialPatch } from '@/lib/tracker-store';
+import { applyCardPatch, getCardsFresh, type UpsertSerialPatch } from '@/lib/tracker-store';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     .select({
       submission: submissions,
       trackerSlug: trackers.slug,
+      trackerName: trackers.name,
     })
     .from(submissions)
     .innerJoin(trackers, eq(submissions.trackerId, trackers.id))
@@ -106,6 +108,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     found: row.submission.submissionType === 'new_find' ? true : undefined,
     foundBy: merged.foundBy,
     dateFound: merged.dateFound,
+    pullChannel: merged.pullChannel,
+    region: merged.region,
     sourceUrl: merged.sourceUrl,
     marketplaceUrl: merged.marketplaceUrl,
     marketplaceLabel: merged.marketplaceLabel,
@@ -164,6 +168,24 @@ export async function POST(request: NextRequest, context: RouteContext) {
     beforeJson: row.submission,
     afterJson: updatedSubmission,
   });
+
+  if (process.env.DISCORD_PUBLIC_ANNOUNCEMENTS_WEBHOOK_URL) {
+    const allCards = await getCardsFresh();
+    await notifyDiscordPublicMilestone({
+      trackerSlug: row.trackerSlug,
+      trackerName: row.trackerName,
+      serialNumber: row.submission.serialNumber,
+      totalCards: allCards.length || 77,
+      foundCount: allCards.filter((c) => c.found).length,
+      submissionType: row.submission.submissionType,
+      foundBy: merged.foundBy,
+      price: merged.price,
+      gradingLabel:
+        merged.gradingService && merged.grade !== undefined
+          ? `${merged.gradingService} ${merged.grade}`
+          : undefined,
+    });
+  }
 
   return NextResponse.json({
     success: true,

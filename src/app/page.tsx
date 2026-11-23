@@ -1,14 +1,17 @@
 import Link from 'next/link';
 import AffiliateLinks from '@/components/AffiliateLinks';
+import LatestActivityStrip from '@/components/LatestActivityStrip';
 import ProgressBar from '@/components/ProgressBar';
 import TrackerGrid from '@/components/TrackerGrid';
-import { getCards } from '@/lib/tracker-store';
+import { buildRecentActivity } from '@/lib/activity';
 import { getSiteUrl } from '@/lib/site-config';
+import { getCards } from '@/lib/tracker-store';
 
 export const revalidate = 300;
 
 export default async function HomePage() {
   const cards = await getCards();
+  const recentActivity = buildRecentActivity(cards, { limit: 6 });
 
   const foundCards = cards.filter((card) => card.found);
   const foundCount = foundCards.length;
@@ -85,6 +88,8 @@ export default async function HomePage() {
             </p>
           )}
         </section>
+
+        <LatestActivityStrip events={recentActivity} />
 
         <TrackerGrid initialCards={cards} />
 

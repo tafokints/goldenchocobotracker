@@ -226,8 +226,10 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                         src={card.resolvedImage}
                         alt={`${activeSeries.name} #${paddedId}`}
                         fill
-                        priority={index < 4}
-                        sizes="(max-width: 640px) 92vw, (max-width: 768px) 46vw, (max-width: 1024px) 30vw, 230px"
+                        quality={75}
+                        priority={index < 2}
+                        loading={index < 4 ? 'eager' : 'lazy'}
+                        sizes="(max-width: 640px) 85vw, (max-width: 768px) 44vw, (max-width: 1024px) 28vw, 220px"
                         className="object-contain"
                       />
                     </button>
