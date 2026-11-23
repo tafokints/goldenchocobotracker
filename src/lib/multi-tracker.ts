@@ -99,54 +99,58 @@ export async function syncDomainRouteInRedis(
 
 async function fetchPublishedTrackersUncached(): Promise<TrackerSummary[]> {
   if (hasDatabaseEnv()) {
-    const db = getDb();
-    const trackerRows = await db
-      .select()
-      .from(trackers)
-      .where(eq(trackers.isPublished, true))
-      .orderBy(asc(trackers.createdAt));
+    try {
+      const db = getDb();
+      const trackerRows = await db
+        .select()
+        .from(trackers)
+        .where(eq(trackers.isPublished, true))
+        .orderBy(asc(trackers.createdAt));
 
-    if (trackerRows.length > 0) {
-      const summaries: TrackerSummary[] = [];
+      if (trackerRows.length > 0) {
+        const summaries: TrackerSummary[] = [];
 
-      for (const t of trackerRows) {
-        const seriesRows = await db
-          .select()
-          .from(series)
-          .where(eq(series.trackerId, t.id))
-          .orderBy(asc(series.sortOrder));
+        for (const t of trackerRows) {
+          const seriesRows = await db
+            .select()
+            .from(series)
+            .where(eq(series.trackerId, t.id))
+            .orderBy(asc(series.sortOrder));
 
-        let totalSerials = 0;
-        let foundCount = 0;
+          let totalSerials = 0;
+          let foundCount = 0;
 
-        for (const s of seriesRows) {
-          totalSerials += s.serialMax - s.serialMin + 1;
-          const items = await db
-            .select({ status: serialItems.status })
-            .from(serialItems)
-            .where(eq(serialItems.seriesId, s.id));
-          foundCount += items.filter((item) => item.status === 'verified').length;
+          for (const s of seriesRows) {
+            totalSerials += s.serialMax - s.serialMin + 1;
+            const items = await db
+              .select({ status: serialItems.status })
+              .from(serialItems)
+              .where(eq(serialItems.seriesId, s.id));
+            foundCount += items.filter((item) => item.status === 'verified').length;
+          }
+
+          summaries.push({
+            id: t.id,
+            slug: t.slug,
+            customDomain: t.customDomain,
+            name: t.name,
+            game: t.game,
+            setName: t.setName,
+            description: t.description,
+            accentHex: t.themeConfig?.accentHex || '#D6A73D',
+            bgHex: t.themeConfig?.bgHex || '#201A15',
+            seriesCount: seriesRows.length,
+            totalSerials,
+            foundCount,
+            affiliateLinksEnabled: t.affiliateLinksEnabled,
+            isPublished: t.isPublished,
+          });
         }
 
-        summaries.push({
-          id: t.id,
-          slug: t.slug,
-          customDomain: t.customDomain,
-          name: t.name,
-          game: t.game,
-          setName: t.setName,
-          description: t.description,
-          accentHex: t.themeConfig?.accentHex || '#D6A73D',
-          bgHex: t.themeConfig?.bgHex || '#201A15',
-          seriesCount: seriesRows.length,
-          totalSerials,
-          foundCount,
-          affiliateLinksEnabled: t.affiliateLinksEnabled,
-          isPublished: t.isPublished,
-        });
+        return summaries;
       }
-
-      return summaries;
+    } catch (error) {
+      console.warn('Postgres hub query not ready yet, falling back to default tracker:', error);
     }
   }
 
@@ -184,42 +188,46 @@ export async function listPublishedTrackers(): Promise<TrackerSummary[]> {
 
 async function hydrateTrackerUncached(slug: string): Promise<HydratedTracker | null> {
   if (hasDatabaseEnv()) {
-    const ctx = await getTrackerContextBySlug(slug);
-    if (ctx) {
-      const seriesWithCards: SeriesWithCards[] = [];
-      for (const s of ctx.seriesList) {
-        const cards = await readSeriesCardsFromPostgres(s);
-        seriesWithCards.push({
-          id: s.id,
-          slug: s.slug,
-          name: s.name,
-          serialMin: s.serialMin,
-          serialMax: s.serialMax,
-          totalCount: cards.length,
-          foundCount: cards.filter((c) => c.found).length,
-          cards,
-        });
-      }
+    try {
+      const ctx = await getTrackerContextBySlug(slug);
+      if (ctx) {
+        const seriesWithCards: SeriesWithCards[] = [];
+        for (const s of ctx.seriesList) {
+          const cards = await readSeriesCardsFromPostgres(s);
+          seriesWithCards.push({
+            id: s.id,
+            slug: s.slug,
+            name: s.name,
+            serialMin: s.serialMin,
+            serialMax: s.serialMax,
+            totalCount: cards.length,
+            foundCount: cards.filter((c) => c.found).length,
+            cards,
+          });
+        }
 
-      return {
-        id: ctx.tracker.id,
-        slug: ctx.tracker.slug,
-        customDomain: ctx.tracker.customDomain,
-        name: ctx.tracker.name,
-        game: ctx.tracker.game,
-        setName: ctx.tracker.setName,
-        description: ctx.tracker.description,
-        themeConfig: {
-          accentHex: ctx.tracker.themeConfig?.accentHex || '#D6A73D',
-          bgHex: ctx.tracker.themeConfig?.bgHex || '#201A15',
-          fgHex: ctx.tracker.themeConfig?.fgHex || '#FFF8F0',
-        },
-        affiliateConfig: ctx.tracker.affiliateConfig || [],
-        communityLinks: ctx.tracker.communityLinks || [],
-        affiliateLinksEnabled: ctx.tracker.affiliateLinksEnabled,
-        isPublished: ctx.tracker.isPublished,
-        series: seriesWithCards,
-      };
+        return {
+          id: ctx.tracker.id,
+          slug: ctx.tracker.slug,
+          customDomain: ctx.tracker.customDomain,
+          name: ctx.tracker.name,
+          game: ctx.tracker.game,
+          setName: ctx.tracker.setName,
+          description: ctx.tracker.description,
+          themeConfig: {
+            accentHex: ctx.tracker.themeConfig?.accentHex || '#D6A73D',
+            bgHex: ctx.tracker.themeConfig?.bgHex || '#201A15',
+            fgHex: ctx.tracker.themeConfig?.fgHex || '#FFF8F0',
+          },
+          affiliateConfig: ctx.tracker.affiliateConfig || [],
+          communityLinks: ctx.tracker.communityLinks || [],
+          affiliateLinksEnabled: ctx.tracker.affiliateLinksEnabled,
+          isPublished: ctx.tracker.isPublished,
+          series: seriesWithCards,
+        };
+      }
+    } catch (error) {
+      console.warn(`Postgres tracker query failed for ${slug}, checking fallback:`, error);
     }
   }
 

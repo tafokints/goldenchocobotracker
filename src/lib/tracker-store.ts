@@ -187,9 +187,13 @@ export async function readSeriesCardsFromPostgres(
 
 async function readDefaultTrackerCardsUncached(): Promise<ResolvedCard[]> {
   if (hasDatabaseEnv()) {
-    const ctx = await getTrackerContextBySlug(DEFAULT_TRACKER_SLUG);
-    if (ctx && ctx.seriesList.length > 0) {
-      return readSeriesCardsFromPostgres(ctx.seriesList[0]);
+    try {
+      const ctx = await getTrackerContextBySlug(DEFAULT_TRACKER_SLUG);
+      if (ctx && ctx.seriesList.length > 0) {
+        return readSeriesCardsFromPostgres(ctx.seriesList[0]);
+      }
+    } catch (error) {
+      console.warn('Postgres not ready yet, falling back to Upstash Redis:', error);
     }
   }
   return attachResolvedImages(await readRedisCardsDirect());
