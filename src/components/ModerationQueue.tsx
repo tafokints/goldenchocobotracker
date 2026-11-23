@@ -38,6 +38,23 @@ interface EnrichedSubmission {
   currentItem: CurrentItemSnapshot | null;
 }
 
+interface EditOverrideDraft {
+  foundBy: string;
+  dateFound: string;
+  sourceUrl: string;
+  marketplaceUrl: string;
+  marketplaceLabel: string;
+  price: string;
+  saleDate: string;
+  soldBy: string;
+  soldTo: string;
+  gradingService: string;
+  grade: string;
+  certNumber: string;
+  dateGraded: string;
+  notes: string;
+}
+
 const TYPE_BADGES: Record<SubmissionType, string> = {
   new_find: 'New Discovery',
   price_sale: 'Sale / Price',
@@ -46,6 +63,45 @@ const TYPE_BADGES: Record<SubmissionType, string> = {
   correction: 'Correction',
 };
 
+function createDraftFromSubmission(item: EnrichedSubmission): EditOverrideDraft {
+  const p = item.payloadJson;
+  return {
+    foundBy: p.foundBy || '',
+    dateFound: p.dateFound || '',
+    sourceUrl: p.sourceUrl || '',
+    marketplaceUrl: p.marketplaceUrl || '',
+    marketplaceLabel: p.marketplaceLabel || '',
+    price: p.price !== undefined ? String(p.price) : '',
+    saleDate: p.saleDate || '',
+    soldBy: p.soldBy || '',
+    soldTo: p.soldTo || '',
+    gradingService: p.gradingService || '',
+    grade: p.grade !== undefined ? String(p.grade) : '',
+    certNumber: p.certNumber || '',
+    dateGraded: p.dateGraded || '',
+    notes: p.notes || '',
+  };
+}
+
+function buildOverridesPayload(draft: EditOverrideDraft) {
+  return {
+    foundBy: draft.foundBy.trim() || undefined,
+    dateFound: draft.dateFound.trim() || undefined,
+    sourceUrl: draft.sourceUrl.trim() || undefined,
+    marketplaceUrl: draft.marketplaceUrl.trim() || undefined,
+    marketplaceLabel: draft.marketplaceLabel.trim() || undefined,
+    price: draft.price.trim() !== '' ? Number(draft.price) : undefined,
+    saleDate: draft.saleDate.trim() || undefined,
+    soldBy: draft.soldBy.trim() || undefined,
+    soldTo: draft.soldTo.trim() || undefined,
+    gradingService: draft.gradingService.trim() || undefined,
+    grade: draft.grade.trim() !== '' ? Number(draft.grade) : undefined,
+    certNumber: draft.certNumber.trim() || undefined,
+    dateGraded: draft.dateGraded.trim() || undefined,
+    notes: draft.notes.trim() || undefined,
+  };
+}
+
 export default function ModerationQueue() {
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
   const [items, setItems] = useState<EnrichedSubmission[]>([]);
@@ -53,6 +109,8 @@ export default function ModerationQueue() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [notesById, setNotesById] = useState<Record<string, string>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftsById, setDraftsById] = useState<Record<string, EditOverrideDraft>>({});
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const loadQueue = useCallback(async (statusFilter: string) => {
@@ -80,16 +138,41 @@ export default function ModerationQueue() {
     loadQueue(filter);
   }, [filter, loadQueue]);
 
+  const toggleEdit = (item: EnrichedSubmission) => {
+    if (editingId === item.id) {
+      setEditingId(null);
+      return;
+    }
+    setDraftsById((prev) => ({
+      ...prev,
+      [item.id]: prev[item.id] ?? createDraftFromSubmission(item),
+    }));
+    setEditingId(item.id);
+  };
+
+  const updateDraftField = (id: string, field: keyof EditOverrideDraft, value: string) => {
+    setDraftsById((prev) => {
+      const current = prev[id];
+      if (!current) return prev;
+      return {
+        ...prev,
+        [id]: { ...current, [field]: value },
+      };
+    });
+  };
+
   const handleDecision = async (id: string, decision: 'approve' | 'reject') => {
     setBusyId(id);
     setErrorMsg(null);
     try {
+      const draft = draftsById[id];
       const res = await fetch(`/api/admin/submissions/${id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           decision,
           reviewNote: notesById[id] || undefined,
+          overrides: decision === 'approve' && draft ? buildOverridesPayload(draft) : undefined,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -97,6 +180,7 @@ export default function ModerationQueue() {
         setErrorMsg(data.error || `Action failed (${res.status})`);
         return;
       }
+      if (editingId === id) setEditingId(null);
       await loadQueue(filter);
     } catch {
       setErrorMsg('Network error processing review action.');
@@ -165,6 +249,8 @@ export default function ModerationQueue() {
               .padStart(Math.max(2, item.seriesMax.toString().length), '0');
             const p = item.payloadJson;
             const cur = item.currentItem;
+            const isEditing = editingId === item.id;
+            const draft = draftsById[item.id];
 
             return (
               <article
@@ -187,17 +273,28 @@ export default function ModerationQueue() {
                       {item.submitterHandle ? ` by ${item.submitterHandle}` : ' (anonymous)'}
                     </p>
                   </div>
-                  <span
-                    className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
-                      item.status === 'pending'
-                        ? 'bg-yellow-800/60 text-yellow-200'
-                        : item.status === 'approved'
-                          ? 'bg-green-800/60 text-green-200'
-                          : 'bg-red-800/60 text-red-200'
-                    }`}
-                  >
-                    {item.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {item.status === 'pending' && (
+                      <button
+                        type="button"
+                        onClick={() => toggleEdit(item)}
+                        className="text-xs border border-chocobo-gold/70 text-chocobo-gold hover:bg-chocobo-gold/15 px-2.5 py-1 rounded font-semibold"
+                      >
+                        {isEditing ? 'Close Editor' : 'Edit Before Approving'}
+                      </button>
+                    )}
+                    <span
+                      className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
+                        item.status === 'pending'
+                          ? 'bg-yellow-800/60 text-yellow-200'
+                          : item.status === 'approved'
+                            ? 'bg-green-800/60 text-green-200'
+                            : 'bg-red-800/60 text-red-200'
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Side-by-side Diff */}
@@ -271,6 +368,103 @@ export default function ModerationQueue() {
                   </div>
                 </div>
 
+                {/* Inline Admin Override Editor */}
+                {isEditing && draft && item.status === 'pending' && (
+                  <div className="bg-black/40 border border-chocobo-gold/50 rounded p-4 space-y-3 text-xs">
+                    <p className="font-bold uppercase tracking-wider text-chocobo-gold">
+                      Edit Fields Before Approving (Overrides Submitted Values)
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Found By</span>
+                        <input
+                          type="text"
+                          value={draft.foundBy}
+                          onChange={(e) => updateDraftField(item.id, 'foundBy', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Date Found</span>
+                        <input
+                          type="date"
+                          value={draft.dateFound}
+                          onChange={(e) => updateDraftField(item.id, 'dateFound', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Pull Source URL</span>
+                        <input
+                          type="url"
+                          value={draft.sourceUrl}
+                          onChange={(e) => updateDraftField(item.id, 'sourceUrl', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Marketplace URL</span>
+                        <input
+                          type="url"
+                          value={draft.marketplaceUrl}
+                          onChange={(e) => updateDraftField(item.id, 'marketplaceUrl', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Sale Price ($)</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={draft.price}
+                          onChange={(e) => updateDraftField(item.id, 'price', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Sale Date</span>
+                        <input
+                          type="date"
+                          value={draft.saleDate}
+                          onChange={(e) => updateDraftField(item.id, 'saleDate', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Grading Service</span>
+                        <input
+                          type="text"
+                          value={draft.gradingService}
+                          onChange={(e) => updateDraftField(item.id, 'gradingService', e.target.value)}
+                          placeholder="PSA, BGS, CGC"
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Grade (0–10)</span>
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          max="10"
+                          value={draft.grade}
+                          onChange={(e) => updateDraftField(item.id, 'grade', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="block text-chocobo-light/80">Cert Number</span>
+                        <input
+                          type="text"
+                          value={draft.certNumber}
+                          onChange={(e) => updateDraftField(item.id, 'certNumber', e.target.value)}
+                          className="w-full bg-chocobo-light text-chocobo-dark rounded px-2.5 py-1.5"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
+
                 {/* Quarantined Photo Preview */}
                 {item.previewImageUrl && (
                   <div className="bg-black/30 border border-chocobo-gold/30 rounded p-4">
@@ -305,7 +499,11 @@ export default function ModerationQueue() {
                       onClick={() => handleDecision(item.id, 'approve')}
                       className="bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white font-bold py-2 px-4 rounded text-sm"
                     >
-                      {busyId === item.id ? 'Working...' : 'Approve & Publish'}
+                      {busyId === item.id
+                        ? 'Working...'
+                        : draft
+                          ? 'Save Edits & Approve'
+                          : 'Approve & Publish'}
                     </button>
                     <button
                       type="button"
