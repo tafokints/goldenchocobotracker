@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import StatsCharts from '@/components/StatsCharts';
-import { getResolvedCards } from '@/lib/redis-cards';
+import { getCards } from '@/lib/tracker-store';
 import { getSiteUrl } from '@/lib/site-config';
 import { computeCardStats } from '@/lib/stats';
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function StatsPage() {
-  const cards = await getResolvedCards();
+  const cards = await getCards();
   const stats = computeCardStats(cards);
 
   const firstMonth = stats.findsByMonth[0]?.month ?? '2025-06';

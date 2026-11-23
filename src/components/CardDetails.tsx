@@ -47,12 +47,20 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
             <h2 id="card-details-title" className="text-xl font-bold text-chocobo-gold">
               Golden Chocobo #{paddedId} Details
             </h2>
-            <Link
-              href={`/card/${paddedId}`}
-              className="text-xs text-chocobo-light/80 hover:text-chocobo-gold underline"
-            >
-              Open shareable card page &rarr;
-            </Link>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-0.5">
+              <Link
+                href={`/card/${paddedId}`}
+                className="text-xs text-chocobo-light/80 hover:text-chocobo-gold underline"
+              >
+                Open shareable card page &rarr;
+              </Link>
+              <Link
+                href={`/submit?card=${paddedId}`}
+                className="text-xs text-chocobo-gold hover:underline font-semibold"
+              >
+                Suggest Update
+              </Link>
+            </div>
           </div>
           <button
             type="button"

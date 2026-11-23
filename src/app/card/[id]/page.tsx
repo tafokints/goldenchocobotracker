@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import AffiliateLinks from '@/components/AffiliateLinks';
 import { resolveCardLinks } from '@/lib/affiliate';
-import { getResolvedCardById } from '@/lib/redis-cards';
+import { getCardById } from '@/lib/tracker-store';
 import { getSiteUrl } from '@/lib/site-config';
 import { TOTAL_CHOCOBO_CARDS } from '@/lib/validation';
 
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
     return { title: 'Card Not Found' };
   }
 
-  const card = await getResolvedCardById(parsed.id);
+  const card = await getCardById(parsed.id);
   if (!card) {
     return { title: `Golden Chocobo #${parsed.padded}/77` };
   }
@@ -81,7 +81,7 @@ export default async function CardPage({ params }: CardPageProps) {
     permanentRedirect(`/card/${parsed.padded}`);
   }
 
-  const card = await getResolvedCardById(parsed.id);
+  const card = await getCardById(parsed.id);
   if (!card) {
     notFound();
   }
@@ -186,6 +186,14 @@ export default async function CardPage({ params }: CardPageProps) {
                 <p className="text-sm text-chocobo-light/75 mt-1">
                   Magic: The Gathering &times; Final Fantasy — Serialized Traveling Chocobo
                 </p>
+                <div className="pt-3">
+                  <Link
+                    href={`/submit?card=${parsed.padded}`}
+                    className="inline-block border border-chocobo-gold/80 hover:bg-chocobo-gold hover:text-chocobo-dark text-chocobo-gold text-xs font-bold py-1.5 px-3 rounded transition-colors"
+                  >
+                    Suggest Update for #{parsed.padded} &rarr;
+                  </Link>
+                </div>
               </div>
 
               <section aria-label="Discovery details" className="bg-chocobo-light/10 p-4 rounded space-y-2">

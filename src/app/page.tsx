@@ -2,13 +2,13 @@ import Link from 'next/link';
 import AffiliateLinks from '@/components/AffiliateLinks';
 import ProgressBar from '@/components/ProgressBar';
 import TrackerGrid from '@/components/TrackerGrid';
-import { getResolvedCards } from '@/lib/redis-cards';
+import { getCards } from '@/lib/tracker-store';
 import { getSiteUrl } from '@/lib/site-config';
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const cards = await getResolvedCards();
+  const cards = await getCards();
 
   const foundCards = cards.filter((card) => card.found);
   const foundCount = foundCards.length;
@@ -46,6 +46,12 @@ export default async function HomePage() {
             Golden Chocobo Tracker
           </h1>
           <nav className="flex items-center space-x-5" aria-label="Main navigation">
+            <Link
+              href="/hub"
+              className="text-chocobo-light/85 hover:text-chocobo-gold transition-colors font-semibold"
+            >
+              All Trackers
+            </Link>
             <Link
               href="/stats"
               className="text-chocobo-gold hover:text-yellow-400 transition-colors font-semibold"

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/auth';
-import { readCardsDirect, writeCards } from '@/lib/redis-cards';
+import { applyCardPatch } from '@/lib/tracker-store';
 import { updateGradingSchema } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
@@ -23,21 +23,17 @@ export async function POST(request: NextRequest) {
     }
 
     const { cardId, grading } = parsed.data;
-    const cards = await readCardsDirect();
-    const cardIndex = cards.findIndex((card) => card.id === cardId);
+    const updatedCard = await applyCardPatch(
+      cardId,
+      { grading },
+      {
+        id: adminCheck.session.user.githubId || adminCheck.session.user.githubLogin || 'admin',
+        login: adminCheck.session.user.githubLogin,
+      },
+      { action: 'admin.update_grading' }
+    );
 
-    if (cardIndex === -1) {
-      return NextResponse.json({ error: 'Card not found' }, { status: 404 });
-    }
-
-    cards[cardIndex] = {
-      ...cards[cardIndex],
-      grading,
-    };
-
-    await writeCards(cards);
-
-    return NextResponse.json({ success: true, card: cards[cardIndex] });
+    return NextResponse.json({ success: true, card: updatedCard });
   } catch (error) {
     console.error('Error updating grading:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { attachResolvedImages } from '@/lib/card-images';
-import { getResolvedCards, readCardsDirect } from '@/lib/redis-cards';
+import { getCards, getCardsFresh } from '@/lib/tracker-store';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,14 +9,14 @@ export async function GET(request: NextRequest) {
     if (wantsFresh) {
       const session = await auth();
       if (session?.user?.isAdmin) {
-        const freshCards = attachResolvedImages(await readCardsDirect());
+        const freshCards = await getCardsFresh();
         return NextResponse.json(freshCards, {
           headers: { 'Cache-Control': 'private, no-store' },
         });
       }
     }
 
-    const cards = await getResolvedCards();
+    const cards = await getCards();
     return NextResponse.json(cards, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',

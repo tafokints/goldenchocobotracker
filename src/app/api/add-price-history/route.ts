@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/auth';
-import { readCardsDirect, writeCards } from '@/lib/redis-cards';
-import type { PriceHistoryEntry } from '@/lib/types';
+import { applyCardPatch } from '@/lib/tracker-store';
 import { addPriceHistorySchema } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
@@ -24,28 +23,17 @@ export async function POST(request: NextRequest) {
     }
 
     const { cardId, entry } = parsed.data;
-    const cards = await readCardsDirect();
-    const cardIndex = cards.findIndex((card) => card.id === cardId);
-
-    if (cardIndex === -1) {
-      return NextResponse.json({ error: 'Card not found' }, { status: 404 });
-    }
-
-    const updatedHistory: PriceHistoryEntry[] = [...(cards[cardIndex].priceHistory || []), entry].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    const updatedCard = await applyCardPatch(
+      cardId,
+      { addPriceHistoryEntry: entry },
+      {
+        id: adminCheck.session.user.githubId || adminCheck.session.user.githubLogin || 'admin',
+        login: adminCheck.session.user.githubLogin,
+      },
+      { action: 'admin.add_price_history' }
     );
 
-    const latestEntry = updatedHistory[0];
-    cards[cardIndex] = {
-      ...cards[cardIndex],
-      priceHistory: updatedHistory,
-      price: latestEntry ? latestEntry.price : cards[cardIndex].price,
-      priceDate: latestEntry ? latestEntry.date : cards[cardIndex].priceDate,
-    };
-
-    await writeCards(cards);
-
-    return NextResponse.json({ success: true, card: cards[cardIndex] });
+    return NextResponse.json({ success: true, card: updatedCard });
   } catch (error) {
     console.error('Error adding price history:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

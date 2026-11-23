@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/auth';
-import { readCardsDirect, writeCards } from '@/lib/redis-cards';
+import { applyCardPatch } from '@/lib/tracker-store';
 import { updateImageSchema } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
@@ -23,21 +23,21 @@ export async function POST(request: Request) {
     }
 
     const { cardId, imageUrl } = parsed.data;
-    const cards = await readCardsDirect();
-    const cardIndex = cards.findIndex((c) => c.id === cardId);
+    const updatedCard = await applyCardPatch(
+      cardId,
+      { imageUrl },
+      {
+        id: adminCheck.session.user.githubId || adminCheck.session.user.githubLogin || 'admin',
+        login: adminCheck.session.user.githubLogin,
+      },
+      { action: 'admin.update_image' }
+    );
 
-    if (cardIndex === -1) {
-      return NextResponse.json({ error: 'Card not found' }, { status: 404 });
-    }
-
-    cards[cardIndex] = {
-      ...cards[cardIndex],
-      image: imageUrl,
-    };
-
-    await writeCards(cards);
-
-    return NextResponse.json({ success: true, message: 'Image updated successfully', card: cards[cardIndex] });
+    return NextResponse.json({
+      success: true,
+      message: 'Image updated successfully',
+      card: updatedCard,
+    });
   } catch (error) {
     console.error('Error updating image:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
