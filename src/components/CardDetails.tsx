@@ -1,27 +1,64 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChocoboCard } from '../lib/types';
+import React, { useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { resolveCardLinks } from '@/lib/affiliate';
+import type { ResolvedCard } from '@/lib/types';
 
 interface CardDetailsProps {
-  card: ChocoboCard;
+  card: ResolvedCard;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
+  const paddedId = card.id.toString().padStart(2, '0');
+  const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } = resolveCardLinks(card);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true">
-      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-[min(90vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/20">
-        <div className="flex justify-between items-center pb-4">
-          <h2 className="text-xl font-bold text-chocobo-gold">
-            Golden Chocobo #{card.id.toString().padStart(2, '0')} Details
-          </h2>
+    <div
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="card-details-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="bg-chocobo-dark border border-chocobo-gold rounded-lg p-6 w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto divide-y divide-chocobo-gold/20">
+        <div className="flex justify-between items-center pb-4 gap-4">
+          <div>
+            <h2 id="card-details-title" className="text-xl font-bold text-chocobo-gold">
+              Golden Chocobo #{paddedId} Details
+            </h2>
+            <Link
+              href={`/card/${paddedId}`}
+              className="text-xs text-chocobo-light/80 hover:text-chocobo-gold underline"
+            >
+              Open shareable card page &rarr;
+            </Link>
+          </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-chocobo-gold hover:text-yellow-400 rounded px-2 py-1"
+            aria-label="Close card details"
+            className="text-chocobo-gold hover:text-yellow-400 rounded px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"
           >
             ✕
           </button>
@@ -31,23 +68,46 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
           {/* Basic Info */}
           <div>
             <h3 className="text-lg font-bold text-chocobo-gold mb-2">Basic Information</h3>
-            <div className="bg-chocobo-light bg-opacity-20 p-4 rounded">
+            <div className="bg-chocobo-light/10 p-4 rounded space-y-1.5">
               <p className="text-chocobo-light">
-                <span className="font-bold">Status:</span> {card.found ? "Found" : "Not Found"}
+                <span className="font-bold">Status:</span> {card.found ? 'Found' : 'Not Found'}
               </p>
               {card.found && (
                 <>
-                  <p className="text-chocobo-light">
-                    <span className="font-bold">Found by:</span> {card.foundBy}
-                  </p>
-                  <p className="text-chocobo-light">
-                    <span className="font-bold">Date found:</span> {card.dateFound}
-                  </p>
-                  {card.link && (
+                  {card.foundBy && (
                     <p className="text-chocobo-light">
-                      <span className="font-bold">Source:</span> 
-                      <a href={card.link} target="_blank" rel="noopener noreferrer" className="text-chocobo-gold hover:underline ml-1">
-                        {card.link.toLowerCase().includes('ebay') ? 'eBay' : 'View Source'}
+                      <span className="font-bold">Found by:</span> {card.foundBy}
+                    </p>
+                  )}
+                  {card.dateFound && (
+                    <p className="text-chocobo-light">
+                      <span className="font-bold">Date found:</span> {card.dateFound}
+                    </p>
+                  )}
+                  {pullSourceUrl && (
+                    <p className="text-chocobo-light">
+                      <span className="font-bold">Pull Source:</span>{' '}
+                      <a
+                        href={pullSourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-chocobo-gold hover:underline"
+                      >
+                        View Discovery Post
+                      </a>
+                    </p>
+                  )}
+                  {marketplaceUrl && (
+                    <p className="text-chocobo-light">
+                      <span className="font-bold">Marketplace:</span>{' '}
+                      <a
+                        href={marketplaceUrl}
+                        target="_blank"
+                        rel={isMarketplaceAffiliate ? 'sponsored noopener noreferrer' : 'noopener noreferrer'}
+                        className="text-chocobo-gold hover:underline"
+                      >
+                        View on {marketplaceLabel}
+                        {isMarketplaceAffiliate ? ' (Paid Link)' : ''}
                       </a>
                     </p>
                   )}
@@ -57,15 +117,15 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
           </div>
 
           {/* Current Price */}
-          {card.price && (
+          {typeof card.price === 'number' && (
             <div>
-              <h3 className="text-lg font-bold text-chocobo-gold mb-2">Current Price</h3>
-              <div className="bg-chocobo-light bg-opacity-20 p-4 rounded">
-                <p className="text-green-400 text-xl font-bold">
+              <h3 className="text-lg font-bold text-chocobo-gold mb-2">Recent Reported Sale</h3>
+              <div className="bg-chocobo-light/10 p-4 rounded">
+                <p className="text-green-400 text-xl font-bold tabular-nums">
                   ${card.price.toLocaleString()}
                 </p>
                 {card.priceDate && (
-                  <p className="text-chocobo-light text-sm">Last updated: {card.priceDate}</p>
+                  <p className="text-chocobo-light/80 text-sm">Last updated: {card.priceDate}</p>
                 )}
               </div>
             </div>
@@ -75,12 +135,15 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
           {card.grading && (
             <div>
               <h3 className="text-lg font-bold text-chocobo-gold mb-2">Grading Information</h3>
-              <div className="bg-chocobo-light bg-opacity-20 p-4 rounded">
+              <div className="bg-chocobo-light/10 p-4 rounded">
                 <p className="text-blue-400 text-lg font-bold">
                   {card.grading.service} {card.grading.grade}
                 </p>
+                {card.grading.certNumber && (
+                  <p className="text-chocobo-light text-sm">Cert #: {card.grading.certNumber}</p>
+                )}
                 {card.grading.dateGraded && (
-                  <p className="text-chocobo-light text-sm">Graded on: {card.grading.dateGraded}</p>
+                  <p className="text-chocobo-light/80 text-sm">Graded on: {card.grading.dateGraded}</p>
                 )}
               </div>
             </div>
@@ -90,18 +153,21 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
           {card.priceHistory && card.priceHistory.length > 0 && (
             <div>
               <h3 className="text-lg font-bold text-chocobo-gold mb-2">Price History</h3>
-              <div className="bg-chocobo-light bg-opacity-20 p-4 rounded max-h-60 overflow-y-auto">
+              <div className="bg-chocobo-light/10 p-4 rounded max-h-60 overflow-y-auto">
                 <div className="space-y-2">
                   {card.priceHistory.map((entry, index) => (
-                    <div key={index} className="border-b border-chocobo-gold border-opacity-30 pb-2 last:border-b-0">
-                      <div className="flex justify-between items-start">
+                    <div
+                      key={`${entry.date}-${entry.price}-${index}`}
+                      className="border-b border-chocobo-gold/30 pb-2 last:border-b-0"
+                    >
+                      <div className="flex justify-between items-start gap-2">
                         <div>
-                          <p className="text-green-400 font-bold">
+                          <p className="text-green-400 font-bold tabular-nums">
                             ${entry.price.toLocaleString()}
                           </p>
-                          <p className="text-chocobo-light text-sm">{entry.date}</p>
+                          <p className="text-chocobo-light/80 text-sm">{entry.date}</p>
                         </div>
-                        <div className="text-right text-xs text-chocobo-light">
+                        <div className="text-right text-xs text-chocobo-light/80">
                           {entry.soldBy && <p>From: {entry.soldBy}</p>}
                           {entry.soldTo && <p>To: {entry.soldTo}</p>}
                         </div>
@@ -114,14 +180,16 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
           )}
 
           {/* Image */}
-          {card.image && (
+          {card.resolvedImage && (
             <div>
-              <h3 className="text-lg font-bold text-chocobo-gold mb-2">Card Image</h3>
-              <div className="bg-chocobo-light bg-opacity-20 p-4 rounded">
-                <img
-                  src={card.image}
-                  alt={`Golden Chocobo Card #${card.id.toString().padStart(2, '0')}`}
-                  className="w-full max-w-md mx-auto rounded"
+              <h3 className="text-lg font-bold text-chocobo-gold mb-2">Card Photo</h3>
+              <div className="relative aspect-[3/4] max-w-sm mx-auto bg-black/30 rounded overflow-hidden">
+                <Image
+                  src={card.resolvedImage}
+                  alt={`Golden Chocobo Card #${paddedId}`}
+                  fill
+                  sizes="(max-width: 640px) 90vw, 384px"
+                  className="object-contain"
                 />
               </div>
             </div>
@@ -130,4 +198,4 @@ export default function CardDetails({ card, isOpen, onClose }: CardDetailsProps)
       </div>
     </div>
   );
-} 
+}

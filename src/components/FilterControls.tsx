@@ -25,7 +25,8 @@ export default function FilterControls({
       <div className="relative col-span-1 md:col-span-1">
         <input
           type="text"
-          placeholder="Search by card #"
+          placeholder="Search by card # or finder"
+          aria-label="Search by card number or finder"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full h-10 bg-chocobo-light border border-chocobo-gold text-chocobo-dark rounded-lg py-2 pl-10 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chocobo-gold"

@@ -1,22 +1,33 @@
 import { NextResponse } from 'next/server';
-import { Redis } from '@upstash/redis';
-import { ChocoboCard } from '@/lib/types';
+import { requireAdmin } from '@/auth';
+import { readCardsDirect, writeCards } from '@/lib/redis-cards';
+import { updateImageSchema } from '@/lib/validation';
 
-const redis = Redis.fromEnv();
-
-// Force dynamic rendering to prevent caching issues
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 export async function POST(request: Request) {
-  try {
-    const { cardId, imageUrl } = await request.json();
-    const cards: ChocoboCard[] = (await redis.get('chocobo_cards')) || [];
+  const adminCheck = await requireAdmin();
+  if (!adminCheck.ok) {
+    return adminCheck.response;
+  }
 
-    const cardIndex = cards.findIndex(c => c.id === parseInt(cardId));
+  try {
+    const body = await request.json();
+    const parsed = updateImageSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { cardId, imageUrl } = parsed.data;
+    const cards = await readCardsDirect();
+    const cardIndex = cards.findIndex((c) => c.id === cardId);
 
     if (cardIndex === -1) {
-      return NextResponse.json({ message: 'Card not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Card not found' }, { status: 404 });
     }
 
     cards[cardIndex] = {
@@ -24,11 +35,11 @@ export async function POST(request: Request) {
       image: imageUrl,
     };
 
-    await redis.set('chocobo_cards', cards);
+    await writeCards(cards);
 
-    return NextResponse.json({ message: 'Image updated successfully' }, { status: 200 });
+    return NextResponse.json({ success: true, message: 'Image updated successfully', card: cards[cardIndex] });
   } catch (error) {
     console.error('Error updating image:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-} 
+}

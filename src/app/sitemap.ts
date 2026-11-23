@@ -1,26 +1,34 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/lib/site-config';
+import { TOTAL_CHOCOBO_CARDS } from '@/lib/validation';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://goldenchocobotracker.com'
-  
+  const baseUrl = getSiteUrl();
+  const lastModified = new Date();
+
+  const cardPages: MetadataRoute.Sitemap = Array.from({ length: TOTAL_CHOCOBO_CARDS }, (_, i) => {
+    const padded = (i + 1).toString().padStart(2, '0');
+    return {
+      url: `${baseUrl}/card/${padded}`,
+      lastModified,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    };
+  });
+
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified,
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/stats`,
-      lastModified: new Date(),
+      lastModified,
       changeFrequency: 'daily',
-      priority: 0.8,
+      priority: 0.85,
     },
-    {
-      url: `${baseUrl}/submit`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-  ]
-} 
+    ...cardPages,
+  ];
+}
