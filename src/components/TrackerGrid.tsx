@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
 import { formatCompactUsd } from '@/lib/format';
@@ -13,6 +12,7 @@ import {
   isIconicNumber,
 } from '@/lib/iconic-numbers';
 import type { ResolvedCard } from '@/lib/types';
+import CardPhoto from './CardPhoto';
 import CompactMatrixView from './CompactMatrixView';
 import FilterControls from './FilterControls';
 
@@ -328,8 +328,14 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto sm:ml-auto">
-            <span className="text-xs text-chocobo-muted tabular-nums">
+            <span
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className="text-xs text-chocobo-muted tabular-nums"
+            >
               {filteredAndSortedCards.length} of {initialCards.length}
+              <span className="sr-only"> cards shown</span>
             </span>
             <div
               className="inline-flex rounded-md border border-chocobo-gold/35 overflow-hidden text-xs font-medium bg-chocobo-recessed"
@@ -414,15 +420,14 @@ export default function TrackerGrid({ initialCards }: TrackerGridProps) {
                       }}
                       aria-label={`View larger image of Golden Chocobo Card #${paddedId}`}
                     >
-                      <Image
+                      <CardPhoto
                         src={card.resolvedImage}
                         alt={`Golden Chocobo Card #${paddedId} - ${card.name}`}
-                        fill
                         quality={75}
                         priority={imgRank < 2}
                         loading={imgRank < 4 ? 'eager' : 'lazy'}
                         sizes="(max-width: 640px) 46vw, (max-width: 768px) 44vw, (max-width: 1024px) 28vw, 220px"
-                        className="object-contain"
+                        fallbackSerial={paddedId}
                       />
                     </button>
                   ) : (

@@ -225,6 +225,28 @@ export default function StatsCharts({
     [effectiveScale, positivePriceHistory]
   );
 
+  const discoverySummary = useMemo(() => {
+    if (findsByMonth.length === 0) return 'No pull discoveries recorded yet.';
+    const latest = findsByMonth[findsByMonth.length - 1];
+    return `Cumulative discovery chart across ${findsByMonth.length} months reaching ${latest.cumulative} total pulls as of ${latest.month}.`;
+  }, [findsByMonth]);
+
+  const priceTrendSummary = useMemo(() => {
+    if (trendData.length === 0) return 'No reported sales recorded yet.';
+    const prices = trendData.map((d) => d.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    return `Reported sale price trend (${effectiveScale} scale) across ${trendData.length} sales ranging from ${formatCompactUsd(min)} to ${formatCompactUsd(max)}.`;
+  }, [trendData, effectiveScale]);
+
+  const gradeSummary = useMemo(() => {
+    if (gradingStats.totalGraded === 0) return 'No graded cards recorded yet.';
+    const breakdown = gradingStats.gradeDistribution
+      .map((g) => `Grade ${g.grade}: ${g.count}`)
+      .join(', ');
+    return `Grade distribution across ${gradingStats.totalGraded} slabs: ${breakdown}.`;
+  }, [gradingStats]);
+
   return (
     <div className="space-y-5 sm:space-y-6">
       {/* Cumulative Discovery Curve + Monthly Pulls */}
@@ -238,7 +260,8 @@ export default function StatsCharts({
               Bars = monthly finds &middot; Line = cumulative total found
             </span>
           </div>
-          <ResponsiveContainer width="100%" height={280}>
+          <div role="img" aria-label={discoverySummary}>
+            <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={findsByMonth} margin={{ top: 6, right: 4, left: -12, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
               <XAxis dataKey="month" stroke={AXIS_STROKE} tick={AXIS_TICK} />
@@ -278,7 +301,8 @@ export default function StatsCharts({
                 strokeWidth={2.25}
               />
             </ComposedChart>
-          </ResponsiveContainer>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
 
@@ -287,18 +311,25 @@ export default function StatsCharts({
         <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
           Sale Price Distribution
         </h2>
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={priceRanges} margin={{ top: 6, right: 8, left: -14, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
-            <XAxis dataKey="range" stroke={AXIS_STROKE} tick={AXIS_TICK} interval="preserveStartEnd" />
-            <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} width={38} />
-            <Tooltip
-              cursor={{ fill: 'rgba(214, 167, 61, 0.08)' }}
-              content={(props) => <LedgerTooltip {...props} />}
-            />
-            <Bar dataKey="count" name="Cards" fill="#D6A73D" radius={[3, 3, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div
+          role="img"
+          aria-label={`Sale price distribution buckets: ${priceRanges
+            .map((r) => `${r.range}: ${r.count}`)
+            .join(', ')}.`}
+        >
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={priceRanges} margin={{ top: 6, right: 8, left: -14, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+              <XAxis dataKey="range" stroke={AXIS_STROKE} tick={AXIS_TICK} interval="preserveStartEnd" />
+              <YAxis allowDecimals={false} stroke={AXIS_STROKE} tick={AXIS_TICK} width={38} />
+              <Tooltip
+                cursor={{ fill: 'rgba(214, 167, 61, 0.08)' }}
+                content={(props) => <LedgerTooltip {...props} />}
+              />
+              <Bar dataKey="count" name="Cards" fill="#D6A73D" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Reported Sale Price History */}
@@ -348,42 +379,44 @@ export default function StatsCharts({
               </div>
             )}
           </div>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart
-              key={effectiveScale}
-              data={trendData}
-              margin={{ top: 8, right: 18, left: 0, bottom: 4 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
-              <XAxis dataKey="date" stroke={AXIS_STROKE} tick={AXIS_TICK} minTickGap={24} />
-              <YAxis
-                stroke={AXIS_STROKE}
-                tick={AXIS_TICK}
-                scale={effectiveScale === 'log' ? 'log' : 'auto'}
-                domain={
-                  effectiveScale === 'log' && logScaleConfig
-                    ? [logScaleConfig.domainMin, logScaleConfig.domainMax]
-                    : [0, 'auto']
-                }
-                ticks={effectiveScale === 'log' && logScaleConfig ? logScaleConfig.ticks : undefined}
-                tickFormatter={(value: number) => formatCompactUsd(value)}
-                width={52}
-              />
-              <Tooltip
-                cursor={{ stroke: 'rgba(214, 167, 61, 0.45)', strokeDasharray: '3 3' }}
-                content={(props) => <PriceTrendTooltip {...props} />}
-              />
-              <Line
-                type="monotone"
-                dataKey="price"
-                name="Reported Sale"
-                stroke="#4ADE80"
-                strokeWidth={2}
-                dot={{ fill: '#D6A73D', stroke: '#1B1612', strokeWidth: 1.5, r: 4 }}
-                activeDot={{ fill: '#E8C468', stroke: '#1B1612', strokeWidth: 2, r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div role="img" aria-label={priceTrendSummary}>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart
+                key={effectiveScale}
+                data={trendData}
+                margin={{ top: 8, right: 18, left: 0, bottom: 4 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} />
+                <XAxis dataKey="date" stroke={AXIS_STROKE} tick={AXIS_TICK} minTickGap={24} />
+                <YAxis
+                  stroke={AXIS_STROKE}
+                  tick={AXIS_TICK}
+                  scale={effectiveScale === 'log' ? 'log' : 'auto'}
+                  domain={
+                    effectiveScale === 'log' && logScaleConfig
+                      ? [logScaleConfig.domainMin, logScaleConfig.domainMax]
+                      : [0, 'auto']
+                  }
+                  ticks={effectiveScale === 'log' && logScaleConfig ? logScaleConfig.ticks : undefined}
+                  tickFormatter={(value: number) => formatCompactUsd(value)}
+                  width={52}
+                />
+                <Tooltip
+                  cursor={{ stroke: 'rgba(214, 167, 61, 0.45)', strokeDasharray: '3 3' }}
+                  content={(props) => <PriceTrendTooltip {...props} />}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  name="Reported Sale"
+                  stroke="#4ADE80"
+                  strokeWidth={2}
+                  dot={{ fill: '#D6A73D', stroke: '#1B1612', strokeWidth: 1.5, r: 4 }}
+                  activeDot={{ fill: '#E8C468', stroke: '#1B1612', strokeWidth: 2, r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
 
@@ -394,32 +427,34 @@ export default function StatsCharts({
             <h2 className="font-display text-base sm:text-xl font-bold text-chocobo-gold mb-3 sm:mb-4">
               Grade Distribution
             </h2>
-            <ResponsiveContainer width="100%" height={210}>
-              <PieChart>
-                <Pie
-                  data={gradingStats.gradeDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={44}
-                  outerRadius={80}
-                  paddingAngle={2}
-                  stroke="#1B1612"
-                  strokeWidth={2}
-                  fill="#D6A73D"
-                  dataKey="count"
-                  nameKey="grade"
-                >
-                  {gradingStats.gradeDistribution.map((entry, index) => (
-                    <Cell key={entry.grade} fill={GRADE_COLORS[index % GRADE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  content={(props) => (
-                    <GradePieTooltip {...props} totalGraded={gradingStats.totalGraded} />
-                  )}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <div role="img" aria-label={gradeSummary}>
+              <ResponsiveContainer width="100%" height={210}>
+                <PieChart>
+                  <Pie
+                    data={gradingStats.gradeDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={44}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    stroke="#1B1612"
+                    strokeWidth={2}
+                    fill="#D6A73D"
+                    dataKey="count"
+                    nameKey="grade"
+                  >
+                    {gradingStats.gradeDistribution.map((entry, index) => (
+                      <Cell key={entry.grade} fill={GRADE_COLORS[index % GRADE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={(props) => (
+                      <GradePieTooltip {...props} totalGraded={gradingStats.totalGraded} />
+                    )}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
             {/* Zero-clipping color-swatched ledger legend */}
             <div className="mt-3 pt-3 border-t border-chocobo-gold/15 grid grid-cols-2 gap-2 text-xs">
               {gradingStats.gradeDistribution.map((entry, index) => {

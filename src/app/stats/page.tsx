@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import AffiliateLinks from '@/components/AffiliateLinks';
-import StatsCharts from '@/components/StatsCharts';
+import LazyStatsCharts from '@/components/LazyStatsCharts';
 import { formatCompactUsd } from '@/lib/format';
 import { getSiteUrl } from '@/lib/site-config';
 import { computeCardStats } from '@/lib/stats';
@@ -575,7 +575,7 @@ export default async function StatsPage() {
             </section>
 
             {/* Charts */}
-            <StatsCharts
+            <LazyStatsCharts
               priceRanges={stats.priceRanges}
               findsByMonth={stats.findsByMonth}
               priceHistory={stats.priceHistory}

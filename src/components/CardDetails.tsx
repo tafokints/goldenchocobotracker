@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
 import { formatGradingDisplay } from '@/lib/grading';
 import { getGradingCertUrl } from '@/lib/grading-certs';
 import { getIconicLabel } from '@/lib/iconic-numbers';
 import { PULL_CHANNEL_LABELS, type ResolvedCard } from '@/lib/types';
+import { useDialogAccessibility } from '@/lib/useDialogAccessibility';
+import CardPhoto from './CardPhoto';
 import CopyLinkButton from './CopyLinkButton';
 
 interface CardDetailsProps {
@@ -27,16 +28,19 @@ export default function CardDetails({
   onNext,
   positionLabel,
 }: CardDetailsProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  useDialogAccessibility({
+    isOpen,
+    containerRef: dialogRef,
+    onClose,
+    lockBodyScroll: true,
+  });
 
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-        return;
-      }
-
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
       if (
@@ -59,7 +63,7 @@ export default function CardDetails({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, onPrev, onNext]);
+  }, [isOpen, onPrev, onNext]);
 
   useEffect(() => {
     if (isOpen && modalRef.current) {
@@ -78,7 +82,7 @@ export default function CardDetails({
 
   return (
     <div
-      className="fixed inset-0 bg-black/75 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
+      className="fixed inset-0 bg-black/75 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 animate-fade-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="card-details-title"
@@ -88,7 +92,11 @@ export default function CardDetails({
         }
       }}
     >
-      <div className="bg-chocobo-surface border-t sm:border border-chocobo-gold/55 rounded-t-2xl sm:rounded-lg w-full sm:w-[min(92vw,42rem)] max-h-[92dvh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        className="bg-chocobo-surface border-t sm:border border-chocobo-gold/55 rounded-t-2xl sm:rounded-lg w-full sm:w-[min(92vw,42rem)] max-h-[92dvh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-sheet-up focus:outline-none"
+      >
         {/* Sticky Sheet / Modal Header */}
         <div className="shrink-0 bg-chocobo-surface border-b border-chocobo-gold/15 px-4 pt-3 pb-3 sm:px-6 sm:pt-5 sm:pb-4 space-y-2.5 sm:space-y-3">
           {showStepper && (
@@ -124,7 +132,7 @@ export default function CardDetails({
               </div>
 
               <div className="flex items-center gap-2.5">
-                <span className="hidden sm:inline text-[11px] text-chocobo-muted/70 select-none">
+                <span className="hidden sm:inline text-[11px] text-chocobo-muted select-none">
                   &larr; &rarr; step &middot; Esc close
                 </span>
                 <button
@@ -199,18 +207,17 @@ export default function CardDetails({
         {/* Scrollable Sheet Body */}
         <div
           ref={modalRef}
-          className="flex-1 overflow-y-auto px-4 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-5 space-y-4 sm:space-y-5"
+          className="flex-1 overflow-y-auto overscroll-contain px-4 pt-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-5 space-y-4 sm:space-y-5"
         >
           {/* Card Photo — Shown Upfront So Mobile Users See the Card Immediately */}
           {card.resolvedImage && (
             <div className="relative aspect-[3/4] max-w-[210px] sm:max-w-[260px] mx-auto bg-black/35 border border-chocobo-gold/25 rounded-md overflow-hidden">
-              <Image
+              <CardPhoto
                 src={card.resolvedImage}
                 alt={`Golden Chocobo Card #${paddedId}`}
-                fill
                 quality={80}
                 sizes="(max-width: 640px) 210px, 260px"
-                className="object-contain"
+                fallbackSerial={paddedId}
               />
             </div>
           )}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import StatsCharts from '@/components/StatsCharts';
+import LazyStatsCharts from '@/components/LazyStatsCharts';
 import { formatCompactUsd } from '@/lib/format';
 import { getHydratedTracker } from '@/lib/multi-tracker';
 import { computeCardStats } from '@/lib/stats';
@@ -158,7 +158,7 @@ export default async function DynamicTrackerStatsPage({ params }: TrackerStatsPa
       )}
 
       {stats.foundCount > 0 ? (
-        <StatsCharts
+        <LazyStatsCharts
           priceRanges={stats.priceRanges}
           findsByMonth={stats.findsByMonth}
           priceHistory={stats.priceHistory}

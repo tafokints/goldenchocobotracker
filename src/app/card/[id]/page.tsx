@@ -15,6 +15,7 @@ import { PULL_CHANNEL_LABELS } from '@/lib/types';
 import { TOTAL_CHOCOBO_CARDS } from '@/lib/validation';
 
 export const revalidate = 300;
+export const dynamicParams = false;
 
 interface CardPageProps {
   params: Promise<{ id: string }>;

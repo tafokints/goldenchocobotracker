@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Cinzel, Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import React from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -9,17 +9,20 @@ import SiteFooter from '../components/SiteFooter';
 import SiteHeader from '../components/SiteHeader';
 import { getSiteUrl } from '@/lib/site-config';
 
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  weight: ['600', '700'],
+const cinzel = localFont({
+  src: '../../node_modules/@fontsource-variable/cinzel/files/cinzel-latin-wght-normal.woff2',
+  weight: '400 900',
   display: 'swap',
   variable: '--font-display',
+  fallback: ['Georgia', 'serif'],
 });
 
-const inter = Inter({
-  subsets: ['latin'],
+const inter = localFont({
+  src: '../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2',
+  weight: '100 900',
   display: 'swap',
   variable: '--font-sans',
+  fallback: ['system-ui', '-apple-system', 'sans-serif'],
 });
 
 const siteUrl = getSiteUrl();
@@ -129,9 +132,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${cinzel.variable}`}>
       <body className="font-sans bg-chocobo-dark text-chocobo-light min-h-screen flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-md focus:bg-chocobo-gold focus:text-chocobo-dark focus:font-semibold focus:text-sm focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
         <AffiliateDisclosure />
         <SiteHeader />
-        <div className="flex-1 flex flex-col">{children}</div>
+        <div id="main-content" tabIndex={-1} className="flex-1 flex flex-col focus:outline-none">
+          {children}
+        </div>
         <SiteFooter />
         <SpeedInsights />
         <Analytics />

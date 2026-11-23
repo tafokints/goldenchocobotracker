@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
 import { formatCompactUsd } from '@/lib/format';
 import type { SeriesWithCards } from '@/lib/multi-tracker';
 import type { ResolvedCard } from '@/lib/types';
+import CardPhoto from './CardPhoto';
 import FilterControls from './FilterControls';
 
 const CardLightbox = dynamic(() => import('./CardLightbox'), { ssr: false });
@@ -224,9 +224,15 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
             ))}
           </div>
 
-          <span className="text-xs text-chocobo-muted tabular-nums ml-auto">
+          <span
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="text-xs text-chocobo-muted tabular-nums ml-auto"
+          >
             {filteredAndSortedCards.length.toLocaleString()} of{' '}
             {activeSeries.cards.length.toLocaleString()}
+            <span className="sr-only"> cards shown</span>
           </span>
         </div>
       </div>
@@ -299,15 +305,14 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                       }}
                       aria-label={`View larger image of ${activeSeries.name} #${paddedId}`}
                     >
-                      <Image
+                      <CardPhoto
                         src={card.resolvedImage}
                         alt={`${activeSeries.name} #${paddedId}`}
-                        fill
                         quality={75}
                         priority={imgRank < 2}
                         loading={imgRank < 4 ? 'eager' : 'lazy'}
                         sizes="(max-width: 640px) 46vw, (max-width: 768px) 44vw, (max-width: 1024px) 28vw, 220px"
-                        className="object-contain"
+                        fallbackSerial={paddedId}
                       />
                     </button>
                   ) : (

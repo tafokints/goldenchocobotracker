@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useDialogAccessibility } from '@/lib/useDialogAccessibility';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Tracker' },
@@ -14,23 +15,25 @@ const NAV_ITEMS = [
 export default function SiteHeader() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+
+  const closeMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+  }, []);
 
   // Close mobile menu on navigation
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  // Close mobile menu on Escape
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mobileMenuOpen]);
+  useDialogAccessibility({
+    isOpen: mobileMenuOpen,
+    containerRef: drawerRef,
+    onClose: closeMenu,
+    lockBodyScroll: true,
+    restoreFocusRef: toggleBtnRef,
+  });
 
   const isNavItemActive = (href: string) =>
     href === '/'
@@ -38,7 +41,7 @@ export default function SiteHeader() {
       : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="w-full border-b border-chocobo-gold/20 bg-chocobo-dark/95">
+    <header className="relative z-40 w-full border-b border-chocobo-gold/20 bg-chocobo-dark/95">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center justify-between gap-3 sm:gap-4">
         <Link
           href="/"
@@ -82,6 +85,7 @@ export default function SiteHeader() {
 
         {/* Mobile Hamburger Toggle (< sm) */}
         <button
+          ref={toggleBtnRef}
           type="button"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-expanded={mobileMenuOpen}
@@ -99,42 +103,67 @@ export default function SiteHeader() {
 
       {/* Mobile Navigation Drawer (< sm) */}
       {mobileMenuOpen && (
-        <nav
-          id="mobile-primary-nav"
-          aria-label="Mobile navigation"
-          className="sm:hidden border-t border-chocobo-gold/15 bg-chocobo-surface px-4 py-3 space-y-1"
-        >
-          {NAV_ITEMS.map((item) => {
-            const isActive = isNavItemActive(item.href);
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                aria-current={isActive ? 'page' : undefined}
-                className={`block px-3 py-2.5 rounded-md text-sm font-medium border-l-2 transition-colors ${
-                  isActive
-                    ? 'bg-chocobo-gold/10 text-chocobo-gold border-chocobo-gold'
-                    : 'text-chocobo-light/90 border-transparent hover:bg-chocobo-recessed/70 hover:text-chocobo-gold'
-                }`}
+        <>
+          <div
+            aria-hidden="true"
+            onClick={closeMenu}
+            className="sm:hidden fixed inset-0 top-0 z-30 bg-black/55 animate-fade-in"
+          />
+          <nav
+            ref={drawerRef}
+            id="mobile-primary-nav"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
+            tabIndex={-1}
+            className="sm:hidden relative z-40 border-t border-chocobo-gold/20 bg-chocobo-surface px-4 py-3 space-y-1 shadow-2xl animate-drawer-down"
+          >
+            <div className="flex items-center justify-between pb-1.5 mb-1 border-b border-chocobo-gold/15">
+              <span className="text-xs uppercase tracking-wider font-semibold text-chocobo-muted">
+                Navigation
+              </span>
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label="Close navigation menu"
+                className="inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-md text-chocobo-muted hover:text-chocobo-gold transition-colors"
               >
-                {item.label}
-              </Link>
-            );
-          })}
+                <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
 
-          <div className="pt-2 mt-2 border-t border-chocobo-gold/15">
-            <Link
-              href="/submit"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-current={pathname === '/submit' ? 'page' : undefined}
-              className="block w-full text-center text-sm font-semibold px-3 py-2.5 rounded-md border border-chocobo-gold/70 text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark transition-colors"
-            >
-              Submit Update
-            </Link>
-          </div>
-        </nav>
+            {NAV_ITEMS.map((item) => {
+              const isActive = isNavItemActive(item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeMenu}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`flex items-center min-h-[44px] px-3 py-2.5 rounded-md text-sm font-medium border-l-2 transition-colors ${
+                    isActive
+                      ? 'bg-chocobo-gold/10 text-chocobo-gold border-chocobo-gold'
+                      : 'text-chocobo-light/95 border-transparent hover:bg-chocobo-recessed/70 hover:text-chocobo-gold'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+
+            <div className="pt-2 mt-2 border-t border-chocobo-gold/15 space-y-1">
+              <Link
+                href="/submit"
+                onClick={closeMenu}
+                aria-current={pathname === '/submit' ? 'page' : undefined}
+                className="flex items-center justify-center min-h-[44px] w-full text-center text-sm font-semibold px-3 py-2.5 rounded-md border border-chocobo-gold/70 text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark transition-colors"
+              >
+                Submit Update
+              </Link>
+            </div>
+          </nav>
+        </>
       )}
     </header>
   );
