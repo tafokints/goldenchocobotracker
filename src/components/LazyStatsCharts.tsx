@@ -45,6 +45,9 @@ interface LazyStatsChartsProps {
   gradingStats: ComputedStats['gradingStats'];
   pullChannelDistribution?: ComputedStats['pullChannelDistribution'];
   regionDistribution?: ComputedStats['regionDistribution'];
+  accentHex?: string;
+  bgHex?: string;
+  mutedHex?: string;
 }
 
 /**

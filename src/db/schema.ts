@@ -16,9 +16,17 @@ import type { PullChannel } from '@/lib/types';
 
 export interface TrackerThemeConfig {
   accentHex: string;
+  accentBrightHex?: string;
   bgHex: string;
+  surfaceHex?: string;
+  recessedHex?: string;
   fgHex: string;
+  mutedHex?: string;
   secondaryHex?: string;
+  brandTitle?: string;
+  motifLabel?: string;
+  referenceImageUrl?: string;
+  ipNotice?: string;
 }
 
 export interface TrackerSeoConfig {

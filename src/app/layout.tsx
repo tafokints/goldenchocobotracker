@@ -5,6 +5,7 @@ import React from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import AffiliateDisclosure from '../components/AffiliateDisclosure';
+import DefaultSiteChrome from '../components/DefaultSiteChrome';
 import SiteFooter from '../components/SiteFooter';
 import SiteHeader from '../components/SiteHeader';
 import { getSiteUrl } from '@/lib/site-config';
@@ -138,12 +139,16 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <AffiliateDisclosure />
-        <SiteHeader />
+        <DefaultSiteChrome>
+          <AffiliateDisclosure />
+          <SiteHeader />
+        </DefaultSiteChrome>
         <div id="main-content" tabIndex={-1} className="flex-1 flex flex-col focus:outline-none">
           {children}
         </div>
-        <SiteFooter />
+        <DefaultSiteChrome>
+          <SiteFooter />
+        </DefaultSiteChrome>
         <SpeedInsights />
         <Analytics />
       </body>

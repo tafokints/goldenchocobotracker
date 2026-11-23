@@ -11,6 +11,8 @@ interface FilterControlsProps {
   sortOrder: string;
   setSortOrder: (order: string) => void;
   embedded?: boolean;
+  serialMin?: number;
+  serialMax?: number;
 }
 
 export default function FilterControls({
@@ -21,9 +23,14 @@ export default function FilterControls({
   sortOrder,
   setSortOrder,
   embedded = false,
+  serialMin = 1,
+  serialMax = 77,
 }: FilterControlsProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const slashShortcutAtRef = useRef<number>(0);
+  const padWidth = Math.max(2, serialMax.toString().length);
+  const minSerialLabel = serialMin.toString().padStart(padWidth, '0');
+  const maxSerialLabel = serialMax.toString().padStart(padWidth, '0');
 
   useEffect(() => {
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
@@ -152,8 +159,12 @@ export default function FilterControls({
           onChange={(e) => setSortOrder(e.target.value)}
           className="w-full h-10 sm:h-9 bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-light text-base sm:text-sm rounded-md py-1.5 px-2 sm:px-3 truncate focus-visible:outline-none focus-visible:border-chocobo-gold focus-visible:ring-1 focus-visible:ring-chocobo-gold"
         >
-          <option value="id-asc">Serial: 01 → 77</option>
-          <option value="id-desc">Serial: 77 → 01</option>
+          <option value="id-asc">
+            Serial: {minSerialLabel} → {maxSerialLabel}
+          </option>
+          <option value="id-desc">
+            Serial: {maxSerialLabel} → {minSerialLabel}
+          </option>
           <option value="price-desc">Price: High → Low</option>
           <option value="price-asc">Price: Low → High</option>
           <option value="date-desc">Date: Newest</option>

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { computeCardStats, computeMedian } from '@/lib/stats';
+import {
+  buildAdaptivePriceRanges,
+  buildPopulationReport,
+  computeCardStats,
+  computeMedian,
+} from '@/lib/stats';
 import type { ResolvedCard } from '@/lib/types';
 
 describe('computeMedian', () => {
@@ -164,5 +169,63 @@ describe('computeCardStats', () => {
     expect(stats.iconicWatchlist.find((i) => i.cardId === 2)?.gradingLabel).toBe(
       'CGC Pristine 10'
     );
+  });
+});
+
+describe('buildAdaptivePriceRanges & buildPopulationReport', () => {
+  it('adapts price range buckets to mid-five-figure lots without breaking high-value lots', () => {
+    const oneRingRanges = buildAdaptivePriceRanges([7354, 7500, 7800, 15000, 19149]);
+    expect(oneRingRanges).toEqual([
+      { range: 'Under $5k', count: 0 },
+      { range: '$5k–$10k', count: 3 },
+      { range: '$10k–$15k', count: 0 },
+      { range: '$15k–$20k', count: 2 },
+      { range: '$20k+', count: 0 },
+    ]);
+
+    const chocoboRanges = buildAdaptivePriceRanges([45000, 75000, 250000]);
+    expect(chocoboRanges.map((r) => r.range)).toEqual([
+      'Under $25k',
+      '$25k–$50k',
+      '$50k–$100k',
+      '$100k–$200k',
+      '$200k+',
+    ]);
+  });
+
+  it('groups slabs by service and tier using 3-digit padding for /100 trackers', () => {
+    const cards: ResolvedCard[] = [
+      {
+        id: 16,
+        name: 'The One Ring #016',
+        found: true,
+        priceHistory: [],
+        grading: { service: 'BGS', grade: 10 },
+        resolvedImage: null,
+      },
+      {
+        id: 56,
+        name: 'The One Ring #056',
+        found: true,
+        priceHistory: [],
+        grading: { service: 'BGS', grade: 9.5 },
+        resolvedImage: null,
+      },
+      {
+        id: 63,
+        name: 'The One Ring #063',
+        found: true,
+        priceHistory: [],
+        grading: { service: 'PSA', grade: 10, gradeLabel: 'Gem Mint 10' },
+        resolvedImage: null,
+      },
+    ];
+
+    const pop = buildPopulationReport(cards, 3);
+    expect(pop.totalGraded).toBe(3);
+    expect(pop.groups.map((g) => g.service)).toEqual(['PSA', 'BGS']);
+    expect(pop.groups[0].tiers[0].cards[0].paddedId).toBe('063');
+    expect(pop.groups[1].tiers.map((t) => t.grade)).toEqual([10, 9.5]);
+    expect(pop.groups[1].tiers[0].cards[0].paddedId).toBe('016');
   });
 });

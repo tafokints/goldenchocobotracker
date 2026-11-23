@@ -37,7 +37,13 @@ export default function CompactMatrixView({
         <span className="sm:hidden">Tap any tile for details</span>
       </div>
 
-      <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-11 gap-1.5 sm:gap-2">
+      <div
+        className={`grid gap-1.5 sm:gap-2 ${
+          cards.length === 100
+            ? 'grid-cols-5 sm:grid-cols-10'
+            : 'grid-cols-5 sm:grid-cols-7 md:grid-cols-11'
+        }`}
+      >
         {cards.map((card) => {
           const padded = card.id.toString().padStart(padWidth, '0');
           const iconic = getIconicLabel(card.id, iconicMap);

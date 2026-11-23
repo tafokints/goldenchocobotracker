@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: TrackerSubmitPageProps): Prom
   if (!tracker) return { title: 'Submit Update' };
 
   return {
-    title: `Submit Update — ${tracker.name}`,
+    title: {
+      absolute: `Submit Update — ${tracker.name}`,
+    },
     description: `Report a serialized card discovery, sale price, grading update, or photo for ${tracker.name}.`,
   };
 }
@@ -60,19 +62,21 @@ export default async function DynamicTrackerSubmitPage({
       : 'new_find';
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-6 md:p-12">
-      <header className="w-full max-w-xl flex items-center justify-between mb-6 text-sm font-mono">
+    <main className="flex flex-1 flex-col items-center px-4 sm:px-6 pt-5 pb-10">
+      <header className="w-full max-w-xl flex items-center justify-between mb-5 text-xs sm:text-sm">
         <Link
           href={`/t/${tracker.slug}`}
-          className="text-chocobo-gold hover:text-yellow-400 transition-colors"
+          className="text-chocobo-gold hover:text-chocobo-gold-bright transition-colors"
         >
           &larr; Back to {tracker.name}
         </Link>
       </header>
 
-      <div className="w-full max-w-xl text-center mb-6 space-y-2">
-        <h1 className="text-3xl font-bold text-chocobo-gold">Submit Update — {tracker.name}</h1>
-        <p className="text-sm text-chocobo-light/85">
+      <div className="w-full max-w-xl text-center mb-6 space-y-1.5">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold text-chocobo-gold">
+          Submit Update &mdash; {tracker.name}
+        </h1>
+        <p className="text-xs sm:text-sm text-chocobo-muted">
           All community submissions are reviewed before publishing.
         </p>
       </div>

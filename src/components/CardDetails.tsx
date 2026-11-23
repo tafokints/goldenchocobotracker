@@ -18,6 +18,11 @@ interface CardDetailsProps {
   onPrev?: () => void;
   onNext?: () => void;
   positionLabel?: string;
+  seriesName?: string;
+  padWidth?: number;
+  cardHrefPrefix?: string;
+  submitHrefPrefix?: string;
+  iconicMap?: Record<number, string>;
 }
 
 export default function CardDetails({
@@ -27,6 +32,11 @@ export default function CardDetails({
   onPrev,
   onNext,
   positionLabel,
+  seriesName = 'Golden Chocobo',
+  padWidth = 2,
+  cardHrefPrefix = '/card',
+  submitHrefPrefix = '/submit?card=',
+  iconicMap,
 }: CardDetailsProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -73,12 +83,14 @@ export default function CardDetails({
 
   if (!isOpen) return null;
 
-  const paddedId = card.id.toString().padStart(2, '0');
-  const iconicLabel = getIconicLabel(card.id);
+  const paddedId = card.id.toString().padStart(padWidth, '0');
+  const iconicLabel = getIconicLabel(card.id, iconicMap);
   const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } =
     resolveCardLinks(card);
   const certLookupUrl = getGradingCertUrl(card.grading?.service, card.grading?.certNumber);
   const showStepper = Boolean(onPrev || onNext || positionLabel);
+  const cardDetailHref = `${cardHrefPrefix}/${paddedId}`;
+  const suggestHref = `${submitHrefPrefix}${paddedId}`;
 
   return (
     <div
@@ -154,7 +166,7 @@ export default function CardDetails({
                   id="card-details-title"
                   className="font-display text-lg sm:text-xl font-bold text-chocobo-gold tabular-nums"
                 >
-                  Golden Chocobo #{paddedId}
+                  {seriesName} #{paddedId}
                 </h2>
                 <span
                   className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${
@@ -173,19 +185,19 @@ export default function CardDetails({
               </div>
               <div className="flex flex-wrap items-center gap-2 mt-2">
                 <Link
-                  href={`/card/${paddedId}`}
+                  href={cardDetailHref}
                   className="inline-flex items-center justify-center min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded border border-chocobo-gold/30 bg-chocobo-recessed text-xs text-chocobo-light/90 hover:border-chocobo-gold hover:text-chocobo-gold transition-colors"
                 >
                   Full Card Page &rarr;
                 </Link>
                 <Link
-                  href={`/submit?card=${paddedId}`}
+                  href={suggestHref}
                   className="inline-flex items-center justify-center min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded border border-chocobo-gold/65 text-xs text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark font-semibold transition-colors"
                 >
                   Suggest Update
                 </Link>
                 <CopyLinkButton
-                  path={`/card/${paddedId}`}
+                  path={cardDetailHref}
                   label="Copy Link"
                   className="inline-flex items-center justify-center min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded border border-chocobo-gold/30 bg-chocobo-recessed text-xs text-chocobo-light/90 hover:border-chocobo-gold hover:text-chocobo-gold transition-colors"
                 />
@@ -214,7 +226,7 @@ export default function CardDetails({
             <div className="relative aspect-[3/4] max-w-[210px] sm:max-w-[260px] mx-auto bg-black/35 border border-chocobo-gold/25 rounded-md overflow-hidden">
               <CardPhoto
                 src={card.resolvedImage}
-                alt={`Golden Chocobo Card #${paddedId}`}
+                alt={`${seriesName} Card #${paddedId}`}
                 quality={80}
                 sizes="(max-width: 640px) 210px, 260px"
                 fallbackSerial={paddedId}

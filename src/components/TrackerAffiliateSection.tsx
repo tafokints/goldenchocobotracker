@@ -41,7 +41,8 @@ export default function TrackerAffiliateSection({
             </h2>
             <p
               role="note"
-              className="max-w-3xl mx-auto text-xs text-chocobo-muted bg-[#2A2013] border border-chocobo-gold/30 rounded px-3.5 py-2"
+              className="max-w-3xl mx-auto text-xs text-chocobo-muted border border-chocobo-gold/30 rounded px-3.5 py-2"
+              style={{ backgroundColor: 'var(--theme-disclosure-bg, #2A2013)' }}
             >
               {AFFILIATE_DISCLOSURE_SHORT}
             </p>

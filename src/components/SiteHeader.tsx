@@ -6,13 +6,33 @@ import { usePathname } from 'next/navigation';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useDialogAccessibility } from '@/lib/useDialogAccessibility';
 
-const NAV_ITEMS = [
+export interface SiteNavItem {
+  href: string;
+  label: string;
+  matchExact?: boolean;
+}
+
+export interface SiteHeaderProps {
+  brandName?: string;
+  brandHref?: string;
+  navItems?: SiteNavItem[];
+  submitHref?: string;
+  submitLabel?: string;
+}
+
+const DEFAULT_NAV_ITEMS: SiteNavItem[] = [
   { href: '/', label: 'Tracker' },
   { href: '/stats', label: 'Stats' },
   { href: '/hub', label: 'All Trackers' },
 ];
 
-export default function SiteHeader() {
+export default function SiteHeader({
+  brandName = 'Golden Chocobo',
+  brandHref = '/',
+  navItems = DEFAULT_NAV_ITEMS,
+  submitHref = '/submit',
+  submitLabel = 'Submit Update',
+}: SiteHeaderProps = {}) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
@@ -35,19 +55,24 @@ export default function SiteHeader() {
     restoreFocusRef: toggleBtnRef,
   });
 
-  const isNavItemActive = (href: string) =>
-    href === '/'
-      ? pathname === '/' || pathname.startsWith('/card/')
-      : pathname === href || pathname.startsWith(`${href}/`);
+  const isNavItemActive = (item: SiteNavItem) => {
+    if (item.href === '/') {
+      return pathname === '/' || pathname.startsWith('/card/');
+    }
+    if (item.matchExact) {
+      return pathname === item.href || pathname.startsWith(`${item.href}/card/`);
+    }
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  };
 
   return (
     <header className="relative z-40 w-full border-b border-chocobo-gold/20 bg-chocobo-dark/95">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center justify-between gap-3 sm:gap-4">
         <Link
-          href="/"
+          href={brandHref}
           className="font-display text-base sm:text-xl font-bold tracking-wide text-chocobo-gold hover:text-chocobo-gold-bright transition-colors truncate py-1"
         >
-          Golden Chocobo
+          {brandName}
         </Link>
 
         {/* Desktop Single-Row Navigation */}
@@ -55,8 +80,8 @@ export default function SiteHeader() {
           className="hidden sm:flex items-center gap-5 md:gap-6 text-sm"
           aria-label="Primary navigation"
         >
-          {NAV_ITEMS.map((item) => {
-            const isActive = isNavItemActive(item.href);
+          {navItems.map((item) => {
+            const isActive = isNavItemActive(item);
 
             return (
               <Link
@@ -75,11 +100,11 @@ export default function SiteHeader() {
           })}
 
           <Link
-            href="/submit"
-            aria-current={pathname === '/submit' ? 'page' : undefined}
+            href={submitHref}
+            aria-current={pathname === submitHref ? 'page' : undefined}
             className="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded border border-chocobo-gold/70 text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark transition-colors shrink-0"
           >
-            Submit Update
+            {submitLabel}
           </Link>
         </nav>
 
@@ -132,8 +157,8 @@ export default function SiteHeader() {
               </button>
             </div>
 
-            {NAV_ITEMS.map((item) => {
-              const isActive = isNavItemActive(item.href);
+            {navItems.map((item) => {
+              const isActive = isNavItemActive(item);
 
               return (
                 <Link
@@ -154,12 +179,12 @@ export default function SiteHeader() {
 
             <div className="pt-2 mt-2 border-t border-chocobo-gold/15 space-y-1">
               <Link
-                href="/submit"
+                href={submitHref}
                 onClick={closeMenu}
-                aria-current={pathname === '/submit' ? 'page' : undefined}
+                aria-current={pathname === submitHref ? 'page' : undefined}
                 className="flex items-center justify-center min-h-[44px] w-full text-center text-sm font-semibold px-3 py-2.5 rounded-md border border-chocobo-gold/70 text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark transition-colors"
               >
-                Submit Update
+                {submitLabel}
               </Link>
             </div>
           </nav>

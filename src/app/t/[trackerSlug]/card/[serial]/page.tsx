@@ -5,21 +5,13 @@ import { notFound } from 'next/navigation';
 import CopyLinkButton from '@/components/CopyLinkButton';
 import TrackerAffiliateSection from '@/components/TrackerAffiliateSection';
 import { resolveCardLinks } from '@/lib/affiliate';
+import { formatGradingDisplay } from '@/lib/grading';
 import { getGradingCertUrl } from '@/lib/grading-certs';
+import { getIconicLabel, normalizeIconicMap } from '@/lib/iconic-numbers';
 import { getHydratedTracker } from '@/lib/multi-tracker';
-import { PULL_CHANNEL_LABELS, type ResolvedCard } from '@/lib/types';
+import { PULL_CHANNEL_LABELS } from '@/lib/types';
 
 export const revalidate = 300;
-
-type GradingWithOptionalLabel = NonNullable<ResolvedCard['grading']> & { gradeLabel?: string };
-
-function formatCardGrading(grading: GradingWithOptionalLabel): string {
-  const cleanLabel = grading.gradeLabel?.trim();
-  if (!cleanLabel) return `${grading.service} ${grading.grade}`;
-  return cleanLabel.includes(String(grading.grade))
-    ? `${grading.service} ${cleanLabel}`
-    : `${grading.service} ${grading.grade} · ${cleanLabel}`;
-}
 
 interface DynamicCardPageProps {
   params: Promise<{ trackerSlug: string; serial: string }>;
@@ -44,7 +36,9 @@ export async function generateMetadata({
   const padded = serialNum.toString().padStart(padWidth, '0');
 
   return {
-    title: `${activeSeries.name} #${padded}/${activeSeries.serialMax}`,
+    title: {
+      absolute: `${activeSeries.name} #${padded}/${activeSeries.serialMax} | ${tracker.name}`,
+    },
     description: `Track ${activeSeries.name} #${padded} of ${activeSeries.serialMax} on ${tracker.name}.`,
   };
 }
@@ -89,6 +83,8 @@ export default async function DynamicTrackerCardPage({
   const { pullSourceUrl, marketplaceUrl, marketplaceLabel, isMarketplaceAffiliate } =
     resolveCardLinks(card);
   const certLookupUrl = getGradingCertUrl(card.grading?.service, card.grading?.certNumber);
+  const iconicMap = normalizeIconicMap(tracker.seoConfig.iconicNumbers, {});
+  const iconicLabel = getIconicLabel(card.id, iconicMap);
 
   return (
     <main className="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-8 space-y-5 sm:space-y-6">
@@ -172,6 +168,11 @@ export default async function DynamicTrackerCardPage({
                 >
                   {card.found ? 'Found' : 'Unpulled'}
                 </span>
+                {iconicLabel && (
+                  <span className="rounded px-2.5 py-0.5 text-xs font-medium bg-amber-950/80 border border-chocobo-gold/45 text-amber-200">
+                    ★ {iconicLabel}
+                  </span>
+                )}
               </div>
               <p className="text-xs sm:text-sm text-chocobo-muted mt-1">{tracker.setName}</p>
               <div className="pt-3 grid grid-cols-1 sm:flex sm:flex-wrap gap-2">
@@ -285,7 +286,7 @@ export default async function DynamicTrackerCardPage({
                   Grading
                 </h2>
                 <p className="text-lg font-bold text-sky-400 mt-1">
-                  {formatCardGrading(card.grading as GradingWithOptionalLabel)}
+                  {formatGradingDisplay(card.grading)}
                 </p>
                 {card.grading.certNumber && (
                   <p className="text-sm text-chocobo-light tabular-nums">

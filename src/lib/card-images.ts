@@ -4,9 +4,30 @@ import type { ChocoboCard, ResolvedCard } from './types';
 
 let cachedPublicImages: Map<string, string> | null = null;
 
+function walkPublicImages(rootDir: string, relativePrefix: string, map: Map<string, string>): void {
+  const currentDir = relativePrefix ? path.join(rootDir, relativePrefix) : rootDir;
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(currentDir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+
+  for (const entry of entries) {
+    const relPath = relativePrefix ? `${relativePrefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      walkPublicImages(rootDir, relPath, map);
+      continue;
+    }
+    if (!entry.isFile()) continue;
+    if (!/\.(jpg|jpeg|png|webp|avif)$/i.test(entry.name)) continue;
+    map.set(relPath.toLowerCase(), relPath);
+  }
+}
+
 /**
- * Reads `public/images` once per server instance and builds a case-insensitive lookup map
- * from lowercase filename -> exact filename on disk.
+ * Reads `public/images` (including tracker subdirectories) once per server instance and builds
+ * a case-insensitive lookup map from lowercase relative path -> exact path on disk.
  * Prevents broken 404 image requests on unfound cards and fixes `.JPG` vs `.jpg` case mismatches
  * on Linux/Vercel deployments.
  */
@@ -17,17 +38,7 @@ export function getPublicImageMap(): Map<string, string> {
 
   const map = new Map<string, string>();
   const imagesDir = path.join(process.cwd(), 'public', 'images');
-
-  try {
-    const entries = fs.readdirSync(imagesDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isFile()) continue;
-      if (!/\.(jpg|jpeg|png|webp|avif)$/i.test(entry.name)) continue;
-      map.set(entry.name.toLowerCase(), entry.name);
-    }
-  } catch {
-    // Directory missing in unusual runtime environments; fail gracefully with empty map.
-  }
+  walkPublicImages(imagesDir, '', map);
 
   cachedPublicImages = map;
   return map;

@@ -162,4 +162,76 @@ test.describe('Enterprise launch readiness smoke suite', () => {
 
     expect(errors).toEqual([]);
   });
+
+  test('renders multi-tracker /hub and custom Middle-earth motif on /t/the-one-ring-poster', async ({
+    page,
+  }) => {
+    const errors = attachConsoleErrorTrap(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+
+    await page.goto('/hub', { waitUntil: 'load' });
+    await expect(page.getByRole('heading', { name: /Serialized Card Trackers/i })).toBeVisible();
+
+    const oneRingRes = await page.goto('/t/the-one-ring-poster', { waitUntil: 'load' });
+    if (oneRingRes?.status() === 200) {
+      // Custom Middle-earth obsidian & ember theme variables + branded header/footer
+      const themeTokens = await page.evaluate(() => {
+        const themedRoot = document.querySelector<HTMLElement>('[style*="--theme-accent-rgb"]');
+        return {
+          accentRgb: themedRoot?.style.getPropertyValue('--theme-accent-rgb').trim() ?? '',
+          bgRgb: themedRoot?.style.getPropertyValue('--theme-bg-rgb').trim() ?? '',
+        };
+      });
+      expect(themeTokens.accentRgb).toBe('224 122 47');
+      expect(themeTokens.bgRgb).toBe('17 16 20');
+
+      await expect(page.getByRole('link', { name: 'The One Ring /100' })).toBeVisible();
+      await expect(page.getByText(/Middle-earth Enterprises/i)).toBeVisible();
+      await expect(page).toHaveTitle(/The One Ring Poster Tracker/i);
+      expect(await page.title()).not.toContain('Golden Chocobo');
+
+      // Verify nested subfolder card photos actually load & sort label matches 001 → 100
+      await expect(page.locator('option[value="id-asc"]')).toHaveText(/001 → 100/);
+      const firstFoundImg = page.locator('article img[alt*="The One Ring (Poster) #001"]').first();
+      await expect(firstFoundImg).toBeVisible();
+      await expect
+        .poll(async () => firstFoundImg.evaluate((el) => (el as HTMLImageElement).naturalWidth))
+        .toBeGreaterThan(0);
+
+      // Switch to 1–100 Wall view and verify 100 serial tiles render
+      await page.getByRole('button', { name: /1–100 Wall/i }).click();
+      await expect(page.getByRole('button', { name: /#001/i })).toBeVisible();
+      await expect(page.getByRole('button', { name: /#100/i })).toBeVisible();
+
+      // Open Quick View from tile #001 and verify tracker-specific series title & grail badge
+      await page.getByRole('button', { name: /#001/i }).click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await expect(dialog.getByRole('heading', { name: /The One Ring \(Poster\) #001/i })).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toBeHidden();
+
+      // Stats page renders Pop Report & Raw vs. Graded comparison
+      await page.goto('/t/the-one-ring-poster/stats', { waitUntil: 'load' });
+      await expect(page.getByRole('heading', { name: /Tracked Population Report/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Raw vs\. Graded Market Comparison/i })).toBeVisible();
+
+      // Individual card detail page for BGS Black Label 10 #067
+      await page.goto('/t/the-one-ring-poster/card/067', { waitUntil: 'load' });
+      await expect(page.getByText(/BGS Black Label 10/i)).toBeVisible();
+      await expect(page.getByText(/0017230914/)).toBeVisible();
+
+      // iPhone 390x844 overflow checks on /hub, /t/the-one-ring-poster, and /stats
+      await page.setViewportSize({ width: 390, height: 844 });
+      for (const route of ['/hub', '/t/the-one-ring-poster', '/t/the-one-ring-poster/stats']) {
+        await page.goto(route, { waitUntil: 'load' });
+        const overflowX = await page.evaluate(
+          () => document.documentElement.scrollWidth > window.innerWidth
+        );
+        expect(overflowX).toBe(false);
+      }
+    }
+
+    expect(errors).toEqual([]);
+  });
 });

@@ -69,6 +69,155 @@ export interface ComputedStats {
   priceRanges: Array<{ range: string; count: number }>;
 }
 
+export interface PopReportTier {
+  key: string;
+  label: string;
+  grade: number;
+  gradeLabel?: string;
+  cards: Array<{ id: number; paddedId: string }>;
+}
+
+export interface PopReportServiceGroup {
+  service: string;
+  totalCount: number;
+  tiers: PopReportTier[];
+}
+
+const CANONICAL_SERVICES = ['PSA', 'BGS', 'CGC', 'TAG'] as const;
+
+type GradingWithOptionalLabel = NonNullable<ResolvedCard['grading']> & {
+  gradeLabel?: string;
+};
+
+function normalizeServiceName(raw: string): string {
+  const upper = raw.trim().toUpperCase();
+  if (upper === 'BECKETT') return 'BGS';
+  return upper || 'OTHER';
+}
+
+function getTierPrestigeRank(gradeLabel?: string): number {
+  if (!gradeLabel) return 0;
+  const lower = gradeLabel.toLowerCase();
+  if (lower.includes('black label')) return 4;
+  if (lower.includes('pristine')) return 3;
+  if (lower.includes('mba') || lower.includes('gold')) return 2;
+  return 1;
+}
+
+function formatPopTierLabel(grade: number, gradeLabel?: string): string {
+  const cleanLabel = gradeLabel?.trim();
+  if (!cleanLabel) return `Grade ${grade}`;
+  return cleanLabel.includes(String(grade)) ? cleanLabel : `${grade} · ${cleanLabel}`;
+}
+
+export function buildPopulationReport(
+  cards: ResolvedCard[],
+  padWidth?: number
+): {
+  totalGraded: number;
+  groups: PopReportServiceGroup[];
+} {
+  const effectivePadWidth = padWidth ?? Math.max(2, (cards.length || 77).toString().length);
+  const gradedCards = cards.filter(
+    (card): card is ResolvedCard & { grading: GradingWithOptionalLabel } =>
+      card.found && Boolean(card.grading)
+  );
+
+  const serviceMap = new Map<string, Map<string, PopReportTier>>();
+
+  for (const card of gradedCards) {
+    const grading = card.grading as GradingWithOptionalLabel;
+    const service = normalizeServiceName(grading.service);
+    const cleanLabel = grading.gradeLabel?.trim() || undefined;
+    const tierKey = `${grading.grade}::${cleanLabel?.toLowerCase() ?? ''}`;
+
+    let tierMap = serviceMap.get(service);
+    if (!tierMap) {
+      tierMap = new Map<string, PopReportTier>();
+      serviceMap.set(service, tierMap);
+    }
+
+    let tier = tierMap.get(tierKey);
+    if (!tier) {
+      tier = {
+        key: tierKey,
+        label: formatPopTierLabel(grading.grade, cleanLabel),
+        grade: grading.grade,
+        gradeLabel: cleanLabel,
+        cards: [],
+      };
+      tierMap.set(tierKey, tier);
+    }
+
+    tier.cards.push({
+      id: card.id,
+      paddedId: card.id.toString().padStart(effectivePadWidth, '0'),
+    });
+  }
+
+  const orderedServices = [
+    ...CANONICAL_SERVICES.filter((svc) => serviceMap.has(svc)),
+    ...Array.from(serviceMap.keys())
+      .filter((svc) => !CANONICAL_SERVICES.includes(svc as (typeof CANONICAL_SERVICES)[number]))
+      .sort((a, b) => a.localeCompare(b)),
+  ];
+
+  const groups: PopReportServiceGroup[] = orderedServices.map((service) => {
+    const tiers = Array.from(serviceMap.get(service)!.values())
+      .map((tier) => ({
+        ...tier,
+        cards: [...tier.cards].sort((a, b) => a.id - b.id),
+      }))
+      .sort((a, b) => {
+        if (b.grade !== a.grade) return b.grade - a.grade;
+        const prestigeDiff =
+          getTierPrestigeRank(b.gradeLabel) - getTierPrestigeRank(a.gradeLabel);
+        if (prestigeDiff !== 0) return prestigeDiff;
+        return a.label.localeCompare(b.label);
+      });
+
+    const totalCount = tiers.reduce((sum, t) => sum + t.cards.length, 0);
+    return { service, totalCount, tiers };
+  });
+
+  return {
+    totalGraded: gradedCards.length,
+    groups,
+  };
+}
+
+export function buildAdaptivePriceRanges(prices: number[]): Array<{ range: string; count: number }> {
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+
+  if (maxPrice >= 50000 || prices.length === 0) {
+    return [
+      { range: 'Under $25k', count: prices.filter((p) => p < 25000).length },
+      { range: '$25k–$50k', count: prices.filter((p) => p >= 25000 && p < 50000).length },
+      { range: '$50k–$100k', count: prices.filter((p) => p >= 50000 && p < 100000).length },
+      { range: '$100k–$200k', count: prices.filter((p) => p >= 100000 && p < 200000).length },
+      { range: '$200k+', count: prices.filter((p) => p >= 200000).length },
+    ];
+  }
+
+  if (maxPrice >= 5000) {
+    return [
+      { range: 'Under $5k', count: prices.filter((p) => p < 5000).length },
+      { range: '$5k–$10k', count: prices.filter((p) => p >= 5000 && p < 10000).length },
+      { range: '$10k–$15k', count: prices.filter((p) => p >= 10000 && p < 15000).length },
+      { range: '$15k–$20k', count: prices.filter((p) => p >= 15000 && p < 20000).length },
+      { range: '$20k+', count: prices.filter((p) => p >= 20000).length },
+    ];
+  }
+
+  return [
+    { range: 'Under $500', count: prices.filter((p) => p < 500).length },
+    { range: '$500–$1k', count: prices.filter((p) => p >= 500 && p < 1000).length },
+    { range: '$1k–$2.5k', count: prices.filter((p) => p >= 1000 && p < 2500).length },
+    { range: '$2.5k–$5k', count: prices.filter((p) => p >= 2500 && p < 5000).length },
+    { range: '$5k+', count: prices.filter((p) => p >= 5000).length },
+  ];
+}
+
 export function computeMedian(values: number[]): number {
   if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
@@ -347,13 +496,7 @@ export function computeCardStats(
   const highestPriced = [...pricedCards].sort((a, b) => b.price - a.price).slice(0, 5);
   const lowestPriced = [...pricedCards].sort((a, b) => a.price - b.price).slice(0, 5);
 
-  const priceRanges = [
-    { range: 'Under $25k', count: prices.filter((p) => p < 25000).length },
-    { range: '$25k–$50k', count: prices.filter((p) => p >= 25000 && p < 50000).length },
-    { range: '$50k–$100k', count: prices.filter((p) => p >= 50000 && p < 100000).length },
-    { range: '$100k–$200k', count: prices.filter((p) => p >= 100000 && p < 200000).length },
-    { range: '$200k+', count: prices.filter((p) => p >= 200000).length },
-  ];
+  const priceRanges = buildAdaptivePriceRanges(prices);
 
   return {
     totalCards,

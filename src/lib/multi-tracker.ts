@@ -1,7 +1,15 @@
 import { asc, eq } from 'drizzle-orm';
 import { Redis } from '@upstash/redis';
 import { revalidateTag, unstable_cache } from 'next/cache';
-import { getDb, hasDatabaseEnv, serialItems, series, trackers } from '@/db';
+import {
+  getDb,
+  hasDatabaseEnv,
+  serialItems,
+  series,
+  trackers,
+  type TrackerSeoConfig,
+  type TrackerThemeConfig,
+} from '@/db';
 import { hasRedisEnv } from '@/lib/redis-cards';
 import { normalizeHost } from '@/lib/routing';
 import {
@@ -28,6 +36,8 @@ export interface TrackerSummary {
   description: string;
   accentHex: string;
   bgHex: string;
+  motifLabel?: string;
+  referenceImageUrl?: string;
   seriesCount: number;
   totalSerials: number;
   foundCount: number;
@@ -54,7 +64,8 @@ export interface HydratedTracker {
   game: string;
   setName: string;
   description: string;
-  themeConfig: { accentHex: string; bgHex: string; fgHex: string };
+  themeConfig: TrackerThemeConfig;
+  seoConfig: TrackerSeoConfig;
   affiliateConfig: typeof DEFAULT_TRACKER_CONFIG.affiliateConfig;
   communityLinks: typeof DEFAULT_TRACKER_CONFIG.communityLinks;
   affiliateLinksEnabled: boolean;
@@ -138,7 +149,9 @@ async function fetchPublishedTrackersUncached(): Promise<TrackerSummary[]> {
             setName: t.setName,
             description: t.description,
             accentHex: t.themeConfig?.accentHex || '#D6A73D',
-            bgHex: t.themeConfig?.bgHex || '#201A15',
+            bgHex: t.themeConfig?.bgHex || '#1B1612',
+            motifLabel: t.themeConfig?.motifLabel,
+            referenceImageUrl: t.themeConfig?.referenceImageUrl,
             seriesCount: seriesRows.length,
             totalSerials,
             foundCount,
@@ -167,6 +180,7 @@ async function fetchPublishedTrackersUncached(): Promise<TrackerSummary[]> {
       description: DEFAULT_TRACKER_CONFIG.description,
       accentHex: DEFAULT_TRACKER_CONFIG.themeConfig.accentHex,
       bgHex: DEFAULT_TRACKER_CONFIG.themeConfig.bgHex,
+      motifLabel: 'Final Fantasy · Antique Gold',
       seriesCount: 1,
       totalSerials: defaultCards.length || 77,
       foundCount: defaultCards.filter((c) => c.found).length,
@@ -178,7 +192,7 @@ async function fetchPublishedTrackersUncached(): Promise<TrackerSummary[]> {
 
 const getCachedPublishedTrackers = unstable_cache(
   async () => fetchPublishedTrackersUncached(),
-  ['published-trackers-hub-v1'],
+  ['published-trackers-hub-v2'],
   { revalidate: 300, tags: [HUB_CACHE_TAG] }
 );
 
@@ -215,10 +229,12 @@ async function hydrateTrackerUncached(slug: string): Promise<HydratedTracker | n
           setName: ctx.tracker.setName,
           description: ctx.tracker.description,
           themeConfig: {
+            ...ctx.tracker.themeConfig,
             accentHex: ctx.tracker.themeConfig?.accentHex || '#D6A73D',
-            bgHex: ctx.tracker.themeConfig?.bgHex || '#201A15',
-            fgHex: ctx.tracker.themeConfig?.fgHex || '#FFF8F0',
+            bgHex: ctx.tracker.themeConfig?.bgHex || '#1B1612',
+            fgHex: ctx.tracker.themeConfig?.fgHex || '#F6EFE4',
           },
+          seoConfig: ctx.tracker.seoConfig || {},
           affiliateConfig: ctx.tracker.affiliateConfig || [],
           communityLinks: ctx.tracker.communityLinks || [],
           affiliateLinksEnabled: ctx.tracker.affiliateLinksEnabled,
@@ -243,6 +259,7 @@ async function hydrateTrackerUncached(slug: string): Promise<HydratedTracker | n
       setName: DEFAULT_TRACKER_CONFIG.setName,
       description: DEFAULT_TRACKER_CONFIG.description,
       themeConfig: DEFAULT_TRACKER_CONFIG.themeConfig,
+      seoConfig: {},
       affiliateConfig: DEFAULT_TRACKER_CONFIG.affiliateConfig,
       communityLinks: DEFAULT_TRACKER_CONFIG.communityLinks,
       affiliateLinksEnabled: true,
@@ -268,7 +285,7 @@ async function hydrateTrackerUncached(slug: string): Promise<HydratedTracker | n
 export async function getHydratedTracker(slug: string): Promise<HydratedTracker | null> {
   const cached = unstable_cache(
     async () => hydrateTrackerUncached(slug),
-    [`hydrated-tracker-${slug}-v1`],
+    [`hydrated-tracker-${slug}-v2`],
     {
       revalidate: 300,
       tags: [HUB_CACHE_TAG, trackerCacheTag(slug)],

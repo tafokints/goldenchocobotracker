@@ -1,13 +1,16 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { resolveCardLinks } from '@/lib/affiliate';
 import { formatCompactUsd } from '@/lib/format';
+import { formatGradingDisplay } from '@/lib/grading';
+import { getIconicLabel, isIconicNumber } from '@/lib/iconic-numbers';
 import type { SeriesWithCards } from '@/lib/multi-tracker';
 import type { ResolvedCard } from '@/lib/types';
 import CardPhoto from './CardPhoto';
+import CompactMatrixView from './CompactMatrixView';
 import FilterControls from './FilterControls';
 
 const CardLightbox = dynamic(() => import('./CardLightbox'), { ssr: false });
@@ -15,28 +18,26 @@ const CardDetails = dynamic(() => import('./CardDetails'), { ssr: false });
 
 const PAGE_SIZE = 48;
 
-type QuickFilter = 'all' | 'graded' | 'priced';
-type GradingWithOptionalLabel = NonNullable<ResolvedCard['grading']> & { gradeLabel?: string };
-
-function formatCardGrading(grading: GradingWithOptionalLabel): string {
-  const cleanLabel = grading.gradeLabel?.trim();
-  if (!cleanLabel) return `${grading.service} ${grading.grade}`;
-  return cleanLabel.includes(String(grading.grade))
-    ? `${grading.service} ${cleanLabel}`
-    : `${grading.service} ${grading.grade} · ${cleanLabel}`;
-}
+type QuickFilter = 'all' | 'graded' | 'priced' | 'iconic' | 'unpulled-iconic';
+type ViewMode = 'grid' | 'matrix';
 
 interface MultiTrackerGridProps {
   trackerSlug: string;
   seriesList: SeriesWithCards[];
+  iconicMap?: Record<number, string>;
 }
 
-export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrackerGridProps) {
+export default function MultiTrackerGrid({
+  trackerSlug,
+  seriesList,
+  iconicMap = {},
+}: MultiTrackerGridProps) {
   const [activeSeriesSlug, setActiveSeriesSlug] = useState(seriesList[0]?.slug || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('id-asc');
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [page, setPage] = useState(1);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -47,7 +48,49 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
     seriesList.find((s) => s.slug === activeSeriesSlug) || seriesList[0];
 
   const hasMultipleSeries = seriesList.length > 1;
+  const hasIconicNumbers = Object.keys(iconicMap).length > 0;
+  const supportsWallView = Boolean(activeSeries && activeSeries.cards.length <= 150);
+  const effectiveViewMode: ViewMode = supportsWallView ? viewMode : 'grid';
   const padWidth = activeSeries ? Math.max(2, activeSeries.serialMax.toString().length) : 2;
+
+  const quickFilterCounts = useMemo(() => {
+    const cards = activeSeries?.cards ?? [];
+    let graded = 0;
+    let priced = 0;
+    let iconic = 0;
+    let unpulledIconic = 0;
+
+    for (const card of cards) {
+      if (card.grading) graded++;
+      if (typeof card.price === 'number') priced++;
+      if (hasIconicNumbers && isIconicNumber(card.id, iconicMap)) {
+        iconic++;
+        if (!card.found) unpulledIconic++;
+      }
+    }
+
+    return {
+      all: cards.length,
+      graded,
+      priced,
+      iconic,
+      'unpulled-iconic': unpulledIconic,
+    };
+  }, [activeSeries?.cards, hasIconicNumbers, iconicMap]);
+
+  const hasActiveFilters =
+    searchQuery.trim().length > 0 ||
+    statusFilter !== 'all' ||
+    sortOrder !== 'id-asc' ||
+    quickFilter !== 'all';
+
+  const resetFilters = useCallback(() => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setSortOrder('id-asc');
+    setQuickFilter('all');
+    setPage(1);
+  }, []);
 
   const filteredAndSortedCards = useMemo(() => {
     if (!activeSeries) return [];
@@ -56,12 +99,14 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
     return [...activeSeries.cards]
       .filter((card) => {
         const paddedId = card.id.toString().padStart(padWidth, '0');
+        const iconicLabel = getIconicLabel(card.id, iconicMap)?.toLowerCase();
         const matchesSearch =
           !query ||
           paddedId.includes(query) ||
           card.id.toString().includes(query) ||
           (card.foundBy?.toLowerCase().includes(query) ?? false) ||
-          (card.region?.toLowerCase().includes(query) ?? false);
+          (card.region?.toLowerCase().includes(query) ?? false) ||
+          (iconicLabel?.includes(query) ?? false);
 
         const matchesStatus =
           statusFilter === 'all' ||
@@ -71,7 +116,11 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
         const matchesQuick =
           quickFilter === 'all' ||
           (quickFilter === 'graded' && Boolean(card.grading)) ||
-          (quickFilter === 'priced' && typeof card.price === 'number');
+          (quickFilter === 'priced' && typeof card.price === 'number') ||
+          (quickFilter === 'iconic' && isIconicNumber(card.id, iconicMap)) ||
+          (quickFilter === 'unpulled-iconic' &&
+            isIconicNumber(card.id, iconicMap) &&
+            !card.found);
 
         return matchesSearch && matchesStatus && matchesQuick;
       })
@@ -92,9 +141,9 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
             return a.id - b.id;
         }
       });
-  }, [activeSeries, padWidth, searchQuery, statusFilter, sortOrder, quickFilter]);
+  }, [activeSeries, iconicMap, padWidth, searchQuery, statusFilter, sortOrder, quickFilter]);
 
-  const usePagination = filteredAndSortedCards.length > 80;
+  const usePagination = effectiveViewMode === 'grid' && filteredAndSortedCards.length > 100;
   const totalPages = usePagination ? Math.ceil(filteredAndSortedCards.length / PAGE_SIZE) : 1;
   const safePage = Math.min(page, totalPages);
 
@@ -103,6 +152,23 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
     const start = (safePage - 1) * PAGE_SIZE;
     return filteredAndSortedCards.slice(start, start + PAGE_SIZE);
   }, [filteredAndSortedCards, safePage, usePagination]);
+
+  const selectedCardIndex = useMemo(() => {
+    if (!selectedCardForDetails) return -1;
+    return filteredAndSortedCards.findIndex((card) => card.id === selectedCardForDetails.id);
+  }, [filteredAndSortedCards, selectedCardForDetails]);
+
+  const handlePrevCard = useCallback(() => {
+    if (selectedCardIndex > 0) {
+      setSelectedCardForDetails(filteredAndSortedCards[selectedCardIndex - 1]);
+    }
+  }, [filteredAndSortedCards, selectedCardIndex]);
+
+  const handleNextCard = useCallback(() => {
+    if (selectedCardIndex >= 0 && selectedCardIndex < filteredAndSortedCards.length - 1) {
+      setSelectedCardForDetails(filteredAndSortedCards[selectedCardIndex + 1]);
+    }
+  }, [filteredAndSortedCards, selectedCardIndex]);
 
   const { lightboxSlides, cardIdToSlideIndex } = useMemo(() => {
     const slides: Array<{ src: string; alt: string }> = [];
@@ -135,6 +201,25 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
   if (!activeSeries) {
     return null;
   }
+
+  const quickFilterOptions: Array<[QuickFilter, string]> = hasIconicNumbers
+    ? [
+        ['all', 'All'],
+        ['graded', 'Graded'],
+        ['priced', 'Has Sale'],
+        ['iconic', '★ Grails'],
+        ['unpulled-iconic', '★ Unpulled Grails'],
+      ]
+    : [
+        ['all', 'All'],
+        ['graded', 'Graded'],
+        ['priced', 'Has Sale'],
+      ];
+
+  const cardHrefPrefix = `/t/${trackerSlug}/card`;
+  const submitHrefPrefix = hasMultipleSeries
+    ? `/t/${trackerSlug}/submit?series=${encodeURIComponent(activeSeries.slug)}&card=`
+    : `/t/${trackerSlug}/submit?card=`;
 
   return (
     <>
@@ -176,6 +261,8 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
       <div className="w-full bg-chocobo-surface border border-chocobo-gold/25 rounded-lg p-2.5 sm:p-3 space-y-2.5 sm:space-y-3">
         <FilterControls
           embedded
+          serialMin={activeSeries.serialMin}
+          serialMax={activeSeries.serialMax}
           searchQuery={searchQuery}
           setSearchQuery={(v) => {
             setSearchQuery(v);
@@ -193,47 +280,98 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
           }}
         />
 
-        <div className="pt-2 sm:pt-2.5 border-t border-chocobo-gold/15 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
+        <div className="pt-2 sm:pt-2.5 border-t border-chocobo-gold/15 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-2 sm:gap-2.5">
           <div
             className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"
             role="group"
             aria-label="Quick filters"
           >
-            {(
-              [
-                ['all', 'All'],
-                ['graded', 'Graded'],
-                ['priced', 'Has Sale'],
-              ] as Array<[QuickFilter, string]>
-            ).map(([key, label]) => (
+            {quickFilterOptions.map(([key, label]) => {
+              const isSelected = quickFilter === key;
+              const count = quickFilterCounts[key];
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setQuickFilter(key);
+                    setPage(1);
+                  }}
+                  aria-pressed={isSelected}
+                  className={`shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-colors ${
+                    isSelected
+                      ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold font-semibold'
+                      : 'bg-chocobo-recessed/70 text-chocobo-muted border-chocobo-gold/20 hover:border-chocobo-gold/50 hover:text-chocobo-light'
+                  }`}
+                >
+                  {label}{' '}
+                  <span
+                    className={`tabular-nums ml-0.5 ${
+                      isSelected ? 'text-chocobo-dark/80' : 'text-chocobo-muted/75'
+                    }`}
+                  >
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+
+            {hasActiveFilters && (
               <button
-                key={key}
                 type="button"
-                onClick={() => {
-                  setQuickFilter(key);
-                  setPage(1);
-                }}
-                className={`shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium border transition-colors ${
-                  quickFilter === key
-                    ? 'bg-chocobo-gold text-chocobo-dark border-chocobo-gold font-semibold'
-                    : 'bg-chocobo-recessed/70 text-chocobo-muted border-chocobo-gold/20 hover:border-chocobo-gold/50 hover:text-chocobo-light'
-                }`}
+                onClick={resetFilters}
+                className="shrink-0 whitespace-nowrap min-h-[34px] sm:min-h-0 px-2.5 py-1.5 sm:py-1 rounded-md text-xs font-medium text-chocobo-gold hover:text-chocobo-gold-bright underline underline-offset-2 transition-colors"
               >
-                {label}
+                Reset
               </button>
-            ))}
+            )}
           </div>
 
-          <span
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="text-xs text-chocobo-muted tabular-nums ml-auto"
-          >
-            {filteredAndSortedCards.length.toLocaleString()} of{' '}
-            {activeSeries.cards.length.toLocaleString()}
-            <span className="sr-only"> cards shown</span>
-          </span>
+          <div className="flex items-center justify-between sm:justify-end gap-3 sm:ml-auto">
+            <span
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className="text-xs text-chocobo-muted tabular-nums"
+            >
+              {filteredAndSortedCards.length.toLocaleString()} of{' '}
+              {activeSeries.cards.length.toLocaleString()}
+              <span className="sr-only"> cards shown</span>
+            </span>
+
+            {supportsWallView && (
+              <div
+                className="inline-flex rounded-md border border-chocobo-gold/30 overflow-hidden text-xs font-medium bg-chocobo-recessed"
+                role="group"
+                aria-label="View mode"
+              >
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  aria-pressed={effectiveViewMode === 'grid'}
+                  className={`min-h-[34px] sm:min-h-0 px-3 sm:px-2.5 py-1.5 sm:py-1 transition-colors ${
+                    effectiveViewMode === 'grid'
+                      ? 'bg-chocobo-gold text-chocobo-dark font-semibold'
+                      : 'text-chocobo-muted hover:text-chocobo-light'
+                  }`}
+                >
+                  Grid
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('matrix')}
+                  aria-pressed={effectiveViewMode === 'matrix'}
+                  className={`min-h-[34px] sm:min-h-0 px-3 sm:px-2.5 py-1.5 sm:py-1 transition-colors ${
+                    effectiveViewMode === 'matrix'
+                      ? 'bg-chocobo-gold text-chocobo-dark font-semibold'
+                      : 'text-chocobo-muted hover:text-chocobo-light'
+                  }`}
+                >
+                  {activeSeries.serialMin}&ndash;{activeSeries.serialMax} Wall
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -271,13 +409,30 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
       <section className="w-full" aria-label={`${activeSeries.name} Serialized Cards`}>
         <h2 className="sr-only">{activeSeries.name} Serialized Cards</h2>
         {visibleCards.length === 0 ? (
-          <div className="text-center py-12 bg-chocobo-surface border border-chocobo-gold/20 rounded-lg text-chocobo-muted text-sm">
-            No cards match your current filters.
+          <div className="text-center py-12 bg-chocobo-surface border border-chocobo-gold/20 rounded-lg space-y-3">
+            <p className="text-chocobo-muted text-sm">No cards match your current filters.</p>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex items-center px-3.5 py-1.5 rounded-md border border-chocobo-gold/60 text-xs font-semibold text-chocobo-gold hover:bg-chocobo-gold hover:text-chocobo-dark transition-colors"
+              >
+                Reset all filters
+              </button>
+            )}
           </div>
+        ) : effectiveViewMode === 'matrix' ? (
+          <CompactMatrixView
+            cards={filteredAndSortedCards}
+            iconicMap={iconicMap}
+            padWidth={padWidth}
+            onSelectCard={(card) => setSelectedCardForDetails(card)}
+          />
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
             {visibleCards.map((card) => {
               const paddedId = card.id.toString().padStart(padWidth, '0');
+              const iconicLabel = getIconicLabel(card.id, iconicMap);
               const cardPageHref = hasMultipleSeries
                 ? `/t/${trackerSlug}/card/${paddedId}?series=${encodeURIComponent(activeSeries.slug)}`
                 : `/t/${trackerSlug}/card/${paddedId}`;
@@ -361,6 +516,14 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
                     </span>
                   </div>
 
+                  {iconicLabel && (
+                    <div className="mt-1">
+                      <span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium bg-amber-950/75 border border-chocobo-gold/40 text-amber-200 max-w-full truncate">
+                        ★ {iconicLabel}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Card Metadata */}
                   <div className="flex-1 flex flex-col mt-2 sm:mt-2.5 text-[11px] sm:text-xs">
                     <div className="space-y-1 sm:space-y-1.5 pb-2.5 sm:pb-3">
@@ -377,7 +540,7 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
 
                       {card.grading && (
                         <p className="text-sky-300 font-medium leading-snug">
-                          {formatCardGrading(card.grading as GradingWithOptionalLabel)}
+                          {formatGradingDisplay(card.grading)}
                           {card.grading.dateGraded && (
                             <span className="hidden sm:inline text-chocobo-muted font-normal ml-1.5 tabular-nums">
                               &middot; {card.grading.dateGraded}
@@ -501,6 +664,22 @@ export default function MultiTrackerGrid({ trackerSlug, seriesList }: MultiTrack
           card={selectedCardForDetails}
           isOpen={Boolean(selectedCardForDetails)}
           onClose={() => setSelectedCardForDetails(null)}
+          onPrev={selectedCardIndex > 0 ? handlePrevCard : undefined}
+          onNext={
+            selectedCardIndex >= 0 && selectedCardIndex < filteredAndSortedCards.length - 1
+              ? handleNextCard
+              : undefined
+          }
+          positionLabel={
+            selectedCardIndex >= 0
+              ? `${selectedCardIndex + 1} / ${filteredAndSortedCards.length}`
+              : undefined
+          }
+          seriesName={activeSeries.name}
+          padWidth={padWidth}
+          cardHrefPrefix={cardHrefPrefix}
+          submitHrefPrefix={submitHrefPrefix}
+          iconicMap={iconicMap}
         />
       )}
     </>

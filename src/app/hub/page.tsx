@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import ProgressBar from '@/components/ProgressBar';
 import { listPublishedTrackers } from '@/lib/multi-tracker';
 import { DEFAULT_TRACKER_SLUG } from '@/lib/tracker-store';
 
@@ -26,7 +26,8 @@ export default async function HubPage() {
             Serialized Card Trackers
           </h1>
           <p className="text-xs sm:text-sm text-chocobo-muted mt-1">
-            Community-verified pull tracking, grading logs, and reported sale histories.
+            Community-verified pull tracking, grading logs, and reported sale histories across
+            flagship serialized runs.
           </p>
         </div>
         <Link
@@ -42,46 +43,107 @@ export default async function HubPage() {
           const href = tracker.slug === DEFAULT_TRACKER_SLUG ? '/' : `/t/${tracker.slug}`;
           const statsHref =
             tracker.slug === DEFAULT_TRACKER_SLUG ? '/stats' : `/t/${tracker.slug}/stats`;
+          const pct =
+            tracker.totalSerials > 0 ? (tracker.foundCount / tracker.totalSerials) * 100 : 0;
 
           return (
             <article
               key={tracker.id}
-              className="bg-chocobo-surface border rounded-lg p-4 sm:p-6 flex flex-col justify-between gap-4 transition-all hover:border-chocobo-gold hover:-translate-y-0.5"
-              style={{ borderColor: `${tracker.accentHex}4D` }}
+              className="rounded-lg p-4 sm:p-6 flex flex-col justify-between gap-4 border transition-all hover:-translate-y-0.5"
+              style={{
+                backgroundColor: tracker.bgHex,
+                borderColor: `${tracker.accentHex}55`,
+              }}
             >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-chocobo-recessed border border-chocobo-gold/25 text-chocobo-gold">
-                    {tracker.game}
-                  </span>
-                  <span className="text-xs text-chocobo-muted tabular-nums">
-                    {tracker.seriesCount} series &middot; {tracker.totalSerials.toLocaleString()}{' '}
-                    serials
-                  </span>
-                </div>
-                <h2 className="font-display text-xl font-bold" style={{ color: tracker.accentHex }}>
-                  <Link href={href} className="hover:underline">
-                    {tracker.name}
-                  </Link>
-                </h2>
-                <p className="text-xs text-chocobo-muted">{tracker.setName}</p>
-                <p className="text-sm text-chocobo-light/85 leading-relaxed">
-                  {tracker.description}
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <ProgressBar current={tracker.foundCount} total={tracker.totalSerials} />
-                <div className="flex flex-wrap gap-3">
+              <div className="flex items-start gap-3.5">
+                {tracker.referenceImageUrl && (
                   <Link
                     href={href}
-                    className="flex-1 text-center bg-chocobo-gold hover:bg-chocobo-gold-bright text-chocobo-dark font-semibold py-2 px-4 rounded-md text-sm transition-colors"
+                    className="relative w-16 sm:w-20 aspect-[3/4] shrink-0 rounded overflow-hidden border bg-black/40"
+                    style={{ borderColor: `${tracker.accentHex}66` }}
+                    aria-label={`Open ${tracker.name}`}
+                  >
+                    <Image
+                      src={tracker.referenceImageUrl}
+                      alt={`${tracker.name} reference card`}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                  </Link>
+                )}
+
+                <div className="space-y-1.5 min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span
+                      className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-black/35 border"
+                      style={{
+                        borderColor: `${tracker.accentHex}50`,
+                        color: tracker.accentHex,
+                      }}
+                    >
+                      {tracker.motifLabel || tracker.game}
+                    </span>
+                    <span className="text-xs text-chocobo-muted tabular-nums">
+                      {tracker.seriesCount} series &middot; {tracker.totalSerials.toLocaleString()}{' '}
+                      serials
+                    </span>
+                  </div>
+                  <h2 className="font-display text-lg sm:text-xl font-bold" style={{ color: tracker.accentHex }}>
+                    <Link href={href} className="hover:underline">
+                      {tracker.name}
+                    </Link>
+                  </h2>
+                  <p className="text-xs text-chocobo-muted">{tracker.setName}</p>
+                  <p className="text-xs sm:text-sm text-chocobo-light/85 leading-relaxed">
+                    {tracker.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3.5">
+                <div>
+                  <div className="flex items-baseline justify-between mb-1.5 gap-2">
+                    <span
+                      className="font-display text-sm font-bold tabular-nums"
+                      style={{ color: tracker.accentHex }}
+                    >
+                      {tracker.foundCount} / {tracker.totalSerials} Found
+                    </span>
+                    <span className="text-xs font-semibold text-chocobo-muted tabular-nums">
+                      {pct.toFixed(1)}% &middot;{' '}
+                      {Math.max(0, tracker.totalSerials - tracker.foundCount)} unpulled
+                    </span>
+                  </div>
+                  <div
+                    className="w-full rounded-full h-2.5 bg-black/45 border overflow-hidden"
+                    style={{ borderColor: `${tracker.accentHex}40` }}
+                  >
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.max(pct, tracker.foundCount > 0 ? 2 : 0)}%`,
+                        backgroundColor: tracker.accentHex,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2.5">
+                  <Link
+                    href={href}
+                    className="flex-1 inline-flex items-center justify-center min-h-[40px] text-center text-[#111014] font-semibold py-2 px-4 rounded-md text-sm transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: tracker.accentHex }}
                   >
                     Open Tracker &rarr;
                   </Link>
                   <Link
                     href={statsHref}
-                    className="border border-chocobo-gold/55 hover:border-chocobo-gold hover:bg-chocobo-gold/10 text-chocobo-gold font-semibold py-2 px-4 rounded-md text-sm transition-colors"
+                    className="inline-flex items-center justify-center min-h-[40px] border hover:bg-white/5 font-semibold py-2 px-4 rounded-md text-sm transition-colors"
+                    style={{
+                      borderColor: `${tracker.accentHex}88`,
+                      color: tracker.accentHex,
+                    }}
                   >
                     Stats
                   </Link>
